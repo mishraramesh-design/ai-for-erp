@@ -243,6 +243,8 @@ def tester(reqs: list, cs, snap, llm) -> list:
     system = ("You write behavioural tests for ERPNext changes. Each test saves ONE throwaway document through the API and states what must happen. "
               "Only write tests for validations/mandatory rules/new DocTypes that a save can exercise. Use real field names from the context. "
               "Prefer custom DocTypes created in the change set (you know every field). Provide ALL mandatory values.\n"
+              "ERPNext facts: a mandatory Select field is auto-filled with its first option, so NEVER write a test that expects an error for leaving a Select empty; "
+              "mandatory_depends_on (conditional mandatory) is NOT enforced when saving through the API unless a server script enforces it, so test it only if the change set has a server script for it.\n"
               'Return JSON: {"tests":[{"id":str,"requirement_id":int,"doctype":str,"kind":"insert_expect_error|insert_expect_ok",'
               '"values":{fieldname:value},"error_contains":str (for expect_error: a distinctive phrase of the expected message),"description":str}]}. '
               "At most 6 tests. JSON only.")
