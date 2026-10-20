@@ -11,13 +11,20 @@ from fastapi import Depends, FastAPI, HTTPException, Request, Response
 from fastapi.responses import HTMLResponse, RedirectResponse
 from pydantic import BaseModel
 
+from fastapi import File, Form, UploadFile
+
+from .applier import Applier
 from .erp import HttpErp
+from .kernel import Deps, Kernel, RunStore
+from .ledger import Ledger
+from .models import ConfigStore, Router, UsageLog, apply_profile
 from .prepare import STEPS, prepare
+from .requirements import RequirementStore
+from .snapshot import Snapshot
 from .vault import Vault
 
 VERSION = "0.2.0"
 UI_DIR = Path(__file__).resolve().parent.parent / "ui"
-ROLES = ["architect", "builder", "customize", "uiux", "reviewer", "tester", "docs"]
 
 
 def create_app(data_dir: str | None = None) -> FastAPI:
@@ -26,6 +33,12 @@ def create_app(data_dir: str | None = None) -> FastAPI:
     admin_pw = os.environ.get("STUDIO_ADMIN_PASSWORD", "")
     app = FastAPI(title="ERPNext Studio", version=VERSION)
     app.state.vault = vault
+    cfg_store = ConfigStore(Path(data) / "models.json", dict(os.environ), codec=(vault.enc, vault.dec))
+    usage = UsageLog(Path(data) / "usage.jsonl")
+    router = Router(cfg_store, usage)
+    reqs = RequirementStore(Path(data) / "requirements.json")
+    ledger = Ledger(Path(data) / "ledger")
+    app.state.router, app.state.reqs, app.state.ledger = router, reqs, ledger
     # First start: take the ERPNext address and password from the compose file so the user does not retype them.
     if os.environ.get("ERP_ADMIN_PASSWORD") and not vault.load().get("erp", {}).get("admin_password"):
         d = vault.load()
@@ -69,51 +82,65 @@ def create_app(data_dir: str | None = None) -> FastAPI:
         response.delete_cookie("studio_session")
         return {"ok": True}
 
-    # ---- settings: model access
-    class LlmIn(BaseModel):
+    # ---- models: one provider, a cheap and a strong model, a preset that maps them onto the agent roles
+    class ModelsIn(BaseModel):
         base_url: str = "https://api.openai.com/v1"
         api_key: str = ""  # blank = keep the stored key
-        models: dict[str, str] = {}
-        monthly_budget_usd: float = 0
+        cheap: str = ""
+        strong: str = ""
+        profile: str = "balanced"
+        budget_usd: float = 0
+        budget_calls: int = 5000
 
-    def llm_public(doc: dict) -> dict:
-        l = doc.get("llm", {})
-        return {"base_url": l.get("base_url", "https://api.openai.com/v1"), "models": l.get("models", {}),
-                "monthly_budget_usd": l.get("monthly_budget_usd", 0), "key_set": bool(l.get("llm_api_key")),
-                "roles": ROLES}
+    def models_public() -> dict:
+        c = cfg_store.get()
+        prov = c.provider("main")
+        dev = c.roles.get("developer")
+        return {"base_url": prov.base_url if prov else "https://api.openai.com/v1", "key_set": bool(prov and prov.api_key),
+                "cheap": (dev.primary.model if dev and dev.primary else ""),
+                "strong": (dev.fallbacks[0].model if dev and dev.fallbacks else ""),
+                "profile": app.state.profile if hasattr(app.state, "profile") else "balanced",
+                "budget_usd": c.budget_usd or 0, "budget_calls": c.budget_calls,
+                "roles": {r: {"enabled": rc.enabled, "primary": rc.primary.model if rc.primary else "",
+                              "fallback": rc.fallbacks[0].model if rc.fallbacks else ""} for r, rc in c.roles.items()},
+                "usage": usage.summary()["total"]}
 
-    @app.get("/api/settings/llm")
-    def get_llm(_: str = Depends(authed)) -> dict:
-        return llm_public(vault.load())
+    @app.get("/api/models")
+    def get_models(_: str = Depends(authed)) -> dict:
+        return models_public()
 
-    @app.put("/api/settings/llm")
-    def put_llm(body: LlmIn, _: str = Depends(authed)) -> dict:
-        doc = vault.load()
-        l = doc.setdefault("llm", {})
-        l.update(base_url=body.base_url.rstrip("/"), models={k: v for k, v in body.models.items() if v},
-                 monthly_budget_usd=body.monthly_budget_usd)
+    @app.put("/api/models")
+    def put_models(body: ModelsIn, _: str = Depends(authed)) -> dict:
+        from .models import ModelConfig, Provider
+        c = cfg_store.get().model_copy(deep=True)
+        prov = c.provider("main")
+        if not prov:
+            prov = Provider(id="main", name="Model provider", kind="anthropic" if "anthropic" in body.base_url else "openai")
+            c.providers = [prov]
+        prov.base_url = body.base_url.rstrip("/")
+        prov.kind = "anthropic" if "anthropic.com" in prov.base_url else "openai"
         if body.api_key:
-            l["llm_api_key"] = vault.enc(body.api_key)
-        vault.save(doc)
-        return llm_public(doc)
+            prov.api_key = body.api_key
+        if body.cheap:
+            apply_profile(c, body.profile if body.profile in ("economy", "balanced", "quality") else "balanced",
+                          "main", body.cheap, body.strong or body.cheap)
+        c.budget_usd = body.budget_usd or None
+        c.budget_calls = body.budget_calls
+        app.state.profile = body.profile
+        cfg_store.update(c.model_dump(mode="json"))
+        return models_public()
 
-    @app.post("/api/settings/llm/test")
-    def test_llm(_: str = Depends(authed)) -> dict:
-        l = vault.load().get("llm", {})
-        key = vault.dec(l.get("llm_api_key", ""))
-        model = (l.get("models") or {}).get("architect") or next(iter((l.get("models") or {}).values()), "")
-        if not key or not model:
-            return {"ok": False, "error": "Save an API key and at least one model first."}
-        try:
-            r = httpx.post(l.get("base_url", "") + "/chat/completions", timeout=30,
-                           headers={"Authorization": f"Bearer {key}"},
-                           json={"model": model, "messages": [{"role": "user", "content": "Reply with: ok"}],
-                                 "max_tokens": 5})
-            if r.status_code != 200:
-                return {"ok": False, "error": f"HTTP {r.status_code}: {r.text[:200]}"}
-            return {"ok": True, "model": model, "reply": r.json()["choices"][0]["message"]["content"]}
-        except Exception as e:  # network or parse errors are reported, never raised
-            return {"ok": False, "error": str(e)[:200]}
+    @app.post("/api/models/test")
+    def test_models(_: str = Depends(authed)) -> dict:
+        m = models_public()
+        if not m["key_set"] or not m["cheap"]:
+            return {"ok": False, "error": "Save an API key and a model name first."}
+        r = router.test("main", m["cheap"])
+        if r["ok"] and m["strong"] and m["strong"] != m["cheap"]:
+            r2 = router.test("main", m["strong"])
+            if not r2["ok"]:
+                return {"ok": False, "error": f"The stronger model failed: {r2['error']}"}
+        return r
 
     # ---- the ERPNext development site
     class ErpIn(BaseModel):
@@ -197,8 +224,156 @@ def create_app(data_dir: str | None = None) -> FastAPI:
     @app.get("/api/status")
     def status(_: str = Depends(authed)) -> dict:
         doc = vault.load()
-        return {"version": VERSION, "llm": llm_public(doc)["key_set"] and bool(doc["llm"].get("models")),
+        return {"version": VERSION, "llm": router.enabled("developer"), "requirements": len(reqs.all()),
                 "erp": bool(doc.get("erp", {}).get("api_key"))}
+
+    # ---- requirements
+    @app.get("/api/requirements/stats")
+    def req_stats(_: str = Depends(authed)) -> dict:
+        return reqs.stats()
+
+    @app.get("/api/requirements")
+    def req_list(module: str = "", status: str = "", q: str = "", gap: bool = True, limit: int = 40, offset: int = 0,
+                 ids: str = "", _: str = Depends(authed)) -> dict:
+        if ids:
+            want = [int(x) for x in ids.split(",") if x.strip().isdigit()][:200]
+            items = [reqs.get(i) for i in want]
+            return {"total": len(items), "items": [r.model_dump(mode="json") for r in items if r]}
+        return reqs.query(module=module, gap_only=gap, status=status, q=q, limit=min(limit, 200), offset=offset)
+
+    @app.post("/api/requirements/import")
+    async def req_import(file: UploadFile = File(...), module: str = Form(""), _: str = Depends(authed)) -> dict:
+        data = await file.read()
+        name = (file.filename or "").lower()
+        if len(data) > 25_000_000:
+            raise HTTPException(413, "file too large")
+        try:
+            if name.endswith((".xlsx", ".xlsm")):
+                return reqs.import_matrix(data)
+            if not module.strip():
+                raise HTTPException(400, "Give the module name these requirements belong to (for example: SRM).")
+            if name.endswith(".docx"):
+                import io
+                import docx
+                text = "\n".join(p.text for p in docx.Document(io.BytesIO(data)).paragraphs)
+            else:
+                text = data.decode("utf-8", "ignore")
+            return reqs.import_text(text, module.strip(), source=file.filename or "upload")
+        except HTTPException:
+            raise
+        except Exception as e:  # unreadable file: say so in words
+            raise HTTPException(400, f"Could not read that file: {str(e)[:150]}")
+
+    class TextIn(BaseModel):
+        text: str
+        module: str
+
+    @app.post("/api/requirements/text")
+    def req_text(body: TextIn, _: str = Depends(authed)) -> dict:
+        if not body.module.strip() or not body.text.strip():
+            raise HTTPException(400, "Module and text are required.")
+        return reqs.import_text(body.text, body.module.strip(), source="pasted")
+
+    # ---- runs (the kernel)
+    erp_cache: dict = {}
+
+    def build_deps() -> Deps:
+        e = vault.load().get("erp", {})
+        if not e.get("api_key"):
+            raise ValueError("Prepare the ERPNext site first (ERPNext screen).")
+        key = (e["url"], e["site"], e["api_key"])
+        if erp_cache.get("key") != key:
+            erp = HttpErp(e["url"], e["api_key"], vault.dec(e["api_secret"]), host_header=e["site"])
+            snap = Snapshot(erp)
+            erp_cache.update(key=key, erp=erp, snap=snap, applier=Applier(erp, snap))
+        return Deps(reqs=reqs, ledger=ledger, erp=erp_cache["erp"], snap=erp_cache["snap"], applier=erp_cache["applier"],
+                    llm_for=lambda role, run_id: router.for_role(role, project="default", run_id=run_id),
+                    llm_calls=lambda rid: usage.summary(run_id=rid)["total"]["calls"],
+                    roles_enabled=router.enabled)
+
+    kernel = Kernel(RunStore(Path(data) / "runs"), build_deps)
+    app.state.kernel = kernel
+
+    class RunIn(BaseModel):
+        ids: list[int] = []
+        module: str = ""
+        branch: str = ""
+        process: str = ""
+        limit: int = 12
+        policy: dict = {}
+        guidance: str = ""
+
+    @app.post("/api/runs")
+    def start_run(body: RunIn, _: str = Depends(authed)) -> dict:
+        if not router.enabled("developer"):
+            raise HTTPException(409, "Connect a model first (Models screen).")
+        ids = body.ids or [r.id for r in reqs.batch(module=body.module, branch=body.branch, process=body.process,
+                                                    limit=min(body.limit, 60))]
+        try:
+            run = kernel.start("default", ids, body.policy, body.guidance)
+        except ValueError as e:
+            raise HTTPException(409, str(e))
+        return kernel.public(run)
+
+    @app.get("/api/runs")
+    def list_runs(_: str = Depends(authed)) -> list:
+        out = []
+        for rid in kernel.store.list_ids()[:30]:
+            r = kernel.get(rid)
+            if r:
+                out.append({"id": r.id, "title": r.title, "status": r.status, "created": r.created,
+                            "groups": len(r.groups), "events": len(r.events)})
+        return out
+
+    @app.get("/api/runs/{rid}")
+    def get_run(rid: str, since: int = 0, _: str = Depends(authed)) -> dict:
+        r = kernel.get(rid)
+        if not r:
+            raise HTTPException(404, "unknown run")
+        d = kernel.public(r, since)
+        d["usage"] = usage.summary(run_id=rid)["total"]
+        d["changesets"] = {gid: _cs_view(g["cs_id"]) for gid, g in r.groups.items() if g.get("cs_id")}
+        return d
+
+    def _cs_view(cs_id: str) -> dict:
+        cs = ledger.get(cs_id)
+        if not cs:
+            return {}
+        pub = cs.to_public()
+        return {"id": cs.id, "title": cs.title, "status": cs.status, "risk": pub["risk"], "lines": pub["lines"],
+                "assumptions": cs.assumptions, "not_covered": cs.not_covered, "warnings": cs.warnings, "error": cs.error}
+
+    class DecisionIn(BaseModel):
+        task: str
+        reason: str = ""
+
+    @app.post("/api/runs/{rid}/approve")
+    def approve(rid: str, body: DecisionIn, user: str = Depends(authed)) -> dict:
+        try:
+            return kernel.public(kernel.approve(rid, body.task, user))
+        except (KeyError, ValueError) as e:
+            raise HTTPException(409, str(e))
+
+    @app.post("/api/runs/{rid}/reject")
+    def reject(rid: str, body: DecisionIn, user: str = Depends(authed)) -> dict:
+        try:
+            return kernel.public(kernel.reject(rid, body.task, user, body.reason))
+        except (KeyError, ValueError) as e:
+            raise HTTPException(409, str(e))
+
+    @app.post("/api/runs/{rid}/cancel")
+    def cancel(rid: str, _: str = Depends(authed)) -> dict:
+        try:
+            return kernel.public(kernel.cancel(rid))
+        except KeyError:
+            raise HTTPException(404, "unknown run")
+
+    @app.post("/api/changesets/{cid}/undo")
+    def undo(cid: str, user: str = Depends(authed)) -> dict:
+        try:
+            return kernel.undo(cid, user)
+        except ValueError as e:
+            raise HTTPException(409, str(e))
 
     # ---- pages
     def gated(name: str):

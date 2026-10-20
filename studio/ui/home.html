@@ -1,8 +1,9 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>ERPNext Studio</title>
 <style>
-:root{--bg:#F2F4F7;--surface:#fff;--surface2:#F7F8FA;--line:#DDE1E8;--fg:#171B24;--muted:#586174;--accent:#2B50D1;--accent-soft:#E6ECFD;--ok:#1D6B45;--ok-bg:#E2F3E9;--hold:#9A4A00;--hold-bg:#FFE7CC;--bad:#9B1C1C}
-@media (prefers-color-scheme:dark){:root{--bg:#12151C;--surface:#1B2029;--surface2:#222834;--line:#2C3340;--fg:#E8ECF3;--muted:#98A2B5;--accent:#7C9BFF;--accent-soft:#242E4D;--ok:#6FD3A0;--ok-bg:#173326;--hold:#FFB46B;--hold-bg:#3A2A14;--bad:#FF8A8A}}
+:root{--bg:#F2F4F7;--surface:#fff;--surface2:#F7F8FA;--line:#DDE1E8;--fg:#171B24;--muted:#586174;--accent:#2B50D1;--accent-soft:#E6ECFD;
+--ok:#1D6B45;--ok-bg:#E2F3E9;--hold:#9A4A00;--hold-bg:#FFE7CC;--bad:#9B1C1C;--bad-bg:#FBE1E1;--rule:#1D6B45;--engine:#0B6B72;--model:#7A4B00;--human:#5B3FA8;--run-bg:#DDE8FD}
+@media (prefers-color-scheme:dark){:root{--bg:#12151C;--surface:#1B2029;--surface2:#222834;--line:#2C3340;--fg:#E8ECF3;--muted:#98A2B5;--accent:#7C9BFF;--accent-soft:#242E4D;--ok:#6FD3A0;--ok-bg:#173326;--hold:#FFB46B;--hold-bg:#3A2A14;--bad:#FF8A8A;--bad-bg:#3A1C1C;--rule:#6FD3A0;--engine:#6FD0D8;--model:#FFC46B;--human:#B79CFF;--run-bg:#1E2A4A}}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.5 "IBM Plex Sans",system-ui,sans-serif}
 header{display:flex;gap:12px;align-items:center;padding:10px max(16px,env(safe-area-inset-left));background:var(--surface);border-bottom:1px solid var(--line)}
 .brand{font-weight:600}.sp{flex:1}.chip{font-size:12px;padding:3px 10px;border-radius:99px;background:var(--surface2);border:1px solid var(--line);color:var(--muted)}
@@ -10,49 +11,83 @@ header{display:flex;gap:12px;align-items:center;padding:10px max(16px,env(safe-a
 nav{padding:14px 10px;border-right:1px solid var(--line);background:var(--surface);display:flex;flex-direction:column;gap:2px}
 nav a{padding:8px 12px;border-radius:8px;color:var(--fg);text-decoration:none;cursor:pointer}nav a.on{background:var(--accent-soft);color:var(--accent);font-weight:600}
 nav small{margin:12px 12px 4px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-size:11px}
-main{padding:24px max(16px,env(safe-area-inset-right));max-width:900px}
-h2{margin:0 0 4px;font-size:20px}.sub{color:var(--muted);margin:0 0 20px}
+main{padding:24px max(16px,env(safe-area-inset-right));max-width:1000px;min-width:0}
+h2{margin:0 0 4px;font-size:20px}h3{margin:0 0 8px;font-size:15px}.sub{color:var(--muted);margin:0 0 20px}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:14px}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
 label{display:block;font-size:12px;color:var(--muted);margin:10px 0 3px}
 input,select,textarea{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg);font:inherit}
+input[type=checkbox]{width:auto}
 button{padding:8px 14px;border:1px solid var(--line);border-radius:8px;background:var(--surface2);color:var(--fg);font:inherit;cursor:pointer}
-button.p{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600}
+button.p{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600}button.bad{color:var(--bad)}button:disabled{opacity:.5;cursor:default}
 .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;align-items:center}
 .ok{color:var(--ok)}.bad{color:var(--bad)}.muted{color:var(--muted)}
-.tag{display:inline-block;font-size:12px;padding:2px 8px;border-radius:99px}.tag.ok{background:var(--ok-bg)}.tag.hold{background:var(--hold-bg);color:var(--hold)}
-table{width:100%;border-collapse:collapse}td,th{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line)}
+.tag{display:inline-block;font-size:12px;padding:2px 8px;border-radius:99px;background:var(--surface2);border:1px solid var(--line)}
+.tag.ok{background:var(--ok-bg);color:var(--ok);border-color:transparent}.tag.hold{background:var(--hold-bg);color:var(--hold);border-color:transparent}
+.tag.bad{background:var(--bad-bg);color:var(--bad);border-color:transparent}.tag.run{background:var(--run-bg);color:var(--accent);border-color:transparent}
+.tablew{overflow-x:auto}table{width:100%;border-collapse:collapse}td,th{text-align:left;padding:7px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+.stats{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}.stat{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px 14px;min-width:92px}
+.stat b{display:block;font-size:20px}.stat span{color:var(--muted);font-size:12px}
+.pipe{display:flex;gap:4px;flex-wrap:wrap;align-items:center;margin:6px 0}
+.node{border:1px solid var(--line);border-radius:8px;padding:4px 8px;font-size:12px;background:var(--surface2)}
+.node.done{background:var(--ok-bg);border-color:transparent}.node.running{background:var(--run-bg);border-color:var(--accent)}.node.failed{background:var(--bad-bg);border-color:transparent}
+.node.held{background:var(--hold-bg);border-color:var(--hold)}.node.skipped{opacity:.45}
+.node i{font-style:normal;font-size:10px;text-transform:uppercase;letter-spacing:.05em;margin-left:5px}
+.t-rule i{color:var(--rule)}.t-engine i{color:var(--engine)}.t-model i{color:var(--model)}.t-human i{color:var(--human)}
+.log{font:12px/1.55 "IBM Plex Mono",ui-monospace,monospace;max-height:320px;overflow:auto}.log div{padding:1px 0}
+.log .err{color:var(--bad)}.log .warn{color:var(--hold)}.log .ok{color:var(--ok)}
+ul.lines{margin:6px 0 0;padding-left:18px}
 @media (max-width:760px){.app{grid-template-columns:minmax(0,1fr)}nav{flex-direction:row;overflow-x:auto;border-right:0;border-bottom:1px solid var(--line)}nav small{display:none}}
 </style></head><body>
 <header><div class="brand">◆ ERPNext Studio</div><span class="chip" id="ver"></span><div class="sp"></div><button id="out">Sign out</button></header>
 <div class="app"><nav>
-<a data-t="overview">Overview</a><a href="/workbench">Workbench <span class="chip">preview</span></a>
+<a data-t="overview">Overview</a><a data-t="reqs">Requirements</a><a data-t="runs">Runs</a><a href="/workbench">Workbench <span class="chip">preview</span></a>
 <small>Setup</small><a data-t="models">Models</a><a data-t="erp">ERPNext</a></nav>
 <main id="m"></main></div>
 <script>
-const $=s=>document.querySelector(s),api=async(p,o)=>{const r=await fetch(p,o&&{method:o.method,headers:{'Content-Type':'application/json'},body:JSON.stringify(o.body)});if(r.status===401)location.href='/login';return r.json()};
-const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const V={};
+const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const api=async(p,o)=>{const r=await fetch(p,o&&{method:o.method,headers:{'Content-Type':'application/json'},body:JSON.stringify(o.body)});
+ if(r.status===401){location.href='/login';return {}}let j={};try{j=await r.json()}catch(e){}if(!r.ok&&!j.detail)j.detail='HTTP '+r.status;j._status=r.status;return j};
+const V={};let NAV=0;let timer=null;const stop=()=>{clearTimeout(timer);timer=null};
+const STAT={backlog:'',planned:'run',built:'ok',verified:'ok',blocked:'bad',needs_input:'hold',standard:'ok',fit:''};
+const tag=(s,c)=>`<span class="tag ${c??STAT[s]??''}">${esc(String(s).replace('_',' '))}</span>`;
+
+/* ---------------------------------------------------------------- overview */
 V.overview=async()=>{const s=await api('/api/status');$('#ver').textContent='v'+s.version;
  const step=(ok,t,d,go)=>`<div class="card"><span class="tag ${ok?'ok':'hold'}">${ok?'done':'to do'}</span> <b>${t}</b><div class="muted">${d}</div>${ok?'':`<div class="row"><button class="p" onclick="go('${go}')">Set up</button></div>`}</div>`;
- return `<h2>Welcome</h2><p class="sub">Three steps take you from this screen to a working ERPNext development site.</p>
- ${step(s.llm,'1 · Connect a model','Add your API key and choose a model for each agent role.','models')}
- ${step(s.erp,'2 · Connect ERPNext','The Studio prepares the development site next to it with one click.','erp')}
- <div class="card"><span class="tag hold">coming next</span> <b>3 · Build from requirements</b><div class="muted">Requirements, plans and approvals. The <a href="/workbench">Workbench preview</a> shows how this will look, using scripted data.</div></div>`};
-V.models=async()=>{const l=await api('/api/settings/llm');
- const roles=l.roles.map(r=>`<div><label>${r}</label><input data-r="${r}" value="${esc(l.models[r]||'')}" placeholder="model name"></div>`).join('');
- return `<h2>Models</h2><p class="sub">Use a strong model for planning and a cheaper one for routine steps. Leave a role blank to skip it.</p>
- <div class="card"><label>API base URL</label><input id="bu" value="${esc(l.base_url)}">
- <label>API key ${l.key_set?'<span class="ok">· saved (leave blank to keep)</span>':''}</label><input id="ak" type="password" autocomplete="off" placeholder="${l.key_set?'••••••••':'paste key'}">
- <label>Monthly budget, USD (0 = no limit)</label><input id="bd" type="number" min="0" value="${l.monthly_budget_usd}"></div>
- <div class="card"><b>Model per role</b><div class="grid">${roles}</div></div>
+ return `<h2>Welcome</h2><p class="sub">From requirements to a verified change on your development ERPNext, with approvals where it matters.</p>
+ ${step(s.llm,'1 · Connect a model','Add your API key, a cheap model and a stronger one.','models')}
+ ${step(s.erp,'2 · Prepare ERPNext','One click: company setup check, the Studio Agent user, a connection test.','erp')}
+ ${step(s.requirements>0,'3 · Add requirements','Upload your fit-gap Excel, or a Word or text file, or paste them.','reqs')}
+ <div class="card"><span class="tag ${s.llm&&s.erp&&s.requirements?'ok':'hold'}">${s.llm&&s.erp&&s.requirements?'ready':'waiting'}</span> <b>4 · Build</b>
+ <div class="muted">Select requirements and press Build. You watch each step; high-risk changes wait for your approval.</div>${s.llm&&s.erp&&s.requirements?'<div class="row"><button class="p" onclick="go(\'reqs\')">Go to requirements</button></div>':''}</div>`};
+
+/* ---------------------------------------------------------------- models */
+V.models=async()=>{const m=await api('/api/models');
+ const roleRows=Object.entries(m.roles).map(([r,v])=>`<tr><td>${r}</td><td>${v.enabled?esc(v.primary)||'<span class=muted>—</span>':'<span class=muted>off</span>'}</td><td>${esc(v.fallback)||'<span class=muted>—</span>'}</td></tr>`).join('');
+ return `<h2>Models</h2><p class="sub">One provider, two models. The preset decides which agents use the cheap one and which the strong one.</p>
+ <div class="card"><label>API base URL (any OpenAI-compatible endpoint, or Anthropic)</label><input id="bu" value="${esc(m.base_url)}">
+ <label>API key ${m.key_set?'<span class="ok">· saved (leave blank to keep)</span>':''}</label><input id="ak" type="password" autocomplete="off" placeholder="${m.key_set?'••••••••':'paste key'}">
+ <div class="grid"><div><label>Everyday model (cheap, fast)</label><input id="mc" value="${esc(m.cheap)}" placeholder="e.g. gpt-5-mini"></div>
+ <div><label>Strong model (hard steps, last retry)</label><input id="ms" value="${esc(m.strong)}" placeholder="e.g. gpt-5"></div>
+ <div><label>Preset</label><select id="pf">${['economy','balanced','quality'].map(x=>`<option ${x===m.profile?'selected':''}>${x}</option>`).join('')}</select></div></div>
+ <div class="muted" style="margin-top:8px">economy: cheap model everywhere, no reviewer or tester · balanced: cheap writes, strong takes over on retry, reviewer on · quality: strong model plans and reviews</div>
+ <div class="grid"><div><label>Monthly budget, USD (0 = none; needs prices to count)</label><input id="bd" type="number" min="0" value="${m.budget_usd}"></div>
+ <div><label>Call limit</label><input id="bc" type="number" min="1" value="${m.budget_calls}"></div></div></div>
+ <div class="card"><h3>Agent roles</h3><div class="tablew"><table><tr><th>Role</th><th>Model</th><th>Fallback</th></tr>${roleRows}</table></div>
+ <div class="muted" style="margin-top:8px">Used so far: ${m.usage.calls} calls, ${m.usage.tokens_in+m.usage.tokens_out} tokens.</div></div>
  <div class="row"><button class="p" id="sv">Save</button><button id="ts">Test connection</button><span id="msg"></span></div>`};
+V.models.after=()=>{
+ async function save(){return api('/api/models',{method:'PUT',body:{base_url:$('#bu').value,api_key:$('#ak').value,cheap:$('#mc').value.trim(),strong:$('#ms').value.trim(),profile:$('#pf').value,budget_usd:+$('#bd').value||0,budget_calls:+$('#bc').value||5000}})}
+ $('#sv').onclick=async()=>{await save();go('models');setTimeout(()=>{$('#msg').innerHTML='<span class="ok">Saved</span>'},50)};
+ $('#ts').onclick=async()=>{await save();$('#msg').textContent='Testing…';const r=await api('/api/models/test',{method:'POST',body:{}});
+  $('#msg').innerHTML=r.ok?`<span class="ok">Connected · ${r.ms} ms</span>`:`<span class="bad">${esc(r.error||r.detail)}</span>`}};
+
+/* ---------------------------------------------------------------- erpnext */
 V.erp=async()=>{const e=await api('/api/erp');
  const rows=(e.steps||[]).map(x=>`<tr><td>${x.status==='ok'?'<span class="ok">✔</span>':x.status==='fail'?'<span class="bad">✖</span>':'<span class="muted">…</span>'}</td><td>${esc((e.step_names.find(n=>n[0]===x.key)||[0,x.key])[1])}</td><td class="${x.status==='fail'?'bad':'muted'}">${esc(x.note)}</td></tr>`).join('');
  return `<h2>ERPNext</h2><p class="sub">The development ERPNext that runs next to the Studio. ${e.ready?'<span class="tag ok">ready</span>':'<span class="tag hold">not prepared</span>'}</p>
- <div class="card"><div class="grid">
- <div><label>ERPNext address (inside Docker)</label><input id="eu" value="${esc(e.url)}"></div>
- <div><label>Site name</label><input id="es" value="${esc(e.site)}"></div></div>
+ <div class="card"><div class="grid"><div><label>ERPNext address (inside Docker)</label><input id="eu" value="${esc(e.url)}"></div><div><label>Site name</label><input id="es" value="${esc(e.site)}"></div></div>
  <label>Administrator password ${e.password_set?'<span class="ok">· saved (leave blank to keep)</span>':''}</label><input id="ep" type="password" autocomplete="off" placeholder="from your compose file"></div>
  <div class="card"><b>First-time company setup</b><span class="muted"> (used only if the site has no company yet)</span><div class="grid">
  <div><label>Company name</label><input id="ec" value="${esc(e.company)}"></div><div><label>Country</label><input id="eo" value="${esc(e.country)}"></div>
@@ -61,23 +96,96 @@ V.erp=async()=>{const e=await api('/api/erp');
  ${rows?`<div class="card" style="margin-top:14px"><table>${rows}</table></div>`:''}`};
 V.erp.after=()=>{
  $('#prep').onclick=async()=>{const body={url:$('#eu').value,site:$('#es').value,admin_password:$('#ep').value,company:$('#ec').value,country:$('#eo').value,currency:$('#ey').value,timezone:$('#ez').value};
-  await api('/api/erp',{method:'PUT',body});const r=await fetch('/api/erp/prepare',{method:'POST'});
-  if(!r.ok){$('#msg').innerHTML='<span class="bad">'+esc((await r.json()).detail)+'</span>';return}
-  poll()};
- async function poll(){const e=await api('/api/erp');if(location.hash!=='#erp')return;const keep={eu:$('#eu').value,es:$('#es').value,ec:$('#ec').value,eo:$('#eo').value,ey:$('#ey').value,ez:$('#ez').value};
-  $('#m').innerHTML=await V.erp();V.erp.after();for(const k in keep)$('#'+k).value=keep[k];if(e.running)setTimeout(poll,1500)}
- api('/api/erp').then(e=>{if(e.running)setTimeout(poll,1500)})};
-V.models.after=()=>{
- $('#sv').onclick=save;$('#ts').onclick=async()=>{await save(true);$('#msg').textContent='Testing…';const r=await api('/api/settings/llm/test',{method:'POST',body:{}});
-  $('#msg').innerHTML=r.ok?`<span class="ok">Connected · ${esc(r.model)} replied "${esc(r.reply)}"</span>`:`<span class="bad">${esc(r.error)}</span>`};
- async function save(q){const models={};document.querySelectorAll('[data-r]').forEach(i=>models[i.dataset.r]=i.value.trim());
-  await api('/api/settings/llm',{method:'PUT',body:{base_url:$('#bu').value,api_key:$('#ak').value,models,monthly_budget_usd:+$('#bd').value||0}});
-  if(q!==true)$('#msg').innerHTML='<span class="ok">Saved</span>';}};
-V.overview.after=()=>{};
-async function go(t){t=V[t]?t:'overview';history.replaceState(0,'','#'+t);
- document.querySelectorAll('nav a[data-t]').forEach(a=>a.classList.toggle('on',a.dataset.t===t));
- $('#m').innerHTML=await V[t]();V[t].after&&V[t].after();}
-document.querySelectorAll('nav a[data-t]').forEach(a=>a.onclick=()=>go(a.dataset.t));
+  await api('/api/erp',{method:'PUT',body});const r=await api('/api/erp/prepare',{method:'POST',body:{}});
+  if(r.detail){$('#msg').innerHTML='<span class="bad">'+esc(r.detail)+'</span>';return}poll()};
+ const N=NAV;async function poll(){const e=await api('/api/erp');if(N!==NAV)return;const keep={eu:$('#eu').value,es:$('#es').value,ec:$('#ec').value,eo:$('#eo').value,ey:$('#ey').value,ez:$('#ez').value};
+  const h=await V.erp();if(N!==NAV)return;$('#m').innerHTML=h;V.erp.after();for(const k in keep)$('#'+k).value=keep[k];if(e.running)timer=setTimeout(poll,1500)}
+ api('/api/erp').then(e=>{if(e.running)timer=setTimeout(poll,1500)})};
+
+/* ---------------------------------------------------------------- requirements */
+const RS={module:'',status:'backlog',q:'',offset:0,sel:new Set()};
+V.reqs=async()=>{const st=await api('/api/requirements/stats');const t=st.totals||{};
+ const q=new URLSearchParams({module:RS.module,status:RS.status,q:RS.q,limit:30,offset:RS.offset});const l=await api('/api/requirements?'+q);
+ const mods=(st.modules||[]).map(m=>`<option ${m.module===RS.module?'selected':''}>${esc(m.module)}</option>`).join('');
+ const rows=(l.items||[]).map(r=>`<tr><td><input type="checkbox" data-id="${r.id}" ${RS.sel.has(r.id)?'checked':''} ${['backlog','blocked','needs_input'].includes(r.status)?'':'disabled'}></td><td>${r.id}</td><td>${esc(r.module)}</td><td>${esc(r.text.slice(0,220))}${r.text.length>220?'…':''}${r.notes?`<div class="muted">${esc(r.notes.slice(0,160))}</div>`:''}</td><td>${tag(r.status)}</td></tr>`).join('');
+ const n=(k)=>t[k]||0;
+ return `<h2>Requirements</h2><p class="sub">${n('total')} requirements, ${n('gap')} of them gaps. Only gaps are built; they move through the statuses below.</p>
+ <div class="stats">${[['gap','gaps'],['planned','planned'],['built','built'],['verified','verified'],['needs_input','need input'],['blocked','blocked'],['standard','already standard']].map(([k,v])=>`<div class="stat"><b>${n(k)}</b><span>${v}</span></div>`).join('')}</div>
+ <details class="card" ${n('total')?'':'open'}><summary><b>Add requirements</b></summary>
+ <label>Excel fit-gap matrix (.xlsx), or a Word (.docx) / text file</label><input type="file" id="fl" accept=".xlsx,.xlsm,.docx,.txt,.md">
+ <label>Module name (for Word or text files)</label><input id="fm" placeholder="e.g. SRM">
+ <label>…or paste requirements, one per line</label><textarea id="ft" rows="4"></textarea>
+ <div class="row"><button class="p" id="imp">Import</button><span id="im"></span></div></details>
+ <div class="card"><div class="grid"><div><label>Module</label><select id="fmod"><option value="">All</option>${mods}</select></div>
+ <div><label>Status</label><select id="fst">${['backlog','planned','built','verified','needs_input','blocked','standard',''].map(x=>`<option value="${x}" ${x===RS.status?'selected':''}>${x||'any'}</option>`).join('')}</select></div>
+ <div><label>Search</label><input id="fq" value="${esc(RS.q)}" placeholder="text or id"></div></div>
+ <div class="tablew" style="margin-top:10px"><table><tr><th></th><th>ID</th><th>Module</th><th>Requirement</th><th>Status</th></tr>${rows||'<tr><td colspan=5 class=muted>Nothing here.</td></tr>'}</table></div>
+ <div class="row"><button id="pv" ${RS.offset?'':'disabled'}>Previous</button><button id="nx" ${RS.offset+30<l.total?'':'disabled'}>Next</button><span class="muted">${l.total} match · ${RS.sel.size} selected</span><div class="sp"></div>
+ <button id="bpage">Select this page</button><button class="p" id="build" ${RS.sel.size?'':'disabled'}>Build selected (${RS.sel.size})</button></div><div id="bm"></div></div>`};
+V.reqs.after=()=>{
+ const re=()=>go('reqs');
+ $('#fmod').onchange=e=>{RS.module=e.target.value;RS.offset=0;re()};$('#fst').onchange=e=>{RS.status=e.target.value;RS.offset=0;re()};
+ $('#fq').onkeydown=e=>{if(e.key==='Enter'){RS.q=e.target.value;RS.offset=0;re()}};
+ $('#pv').onclick=()=>{RS.offset=Math.max(0,RS.offset-30);re()};$('#nx').onclick=()=>{RS.offset+=30;re()};
+ document.querySelectorAll('[data-id]').forEach(c=>c.onchange=()=>{const i=+c.dataset.id;c.checked?RS.sel.add(i):RS.sel.delete(i);$('#build').disabled=!RS.sel.size;$('#build').textContent=`Build selected (${RS.sel.size})`});
+ $('#bpage').onclick=()=>{document.querySelectorAll('[data-id]:not(:disabled)').forEach(c=>RS.sel.add(+c.dataset.id));re()};
+ $('#build').onclick=async()=>{$('#bm').textContent='Starting…';const r=await api('/api/runs',{method:'POST',body:{ids:[...RS.sel]}});
+  if(r.detail){$('#bm').innerHTML='<span class="bad">'+esc(r.detail)+'</span>';return}RS.sel.clear();location.hash='#run/'+r.id};
+ $('#imp').onclick=async()=>{const f=$('#fl').files[0],txt=$('#ft').value.trim(),mod=$('#fm').value.trim();let r;
+  if(f){const fd=new FormData();fd.append('file',f);fd.append('module',mod);const x=await fetch('/api/requirements/import',{method:'POST',body:fd});r=await x.json();if(!x.ok)r={detail:r.detail||'failed'}}
+  else if(txt)r=await api('/api/requirements/text',{method:'POST',body:{text:txt,module:mod}});else{$('#im').innerHTML='<span class="bad">Choose a file or paste text</span>';return}
+  if(r.detail){$('#im').innerHTML='<span class="bad">'+esc(r.detail)+'</span>';return}go('reqs')}};
+
+/* ---------------------------------------------------------------- runs */
+V.runs=async()=>{const l=await api('/api/runs');
+ const rows=(l||[]).map(r=>`<tr><td><a href="#run/${r.id}">${esc(r.title)}</a></td><td>${tag(r.status,{done:'ok',failed:'bad',cancelled:'',running:'run',waiting_approval:'hold'}[r.status])}</td><td>${r.groups}</td><td>${new Date(r.created*1000).toLocaleString()}</td></tr>`).join('');
+ return `<h2>Runs</h2><p class="sub">Every build is a run: its steps, who or what did each one, and the evidence.</p><div class="card tablew"><table><tr><th>Run</th><th>Status</th><th>Groups</th><th>Started</th></tr>${rows||'<tr><td colspan=4 class=muted>No runs yet. Select requirements and press Build.</td></tr>'}</table></div>`};
+const KINDS=['triage','analyze','plan','review','gate','apply','verify'];
+let LOG=[];
+V.run=async(id)=>{LOG=[];const r=await api('/api/runs/'+id);if(r.detail)return `<h2>Run</h2><p class="bad">${esc(r.detail)}</p>`;LOG=r.events;
+ return `<div id="rv">${runHtml(r)}</div>`};
+function runHtml(r){
+ const chip=tag(r.status,{done:'ok',failed:'bad',cancelled:'',running:'run',waiting_approval:'hold'}[r.status]);
+ const u=r.usage||{};const T=r.tiers||{};
+ const groups=Object.entries(r.groups).map(([gid,g])=>{
+  const ts=r.tasks.filter(t=>t.group===gid);const last=Math.max(...ts.map(t=>t.attempt));
+  const pipes=[...new Set(ts.map(t=>t.attempt))].map(a=>`<div class="pipe">${a?`<span class="muted">attempt ${a+1}</span>`:''}${ts.filter(t=>t.attempt===a||(!['plan','review','gate','apply','verify'].includes(t.kind)&&a===0)).sort((x,y)=>KINDS.indexOf(x.kind)-KINDS.indexOf(y.kind)).map(t=>`<span class="node ${t.status} t-${t.tier}" title="${esc(t.note)}">${t.kind}<i>${t.tier}</i></span>`).join('<span class="muted">›</span>')}</div>`).join('');
+  const cs=(r.changesets||{})[gid];const held=ts.find(t=>t.status==='held');
+  const csHtml=cs?`<div style="margin-top:8px"><b>${esc(cs.title)}</b> ${tag(cs.status,{applied:'ok',failed:'bad',undone:'',discarded:'',proposed:'run'}[cs.status])} ${tag('risk '+cs.risk,{low:'ok',medium:'hold',high:'bad'}[cs.risk])}
+   <ul class="lines">${cs.lines.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>${cs.not_covered&&cs.not_covered.length?`<div class="muted">Not covered: ${cs.not_covered.map(n=>esc(n.id+': '+n.reason)).join('; ')}</div>`:''}
+   ${cs.assumptions&&cs.assumptions.length?`<div class="muted">Assumptions: ${cs.assumptions.map(esc).join('; ')}</div>`:''}
+   ${cs.status==='applied'?`<div class="row"><button class="bad" data-undo="${cs.id}">Undo this change</button></div>`:''}</div>`:'';
+  const appr=held?`<div class="card" style="background:var(--hold-bg);margin:10px 0 0"><b>Waiting for your approval</b><div>${esc(held.note)}. Review the operations above, then decide.</div>
+   <div class="row"><button class="p" data-approve="${held.id}">Approve and apply</button><input id="rj${gid}" placeholder="reason if rejecting" style="max-width:260px"><button class="bad" data-reject="${held.id}" data-g="${gid}">Reject</button></div></div>`:'';
+  return `<div class="card"><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><h3 style="margin:0">${esc(g.label)}</h3><span class="muted">${g.ids.length} requirement(s)</span>${g.outcome?tag(g.outcome,{verified:'ok',built:'ok',blocked:'bad',failed:'bad',rejected:''}[g.outcome]):''}</div>${pipes}${csHtml}${appr}</div>`}).join('');
+ return `<h2>${esc(r.title)} ${chip}</h2><p class="sub">${T.rule||0} rule steps · ${T.engine||0} engine steps · ${T.model||0} model steps · ${T.human||0} human · ${u.calls||0} model calls, ${(u.tokens_in||0)+(u.tokens_out||0)} tokens
+ ${['running','waiting_approval'].includes(r.status)?' · <a href="#" id="cx">Cancel run</a>':''}</p>${r.error?`<p class="bad">${esc(r.error)}</p>`:''}${groups}
+ <div class="card"><h3>Event log</h3><div class="log" id="lg">${LOG.map(e=>`<div class="${e.level}">${esc(e.tier?('['+e.tier+'] '):'')}${esc(e.text)}</div>`).join('')}</div></div>
+ <div class="card"><h3>Requirements in this run</h3><div id="rq" class="tablew muted">Loading…</div></div>`}
+V.run.after=(id)=>{
+ let since=LOG.length;const N=NAV;
+ async function tick(){if(N!==NAV)return;const r=await api(`/api/runs/${id}?since=${since}`);if(r.detail||N!==NAV)return;
+  LOG=LOG.concat(r.events);since=r.next;const full=await api(`/api/runs/${id}`);if(N!==NAV)return;
+  const y=$('#lg')?$('#lg').scrollTop:0;$('#rv').innerHTML=runHtml({...full,events:[]});bind();const lg=$('#lg');if(lg)lg.scrollTop=lg.scrollHeight;
+  const ids=[...new Set(Object.values(full.groups).flatMap(g=>g.ids))];loadReqs(ids);
+  if(['running','waiting_approval'].includes(full.status))timer=setTimeout(tick,full.status==='running'?1200:3000)}
+ async function loadReqs(ids){if(!ids.length)return;const l=await api('/api/requirements?gap=false&ids='+ids.join(','));const el=$('#rq');if(!el||N!==NAV)return;
+  el.innerHTML=`<table><tr><th>ID</th><th>Requirement</th><th>Status</th></tr>${(l.items||[]).map(r=>`<tr><td>${r.id}</td><td>${esc(r.text.slice(0,180))}${r.notes?`<div class="muted">${esc(r.notes.slice(0,200))}</div>`:''}</td><td>${tag(r.status)}</td></tr>`).join('')}</table>`}
+ function bind(){
+  document.querySelectorAll('[data-approve]').forEach(b=>b.onclick=async()=>{b.disabled=true;await api(`/api/runs/${id}/approve`,{method:'POST',body:{task:b.dataset.approve}});clearTimeout(timer);tick()});
+  document.querySelectorAll('[data-reject]').forEach(b=>b.onclick=async()=>{await api(`/api/runs/${id}/reject`,{method:'POST',body:{task:b.dataset.reject,reason:$('#rj'+b.dataset.g).value}});clearTimeout(timer);tick()});
+  document.querySelectorAll('[data-undo]').forEach(b=>b.onclick=async()=>{b.disabled=true;const r=await api(`/api/changesets/${b.dataset.undo}/undo`,{method:'POST',body:{}});clearTimeout(timer);tick()});
+  const cx=$('#cx');if(cx)cx.onclick=async e=>{e.preventDefault();await api(`/api/runs/${id}/cancel`,{method:'POST',body:{}});clearTimeout(timer);tick()}}
+ bind();const lg=$('#lg');if(lg)lg.scrollTop=lg.scrollHeight;tick()};
+
+/* ---------------------------------------------------------------- shell */
+async function go(t){stop();NAV++;let arg='';if(t.startsWith('run/')){arg=t.slice(4);t='run'}t=V[t]?t:'overview';
+ history.replaceState(0,'','#'+t+(arg?'/'+arg:''));
+ document.querySelectorAll('nav a[data-t]').forEach(a=>a.classList.toggle('on',a.dataset.t===(t==='run'?'runs':t)));
+ $('#m').innerHTML=await V[t](arg);V[t].after&&V[t].after(arg)}
+window.addEventListener('hashchange',()=>go(location.hash.slice(1)||'overview'));
+document.querySelectorAll('nav a[data-t]').forEach(a=>a.onclick=()=>{if(location.hash==='#'+a.dataset.t)go(a.dataset.t);else location.hash='#'+a.dataset.t});
 $('#out').onclick=async()=>{await api('/api/logout',{method:'POST',body:{}});location.href='/login'};
+api('/api/status').then(s=>{$('#ver').textContent='v'+s.version});
 go(location.hash.slice(1)||'overview');
 </script></body></html>

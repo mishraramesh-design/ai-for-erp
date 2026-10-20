@@ -87,7 +87,9 @@ def apply_profile(cfg: ModelConfig, name: str, provider: str, cheap: str, strong
 
 
 class ConfigStore:
-    def __init__(self, path, env: Optional[dict] = None):
+    def __init__(self, path, env: Optional[dict] = None, codec: Optional[tuple] = None):
+        """codec = (encrypt, decrypt): provider keys are stored encrypted on disk when given."""
+        self.codec = codec
         self.path = Path(path)
         self.path.parent.mkdir(parents=True, exist_ok=True)
         self._lock = threading.Lock()
@@ -95,6 +97,10 @@ class ConfigStore:
         if self.path.exists():
             try:
                 self._cfg = ModelConfig.model_validate_json(self.path.read_text(encoding="utf-8"))
+                if codec:
+                    for p in self._cfg.providers:
+                        if p.api_key.startswith("enc:"):
+                            p.api_key = codec[1](p.api_key[4:])
             except Exception:
                 pass
         elif env and env.get("STUDIO_LLM_API_KEY"):  # first boot: seed one provider from the environment
@@ -109,7 +115,12 @@ class ConfigStore:
         return self._cfg
 
     def _save(self) -> None:
-        self.path.write_text(self._cfg.model_dump_json(indent=2), encoding="utf-8")
+        data = self._cfg.model_copy(deep=True)
+        if self.codec:
+            for p in data.providers:
+                if p.api_key:
+                    p.api_key = "enc:" + self.codec[0](p.api_key)
+        self.path.write_text(data.model_dump_json(indent=2), encoding="utf-8")
         try:
             self.path.chmod(0o600)
         except OSError:

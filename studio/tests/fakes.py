@@ -107,6 +107,8 @@ class FakeErp:
             for p in self.perms:
                 if p[:3] == [data["doctype"], data["role"], data.get("permlevel", 0)]:
                     p[3][data["ptype"]] = data["value"]
+        elif method.endswith("permission_manager.get_permissions"):
+            return [{"role": p[1], "permlevel": p[2], **p[3]} for p in self.perms if p[0] == data["doctype"]]
         elif method.endswith("permission_manager.remove"):
             self.perms = [p for p in self.perms if p[:3] != [data["doctype"], data["role"], data.get("permlevel", 0)]]
         return None
