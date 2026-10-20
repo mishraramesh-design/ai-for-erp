@@ -133,3 +133,81 @@ def workflow_payload(op) -> dict:
 
 def desk_route(doctype: str) -> str:
     return "/app/" + slugify(doctype, limit=80).replace("_", "-")
+
+
+# ------------------------------------------------------------------ recipe ops
+def _filter_json(doctype: str, filters: list) -> str:
+    import json
+    return json.dumps([[doctype, f.field, f.operator, f.value, False] for f in filters])
+
+
+def notification_payload(op) -> dict:
+    rec = []
+    for r in op.recipients:
+        row = {}
+        if r.field:
+            row["receiver_by_document_field"] = r.field
+        if r.role:
+            row["receiver_by_role"] = r.role
+        rec.append(row)
+    d = {"doctype": "Notification", "name": op.name, "document_type": op.doctype, "event": op.event,
+         "channel": op.channel, "enabled": 1, "message_type": "HTML", "message": op.message, "recipients": rec}
+    if op.channel == "Email":
+        d["subject"] = op.subject
+    else:
+        d.update({"subject": op.subject, "notification_type": "Alert", "notification_title": op.subject[:140]})
+    if op.condition:
+        d["condition"] = op.condition
+    if op.event == "Value Change" and op.value_changed:
+        d["value_changed"] = op.value_changed
+    if op.event in ("Days Before", "Days After"):
+        d["date_changed"] = op.date_field
+        d["days_in_advance"] = op.days
+    return d
+
+
+def report_payload(op) -> dict:
+    import json
+    order = f"`tab{op.doctype}`.`{op.sort_by or 'modified'}` {'desc' if op.sort_desc else 'asc'}"
+    cfg = {"filters": [[op.doctype, f.field, f.operator, f.value, False] for f in op.filters],
+           "fields": [[c, op.doctype] for c in op.columns], "order_by": order, "add_totals_row": 0,
+           "page_length": 20, "column_widths": {}, "group_by": None}
+    return {"doctype": "Report", "name": op.name, "report_name": op.name, "ref_doctype": op.doctype,
+            "report_type": "Report Builder", "is_standard": "No", "json": json.dumps(cfg),
+            "roles": [{"role": r} for r in op.roles]}
+
+
+def number_card_payload(op) -> dict:
+    d = {"doctype": "Number Card", "name": op.label, "label": op.label, "type": "Document Type",
+         "document_type": op.doctype, "function": op.function, "filters_json": _filter_json(op.doctype, op.filters),
+         "show_percentage_stats": 1, "stats_time_interval": "Daily", "is_public": 1}
+    if op.function != "Count" and op.field:
+        d["aggregate_function_based_on"] = op.field
+    if op.color:
+        d["color"] = op.color
+    return d
+
+
+def dashboard_chart_payload(op) -> dict:
+    d = {"doctype": "Dashboard Chart", "name": op.name, "chart_name": op.name, "document_type": op.doctype,
+         "chart_type": op.chart_type, "type": op.graph, "filters_json": _filter_json(op.doctype, op.filters),
+         "is_public": 1}
+    if op.chart_type == "Group By":
+        d.update({"group_by_type": "Count", "group_by_based_on": op.group_by_field, "number_of_groups": 10,
+                  "timeseries": 0})
+    else:
+        d.update({"timeseries": 1, "based_on": op.date_field, "time_interval": op.interval, "timespan": op.timespan})
+        if op.chart_type in ("Sum", "Average"):
+            d["value_based_on"] = op.value_field
+    return d
+
+
+def dashboard_payload(op) -> dict:
+    return {"doctype": "Dashboard", "name": op.name, "dashboard_name": op.name,
+            "charts": [{"chart": c, "width": "Half"} for c in op.charts], "cards": [{"card": c} for c in op.cards]}
+
+
+def record_payload(op) -> dict:
+    return {"create_notification": notification_payload, "create_report": report_payload,
+            "create_number_card": number_card_payload, "create_dashboard_chart": dashboard_chart_payload,
+            "create_dashboard": dashboard_payload}[op.op](op)

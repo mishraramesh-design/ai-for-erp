@@ -6,7 +6,6 @@ import re
 
 OUT_OF_SCOPE = [
     (r"\bprint\s*formats?\b|\bletter\s*head\b|\bprinted\s+(?:copy|output)\b", "Print formats are not an operation the studio can build yet."),
-    (r"\bdashboards?\b|\bscorecards?\b", "Dashboards are not an operation the studio can build yet."),
     (r"\bmobile\s+app\b|\bandroid\b|\bios\s+app\b", "A mobile app is outside configuration of ERPNext."),
     (r"\bsms\b|\bwhats\s*app\b|\bbiometric\b|\bbarcode\s+scanner\b|\brfid\b|\bgps\b", "Needs an external device or gateway integration."),
     (r"\bintegrat(?:e|ion|ed)\b.{0,60}\b(?:with|to)\b.{0,40}\b(?:external|third|bank|gst portal|e-?invoice|api|sap|tally|payment gateway)\b", "Needs an external system integration."),

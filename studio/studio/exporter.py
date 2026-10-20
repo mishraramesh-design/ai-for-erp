@@ -20,8 +20,8 @@ from dataclasses import dataclass, field
 from typing import Optional
 
 from .compiler import (client_script_payload, custom_field_payload, doctype_payload, property_setter_payload,
-                       property_value, server_script_payload, workflow_payload)
-from .spec import describe
+                       property_value, record_payload, server_script_payload, workflow_payload)
+from .spec import RECORD_OPS, describe
 
 APP = "csd_customizations"
 PKG_PREFIX = "customizations/csd_customizations/csd_customizations/"
@@ -29,7 +29,8 @@ BLOCK_START = "# GENERATED BLOCK START (written by the Studio exporter; do not e
 BLOCK_END = "# GENERATED BLOCK END"
 # Import order matters: masters before the documents that link to them.
 ORDER = ["Role", "Workflow State", "Workflow Action Master", "DocType", "Custom Field", "Property Setter",
-         "Client Script", "Server Script", "Workflow"]
+         "Client Script", "Server Script", "Workflow", "Report", "Notification", "Number Card", "Dashboard Chart",
+         "Dashboard"]
 
 
 DEFAULT_HOOKS = ('app_name = "csd_customizations"\napp_title = "CSD Customizations"\napp_publisher = "ai-for-erp"\n'
@@ -126,6 +127,10 @@ def _docs(chosen: list) -> tuple[dict, list, list, list]:
             elif t == "create_doctype":
                 p = doctype_payload(op)
                 put("DocType", op.name, {k: v for k, v in p.items() if k not in ("name", "doctype")})
+            elif t in RECORD_OPS:
+                p = record_payload(op)
+                put(RECORD_OPS[t], _name_from_steps(cs, i, RECORD_OPS[t]) or p["name"],
+                    {k: v for k, v in p.items() if k not in ("doctype", "name")})
             elif t == "create_workflow":
                 for s in op.states:
                     put("Workflow State", s.state, {"workflow_state_name": s.state})

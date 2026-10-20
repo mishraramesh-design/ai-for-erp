@@ -31,6 +31,11 @@ You output ONE JSON object:
  add_permission {{doctype, role, permlevel?, read, write, create, delete, submit, cancel, amend, report, export, print, email, share}}
  create_doctype {{name, module? (default "Custom"), description?, is_child_table?, is_submittable?, naming: series|field|hash|prompt, series_prefix?, name_field?, title_field?, fields: [{{fieldname, label, fieldtype, options?, reqd?, unique?, in_list_view?, in_standard_filter?, default?, depends_on?, fetch_from?}}], permissions: [{{role, read, write, create, delete, submit, cancel, amend, report, export, print, email, share}}]}}
  create_workflow {{name, doctype, states: [{{state, doc_status 0|1|2, allow_edit (role)}}], transitions: [{{state, action, next_state, allowed (role), allow_self_approval?, condition?}}]}}
+ create_notification {{name, doctype, event New|Save|Submit|Cancel|Value Change|Days Before|Days After, subject, message (HTML; Jinja like {{{{ doc.supplier_name }}}}), channel? Email|System Notification, condition? (Python expression on doc e.g. doc.status == "Approved"), value_changed? (field, for Value Change), date_field? and days? (for Days Before/After), recipients: [{{field? (document field holding the email/user), role?}}]}}
+ create_report {{name, doctype, columns: [fieldnames], filters?: [{{field, operator = != > < >= <= like in, value}}], sort_by?, sort_desc?, roles?}}   (Report Builder list report with chosen columns)
+ create_number_card {{label, doctype, function? Count|Sum|Average|Minimum|Maximum, field? (numeric, for non-Count), filters?, color?}}
+ create_dashboard_chart {{name, doctype, chart_type? Group By|Count|Sum|Average, group_by_field? (Group By), date_field? (time axis for Count/Sum/Average), value_field?, graph? Bar|Line|Pie|Donut|Percentage, interval?, timespan?, filters?}}
+ create_dashboard {{name, charts: [chart names created or existing], cards: [number card labels]}}   (shows charts and cards together at /app/dashboard-view/<name>)
 Field types: {", ".join(FIELD_TYPES)}. Link fields need options = an EXISTING DocType name. Select options are newline-separated.
 Rules:
  - Use ONLY DocTypes, fields and roles that appear in the context below, or ones you create in the same ops list (create_role before use).
@@ -38,7 +43,7 @@ Rules:
  - Never invent a field of a standard DocType; if you need it, add a custom field.
  - If a requirement says a value must be recorded/captured/mandatory, set reqd=true on that field. A conditional rule (mandatory only when X) needs BOTH mandatory_depends_on AND a server validation, because the API does not enforce mandatory_depends_on.
  - Workflows: the first state must have doc_status 0; submitted states doc_status 1; only for submittable DocTypes use 1/2.
- - If a requirement needs something the ops cannot express (integrations, reports, print formats, dashboards, mobile, external systems, data migration, UI beyond forms), do NOT fake it: put its id in not_covered with a one-line reason.
+ - If a requirement needs something the ops cannot express (integrations, print formats, mobile, external systems, data migration, UI beyond forms, complex analytical reports that need joins or calculations), do NOT fake it: put its id in not_covered with a one-line reason.
  - If a decision is genuinely ambiguous, state your assumption in "assumptions" (do not block); only use "questions" if you cannot proceed.
  - Output JSON only.
 """.strip()
@@ -199,8 +204,9 @@ def analyst(reqs: list, snap, llm) -> dict:
     system = ("You are a senior ERPNext v15 business analyst triaging RFP fit-gap items. For EACH requirement choose one class:\n"
               " configure   = achievable with settings, custom fields, property changes, roles/permissions, or a workflow\n"
               " customize   = needs a script or a new DocType, still inside the form layer\n"
+              " configure also covers: list reports, email/system notifications, count cards and charts, dashboards\n"
               " standard    = ERPNext already does this out of the box (say where)\n"
-              " out_of_scope= needs reports, dashboards, print formats, external integrations, devices, migration, or custom code outside forms\n"
+              " out_of_scope= needs print formats, external integrations, devices, migration, or custom code outside forms\n"
               " clarify     = cannot be built without a business decision (ask ONE precise question)\n"
               'Return JSON: {"items":[{"id":int,"class":str,"reason":str,"approach":str (one line, the ERPNext way),"question":str}]}. JSON only.')
     user = (build_context(" ".join(r.text for r in reqs), {}, snap) + "\n\nREQUIREMENTS:\n" + "\n".join(_req_block(r) for r in reqs))

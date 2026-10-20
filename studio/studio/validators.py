@@ -7,7 +7,7 @@ import re
 from dataclasses import asdict, dataclass
 from typing import Optional
 
-from .spec import FIELD_TYPES, LAYOUT_TYPES, ChangeSet
+from .spec import FIELD_TYPES, LAYOUT_TYPES, RECORD_OPS, ChangeSet
 
 FIELDNAME_RE = re.compile(r"^[a-z][a-z0-9_]{0,59}$")
 DOCTYPE_RE = re.compile(r"^[A-Za-z][A-Za-z0-9 _-]{1,60}$")
@@ -55,7 +55,9 @@ STANDARD_DOC_METHODS = {
     "get_formatted", "is_submittable", "get_password", "add_comment", "notify_update", "get_latest",
 }
 PHASE = {"create_role": 0, "create_doctype": 1, "add_custom_field": 2, "set_property": 3, "add_client_script": 4,
-         "add_server_validation": 4, "create_workflow": 5, "set_setting": 5, "add_permission": 6}
+         "add_server_validation": 4, "create_workflow": 5, "set_setting": 5, "add_permission": 6,
+         "create_notification": 7, "create_report": 7, "create_number_card": 7, "create_dashboard_chart": 7,
+         "create_dashboard": 8}
 
 
 @dataclass
@@ -116,6 +118,7 @@ class _Ctx:
         self.planned_doctypes: dict = {}  # name -> {"child": bool, "fields": set, "submittable": bool}
         self.planned_fields: dict = {}  # doctype -> set(fieldnames)
         self.planned_roles: set = set()
+        self.planned_records: set = set()  # (doctype, name) of reports/cards/charts created in this change set
 
     def doctype_exists(self, name: str) -> bool:
         return name in self.planned_doctypes or self.snap.has_doctype(name)
@@ -373,6 +376,9 @@ def validate(cs: ChangeSet, snap) -> list:
         elif t == "create_workflow":
             _check_workflow(op, ctx, snap, add, i)
 
+        elif t in RECORD_OPS:
+            _check_record(op, ctx, snap, add, i)
+
         elif t == "add_permission":
             if op.doctype in ctx.planned_doctypes:
                 add("error", "perm_on_new_doctype", f'Put "{op.doctype}" permissions inside its create_doctype operation.', i)
@@ -455,3 +461,108 @@ def _check_options(fieldtype, options, where, ctx, add, i):
             add("error", "link_options", f"{where}: {fieldtype} needs the target DocType in options.", i)
         elif not ctx.doctype_exists(options):
             add("error", "link_target", f'{where}: target DocType "{options}" does not exist.' + _close(options, ctx.snap.doctypes()), i)
+
+
+_NUMERIC = ("Int", "Float", "Currency", "Percent", "Duration")
+_DOC_REF = re.compile(r"\bdoc\.([A-Za-z_][A-Za-z0-9_]*)")
+_STD_DOC_ATTRS = {"name", "owner", "creation", "modified", "modified_by", "docstatus", "idx", "doctype", "parent",
+                  "parenttype", "parentfield", "get", "as_dict", "get_formatted", "meta", "flags"}
+
+
+def _field_type(ctx, doctype: str, field: str) -> str:
+    m = ctx.snap.meta(doctype)
+    for f in (m or {}).get("fields", []):
+        if f.get("fieldname") == field:
+            return f.get("fieldtype") or ""
+    return ""
+
+
+def _check_record(op, ctx, snap, add, i) -> None:
+    t = op.op
+    label = {"create_notification": "Notification", "create_report": "Report", "create_number_card": "Number Card",
+             "create_dashboard_chart": "Dashboard Chart", "create_dashboard": "Dashboard"}[t]
+    name = op.label if t == "create_number_card" else op.name
+    if not re.match(r"^[A-Za-z0-9][A-Za-z0-9 _.\-()/&,]{2,120}$", name or ""):
+        add("error", "record_name", f'Invalid {label} name "{name}" (3-120 letters, digits, spaces, - _ . ( ) / & ,).', i)
+    if snap.doc_exists(label, name):
+        add("warning", "record_exists", f'{label} "{name}" exists and will be overwritten (undo restores it).', i)
+    ctx.planned_records.add((label, name))
+    if t == "create_dashboard":
+        for c in op.charts:
+            if ("Dashboard Chart", c) not in ctx.planned_records and not snap.doc_exists("Dashboard Chart", c):
+                add("error", "chart_missing", f'Dashboard chart "{c}" does not exist; create it earlier in the same change set.', i)
+        for c in op.cards:
+            if ("Number Card", c) not in ctx.planned_records and not snap.doc_exists("Number Card", c):
+                add("error", "card_missing", f'Number card "{c}" does not exist; create it earlier in the same change set.', i)
+        if not op.charts and not op.cards:
+            add("error", "dashboard_empty", "A dashboard needs at least one chart or number card.", i)
+        return
+    dt = op.doctype
+    if not ctx.doctype_exists(dt):
+        add("error", "doctype_missing", f'DocType "{dt}" does not exist.' + _close(dt, snap.doctypes()), i)
+        return
+    known = ctx.fields(dt) | {"name", "creation", "modified", "owner", "docstatus"}
+
+    def need(field, what):
+        if field and field not in known:
+            add("error", "field_missing", f'{what} "{field}" is not a field of {dt}.' + _close(field, known), i)
+            return False
+        return bool(field)
+
+    for f in getattr(op, "filters", []):
+        need(f.field, "Filter field")
+    if t == "create_notification":
+        if not op.recipients:
+            add("error", "no_recipients", "A notification needs at least one recipient (a field or a role).", i)
+        for r in op.recipients:
+            if not r.field and not r.role:
+                add("error", "recipient_empty", "Each recipient needs a field or a role.", i)
+            need(r.field, "Recipient field")
+            if r.role and not ctx.role_exists(r.role):
+                add("error", "role_missing", f'Role "{r.role}" does not exist.' + _close(r.role, snap.roles()), i)
+        if op.event == "Value Change" and not need(op.value_changed, "value_changed field"):
+            add("error", "value_changed", 'Event "Value Change" needs value_changed (the field to watch).', i)
+        if op.event in ("Days Before", "Days After"):
+            if not need(op.date_field, "date_field"):
+                add("error", "date_field", f'Event "{op.event}" needs date_field.', i)
+            if op.days < 0:
+                add("error", "days", "days must be zero or more.", i)
+        if not op.subject.strip() or not op.message.strip():
+            add("error", "notification_text", "A notification needs a subject and a message.", i)
+        for src, text in (("condition", op.condition or ""), ("message", op.message), ("subject", op.subject)):
+            for ref in sorted(set(_DOC_REF.findall(text))):
+                if ref not in known and ref not in _STD_DOC_ATTRS and not ref.startswith("_"):
+                    add("error", "field_missing", f'The {src} uses doc.{ref}, which is not a field of {dt}.' + _close(ref, known), i)
+        if op.condition:
+            try:
+                ast.parse(op.condition.strip(), mode="eval")
+            except SyntaxError as e:
+                add("error", "condition_syntax", f"The condition is not a valid Python expression: {e.msg}.", i)
+            if "import" in op.condition or "__" in op.condition:
+                add("error", "condition_unsafe", "The condition may not use imports or double underscores.", i)
+    elif t == "create_report":
+        if not op.columns:
+            add("error", "no_columns", "A report needs at least one column.", i)
+        for c in op.columns:
+            need(c, "Column")
+        need(op.sort_by, "sort_by field")
+        for r in op.roles:
+            if not ctx.role_exists(r):
+                add("error", "role_missing", f'Role "{r}" does not exist.' + _close(r, snap.roles()), i)
+    elif t == "create_number_card":
+        if op.function != "Count":
+            if need(op.field, "Aggregate field"):
+                ft = _field_type(ctx, dt, op.field) if dt not in ctx.planned_doctypes else "Float"
+                if ft and ft not in _NUMERIC:
+                    add("error", "field_numeric", f"{op.function} needs a numeric field; {op.field} is {ft}.", i)
+            else:
+                add("error", "field_needed", f"{op.function} needs the numeric field to aggregate.", i)
+    elif t == "create_dashboard_chart":
+        if op.chart_type == "Group By":
+            if not need(op.group_by_field, "group_by_field"):
+                add("error", "group_by_field", "A Group By chart needs group_by_field.", i)
+        else:
+            if not need(op.date_field, "date_field"):
+                add("error", "date_field", f"A {op.chart_type} chart needs date_field (the time axis).", i)
+            if op.chart_type in ("Sum", "Average") and not need(op.value_field, "value_field"):
+                add("error", "value_field", f"A {op.chart_type} chart needs value_field.", i)

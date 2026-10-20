@@ -203,10 +203,84 @@ class CreateWorkflow(_Op):
     transitions: list[WorkflowTransitionSpec]
 
 
+# ------------------------------------------------------------------ recipe ops (notifications, reports, dashboards)
+class NotifyRecipient(_Op):
+    field: Optional[str] = None  # a field of the document holding an email address / user
+    role: Optional[str] = None   # everyone with this role
+
+
+class CreateNotification(_Op):
+    op: Literal["create_notification"] = "create_notification"
+    name: str
+    doctype: str
+    event: Literal["New", "Save", "Submit", "Cancel", "Value Change", "Days Before", "Days After"]
+    subject: str
+    message: str  # HTML with Jinja, e.g. {{ doc.supplier_name }}
+    channel: Literal["Email", "System Notification"] = "Email"
+    condition: Optional[str] = None  # Python expression on doc, e.g. doc.status == "Approved"
+    value_changed: Optional[str] = None  # field, for event "Value Change"
+    date_field: Optional[str] = None     # field, for "Days Before"/"Days After"
+    days: int = 0
+    recipients: list[NotifyRecipient] = Field(default_factory=list)
+
+
+class ReportFilter(_Op):
+    field: str
+    operator: Literal["=", "!=", ">", "<", ">=", "<=", "like", "in", "not in"] = "="
+    value: Any = None
+
+
+class CreateReport(_Op):
+    op: Literal["create_report"] = "create_report"
+    name: str
+    doctype: str
+    columns: list[str]
+    filters: list[ReportFilter] = Field(default_factory=list)
+    sort_by: Optional[str] = None
+    sort_desc: bool = True
+    roles: list[str] = Field(default_factory=list)  # empty = the DocType's own permissions decide
+
+
+class CreateNumberCard(_Op):
+    op: Literal["create_number_card"] = "create_number_card"
+    label: str
+    doctype: str
+    function: Literal["Count", "Sum", "Average", "Minimum", "Maximum"] = "Count"
+    field: Optional[str] = None  # numeric field for Sum/Average/Minimum/Maximum
+    filters: list[ReportFilter] = Field(default_factory=list)
+    color: Optional[str] = None
+
+
+class CreateDashboardChart(_Op):
+    op: Literal["create_dashboard_chart"] = "create_dashboard_chart"
+    name: str
+    doctype: str
+    chart_type: Literal["Count", "Sum", "Average", "Group By"] = "Group By"
+    group_by_field: Optional[str] = None  # Group By: the field whose values become the bars
+    date_field: Optional[str] = None      # Count/Sum/Average: the date field of the time axis
+    value_field: Optional[str] = None     # Sum/Average: numeric field
+    graph: Literal["Line", "Bar", "Pie", "Donut", "Percentage"] = "Bar"
+    interval: Literal["Yearly", "Quarterly", "Monthly", "Weekly", "Daily"] = "Monthly"
+    timespan: Literal["Last Year", "Last Quarter", "Last Month", "Last Week"] = "Last Year"
+    filters: list[ReportFilter] = Field(default_factory=list)
+
+
+class CreateDashboard(_Op):
+    op: Literal["create_dashboard"] = "create_dashboard"
+    name: str
+    charts: list[str] = Field(default_factory=list)  # names of dashboard charts
+    cards: list[str] = Field(default_factory=list)   # labels of number cards
+
+
+RECORD_OPS = {"create_notification": "Notification", "create_report": "Report", "create_number_card": "Number Card",
+              "create_dashboard_chart": "Dashboard Chart", "create_dashboard": "Dashboard"}
+
+
 Op = Annotated[
     Union[
         AddCustomField, SetProperty, AddClientScript, AddServerValidation, SetSetting,
-        CreateRole, AddPermission, CreateDocType, CreateWorkflow,
+        CreateRole, AddPermission, CreateDocType, CreateWorkflow, CreateNotification, CreateReport,
+        CreateNumberCard, CreateDashboardChart, CreateDashboard,
     ],
     Field(discriminator="op"),
 ]
@@ -216,6 +290,7 @@ RISK = {
     "add_custom_field": 0, "create_doctype": 0, "create_role": 0,
     "set_property": 1, "add_client_script": 1, "add_server_validation": 1, "set_setting": 1,
     "add_permission": 2, "create_workflow": 2,
+    "create_notification": 1, "create_report": 0, "create_number_card": 0, "create_dashboard_chart": 0, "create_dashboard": 0,
 }
 RISK_LEVELS = ("low", "medium", "high")
 
@@ -256,6 +331,16 @@ def describe(op) -> str:
     if t == "create_workflow":
         return (f'Create workflow "{op.name}" on {op.doctype}: {len(op.states)} states, '
                 f'{len(op.transitions)} transitions')
+    if t == "create_notification":
+        return f'Create {op.channel.lower()} notification "{op.name}" on {op.doctype} ({op.event})'
+    if t == "create_report":
+        return f'Create report "{op.name}" on {op.doctype} with {len(op.columns)} columns'
+    if t == "create_number_card":
+        return f'Create number card "{op.label}": {op.function}{" of " + op.field if op.field else ""} on {op.doctype}'
+    if t == "create_dashboard_chart":
+        return f'Create {op.graph.lower()} chart "{op.name}" on {op.doctype}'
+    if t == "create_dashboard":
+        return f'Create dashboard "{op.name}" with {len(op.charts)} chart(s) and {len(op.cards)} number card(s)'
     if t == "create_doctype":
         kind = "child table" if op.is_child_table else "DocType"
         s = f'Create {kind} "{op.name}" in module {op.module} with {len(op.fields)} fields'

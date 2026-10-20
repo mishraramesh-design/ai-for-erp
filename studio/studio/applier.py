@@ -7,7 +7,8 @@ from __future__ import annotations
 from typing import Callable, Optional
 
 from .compiler import (client_script_payload, custom_field_payload, doctype_payload, property_setter_payload,
-                       property_value, server_script_payload, workflow_payload)
+                       property_value, record_payload, server_script_payload, workflow_payload)
+from .spec import RECORD_OPS
 from .erp import ErpError
 
 PM = "frappe.core.page.permission_manager.permission_manager"
@@ -95,6 +96,18 @@ class Applier:
                     step["created"].append(["Workflow Action Master", d.get("name") or a])
             doc = self.erp.insert("Workflow", workflow_payload(op))
             step["created"].append(["Workflow", doc.get("name") or op.name])
+        elif t in RECORD_OPS:
+            dt = RECORD_OPS[t]
+            payload = record_payload(op)
+            existing = self.erp.get_doc(dt, payload["name"])
+            if existing:
+                keys = [k for k in payload if k not in ("doctype", "name")]
+                step["updated"].append([dt, payload["name"], {k: existing.get(k) for k in keys if k in existing}])
+                self.erp.update(dt, payload["name"], {k: v for k, v in payload.items() if k not in ("doctype", "name")})
+                step["note"] = "overwrote existing " + dt
+            else:
+                doc = self.erp.insert(dt, payload)
+                step["created"].append([dt, doc.get("name") or payload["name"]])
         else:  # pragma: no cover - the discriminated union makes this unreachable
             raise ValueError(f"unknown operation {t}")
         return step

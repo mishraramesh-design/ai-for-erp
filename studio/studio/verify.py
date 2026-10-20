@@ -11,7 +11,8 @@ import time
 from dataclasses import asdict, dataclass
 
 from .applier import PM
-from .compiler import client_script_payload, script_name, server_script_payload
+from .compiler import client_script_payload, record_payload, script_name, server_script_payload
+from .spec import RECORD_OPS
 from .erp import ErpError
 from .validators import PROPERTY_TYPES, _norm_check_value
 
@@ -109,6 +110,13 @@ def verify_changeset(cs, erp) -> list[Check]:
                             add(i, "table is queryable (database table created)", True)
                         except ErpError as e:
                             add(i, "table is queryable (database table created)", False, e.detail[:160])
+            elif t in RECORD_OPS:
+                dt = RECORD_OPS[t]
+                nm = record_payload(op)["name"]
+                d = erp.get_doc(dt, nm)
+                add(i, f"{dt} '{nm}' exists", d is not None)
+                if d:
+                    _record_checks(op, d, add, i)
             elif t == "create_workflow":
                 d = erp.get_doc("Workflow", op.name)
                 add(i, f"workflow '{op.name}' exists", d is not None)
@@ -228,3 +236,29 @@ def run_tests(tests: list, erp, own_fields: Optional[set] = None, own_terms: Opt
                     pass
         results.append(res)
     return results
+
+
+def _record_checks(op, d, add, i) -> None:
+    t = op.op
+    if t == "create_notification":
+        add(i, "notification is enabled", bool(d.get("enabled")))
+        add(i, f"fires on {op.event}", d.get("event") == op.event, f"found {d.get('event')}")
+        add(i, "recipients stored", len(d.get("recipients") or []) == len(op.recipients),
+            f"{len(d.get('recipients') or [])} of {len(op.recipients)}")
+    elif t == "create_report":
+        import json
+        try:
+            cols = [c[0] for c in json.loads(d.get("json") or "{}").get("fields", [])]
+        except ValueError:
+            cols = []
+        add(i, "report columns stored", cols == list(op.columns), f"found {cols}")
+        add(i, "report is a Report Builder report", d.get("report_type") == "Report Builder")
+    elif t == "create_number_card":
+        add(i, "card reads the right DocType", d.get("document_type") == op.doctype, f"found {d.get('document_type')}")
+        add(i, f"card function is {op.function}", d.get("function") == op.function, f"found {d.get('function')}")
+    elif t == "create_dashboard_chart":
+        add(i, "chart reads the right DocType", d.get("document_type") == op.doctype, f"found {d.get('document_type')}")
+        add(i, f"chart type is {op.chart_type}", d.get("chart_type") == op.chart_type, f"found {d.get('chart_type')}")
+    elif t == "create_dashboard":
+        add(i, "dashboard charts stored", len(d.get("charts") or []) == len(op.charts), f"{len(d.get('charts') or [])} of {len(op.charts)}")
+        add(i, "dashboard cards stored", len(d.get("cards") or []) == len(op.cards), f"{len(d.get('cards') or [])} of {len(op.cards)}")
