@@ -170,7 +170,12 @@ def autofill(erp, doctype: str, vals: dict, own_fields: set, made: list) -> dict
     return out
 
 
-def run_tests(tests: list, erp, own_fields: Optional[set] = None) -> list[dict]:
+def _mentions(detail: str, terms: set) -> bool:
+    d = re.sub(r"[^a-z0-9]+", " ", detail.lower())
+    return any(t and t in d for t in terms)
+
+
+def run_tests(tests: list, erp, own_fields: Optional[set] = None, own_terms: Optional[set] = None) -> list[dict]:
     """Behavioural tests from the tester agent. Each inserts a throwaway document and removes it again."""
     results = []
     for t in tests[:12]:
@@ -206,6 +211,8 @@ def run_tests(tests: list, erp, own_fields: Optional[set] = None) -> list[dict]:
             else:
                 if _MANDATORY.search(e.detail):
                     res["status"], res["detail"] = "inconclusive", f"test data incomplete: {e.detail[:160]}"
+                elif own_terms and not _mentions(e.detail, own_terms):
+                    res["status"], res["detail"] = "inconclusive", f"blocked by a rule that is not part of this change: {e.detail[:160]}"
                 else:
                     res["status"], res["detail"] = "fail", f"unexpectedly rejected: {e.detail[:160]}"
         finally:

@@ -10,6 +10,7 @@ one change set at a time, under a single write lock.
 from __future__ import annotations
 
 import json
+import re
 import os
 import threading
 import time
@@ -572,7 +573,10 @@ class Kernel:
                 with self._write_lock:
                     own = {getattr(o, "fieldname", None) for o in cs.ops if getattr(o, "fieldname", None)}
                     own |= {f.fieldname for o in cs.ops for f in (getattr(o, "fields", None) or [])}
-                    tests = run_tests(spec, d.erp, own_fields=own)
+                    terms = {re.sub(r"[^a-z0-9]+", " ", str(x).lower()).strip() for o in cs.ops for x in (
+                        getattr(o, "fieldname", None), getattr(o, "label", None), getattr(o, "name", None), getattr(o, "role_name", None)) if x}
+                    terms |= {re.sub(r"[^a-z0-9]+", " ", f.label.lower()).strip() for o in cs.ops for f in (getattr(o, "fields", None) or [])}
+                    tests = run_tests(spec, d.erp, own_fields=own, own_terms={t for t in terms if len(t) > 2})
             except LlmError as e:
                 self._log(run, t.id, "warn", f"Tester unavailable: {e}", tier="model")
         failed_tests = [x for x in tests if x["status"] == "fail"]

@@ -100,3 +100,22 @@ def test_autofill_fills_other_changes_mandatory_fields_but_not_own():
     out = autofill(E(), "Supplier", {"supplier_name": "X"}, {"custom_risk"}, made)
     assert out["supplier_name"] == "X" and out["primary_contact"] == "C-1" and out["kind"] == "A"
     assert "custom_risk" not in out and made == [("Contact", "C-1")]
+
+
+def test_rejection_by_an_unrelated_rule_is_inconclusive_not_failure():
+    from studio.erp import ErpError
+    from studio.verify import run_tests
+
+    class E:
+        def get_meta(self, dt):
+            return {"fields": []}
+
+        def insert(self, dt, data):
+            raise ErpError(417, "Contact Studio Agent is not linked to Supplier X")
+
+        def delete(self, dt, name):
+            pass
+
+    t = [{"id": "t1", "doctype": "Supplier", "kind": "insert_expect_ok", "values": {}}]
+    assert run_tests(t, E(), own_terms={"upi id", "preferred payment method"})[0]["status"] == "inconclusive"
+    assert run_tests(t, E(), own_terms={"studio agent"})[0]["status"] == "fail"
