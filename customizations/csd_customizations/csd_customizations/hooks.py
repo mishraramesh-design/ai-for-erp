@@ -7,5 +7,22 @@ app_license = "MIT"
 required_apps = ["erpnext"]
 
 # GENERATED BLOCK START (written by the Studio exporter; do not edit)
-fixtures = []
+fixtures = [{'dt': 'Custom Field',
+  'filters': [['name',
+               'in',
+               ['Supplier-custom_preferred_payment_method',
+                'Supplier-custom_risk_rating',
+                'Supplier-custom_risk_review_date',
+                'Supplier-custom_upi_id']]]},
+ {'dt': 'Property Setter',
+  'filters': [['name',
+               'in',
+               ['Supplier-custom_risk_review_date-mandatory_depends_on',
+                'Supplier-custom_upi_id-mandatory_depends_on']]]},
+ {'dt': 'Server Script',
+  'filters': [['name',
+               'in',
+               ['Supplier - Validate UPI ID when method is UPI',
+                'Supplier - validate_risk_review_date_when_high']]]}]
+after_migrate = []
 # GENERATED BLOCK END

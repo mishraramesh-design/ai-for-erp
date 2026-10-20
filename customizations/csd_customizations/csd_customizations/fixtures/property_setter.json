@@ -1,0 +1,22 @@
+[
+ {
+  "doc_type": "Supplier",
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "custom_risk_review_date",
+  "name": "Supplier-custom_risk_review_date-mandatory_depends_on",
+  "property": "mandatory_depends_on",
+  "property_type": "Code",
+  "value": "eval:doc.custom_risk_rating=='High'"
+ },
+ {
+  "doc_type": "Supplier",
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "custom_upi_id",
+  "name": "Supplier-custom_upi_id-mandatory_depends_on",
+  "property": "mandatory_depends_on",
+  "property_type": "Code",
+  "value": "eval:doc.custom_preferred_payment_method=='UPI'"
+ }
+]

@@ -1,0 +1,37 @@
+{
+ "app": "csd_customizations",
+ "change_sets": [
+  {
+   "change_set": "01M5D7CYSV8W981QS281ZH4A9V",
+   "created_by": "run:f906b08cb40d",
+   "operations": [
+    "Add Select field \"Vendor Risk Rating\" (custom_risk_rating) to Supplier after supplier_type, options: Low / Medium / High",
+    "Add Date field \"Risk Review Date\" (custom_risk_review_date) to Supplier after custom_risk_rating",
+    "Set mandatory_depends_on = eval:doc.custom_risk_rating=='High' on field \"custom_risk_review_date\" of Supplier",
+    "Add server script \"validate_risk_review_date_when_high\" on Supplier (before save)"
+   ],
+   "requirements": [
+    100005
+   ],
+   "risk": "medium",
+   "session": "f906b08cb40d",
+   "title": "Supplier Risk Rating with Conditional Review Date"
+  },
+  {
+   "change_set": "01M5DAZ1YAKZC3P48E2J48DTEV",
+   "created_by": "run:d421c676b2c8",
+   "operations": [
+    "Add Select field \"Preferred Payment Method\" (custom_preferred_payment_method) to Supplier after default_bank_account, mandatory, options: Bank Transfer / Cheque / UPI",
+    "Add Data field \"UPI ID\" (custom_upi_id) to Supplier after custom_preferred_payment_method",
+    "Set mandatory_depends_on = eval:doc.custom_preferred_payment_method=='UPI' on field \"custom_upi_id\" of Supplier",
+    "Add server script \"Validate UPI ID when method is UPI\" on Supplier (before save)"
+   ],
+   "requirements": [
+    100008
+   ],
+   "risk": "medium",
+   "session": "d421c676b2c8",
+   "title": "Supplier preferred payment method with conditional UPI ID (ERPNext v15)"
+  }
+ ]
+}
