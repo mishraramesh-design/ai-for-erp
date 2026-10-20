@@ -418,6 +418,39 @@ class ChangeSet(BaseModel):
         return d
 
 
+def normalize_ops(ops) -> list:
+    """Tolerate the common ways a model mis-shapes an operation, so one slip does not discard a whole plan."""
+    if not isinstance(ops, list):
+        return []
+    out = []
+    for o in ops:
+        if not isinstance(o, dict):
+            out.append(o)
+            continue
+        o = {k: v for k, v in o.items() if v is not None}
+        if "op" not in o:
+            for alt in ("type", "operation", "action", "kind"):
+                if isinstance(o.get(alt), str):
+                    o["op"] = o.pop(alt)
+                    break
+            else:
+                if len(o) == 1:
+                    (k, v), = o.items()
+                    if str(k).lower().replace("-", "_").replace(" ", "_") in RISK and isinstance(v, dict):
+                        o = {**v, "op": k}
+        if isinstance(o.get("op"), str):
+            o["op"] = o["op"].strip().lower().replace("-", "_").replace(" ", "_")
+        for k in ("value_changed", "date_field", "sort_by", "field"):
+            if isinstance(o.get(k), list):
+                o[k] = str(o[k][0]) if o[k] else None
+            elif o.get(k) is not None and not isinstance(o[k], str) and o.get("op") in RECORD_OPS:
+                o[k] = str(o[k])
+        if isinstance(o.get("days"), str) and o["days"].strip().lstrip("-").isdigit():
+            o["days"] = int(o["days"])
+        out.append(o)
+    return out
+
+
 class LlmProposal(BaseModel):
     """What the language model returns: either an answer, or an answer plus operations."""
     model_config = ConfigDict(extra="ignore")

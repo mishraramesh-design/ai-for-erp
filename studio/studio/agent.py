@@ -12,7 +12,7 @@ from typing import Optional
 from pydantic import ValidationError
 
 from .llm import LlmError
-from .spec import ChangeSet, LlmProposal, FIELD_TYPES
+from .spec import ChangeSet, LlmProposal, FIELD_TYPES, normalize_ops
 from .validators import PROPERTY_TYPES, SETTING_DOCTYPES, Issue, has_errors, order_ops, validate
 
 SPEC_HELP = f"""
@@ -122,7 +122,7 @@ def _run(llm, system: str, user: str, snap, source: str, message: str, created_b
             res.reply = f"I could not reach the language model: {e}"
             return res
         try:
-            prop = LlmProposal.model_validate(raw)
+            prop = LlmProposal.model_validate({**raw, "ops": normalize_ops(raw.get("ops"))} if isinstance(raw, dict) else raw)
         except ValidationError as e:
             msg = "; ".join(f"{'.'.join(str(x) for x in er['loc'])}: {er['msg']}" for er in e.errors()[:8])
             prompt = f"{user}\n\nYOUR PREVIOUS ANSWER WAS NOT VALID AGAINST THE SCHEMA:\n{msg}\nReturn corrected JSON."

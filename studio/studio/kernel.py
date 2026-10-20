@@ -526,7 +526,8 @@ class Kernel:
         for i, v in bad.items():
             self._log(run, t.id, "warn", f"[{i}] {v['verdict']}: {v['issue']}", tier="model")
         res = {"verdicts": {str(i): v for i, v in verdicts.items()}}
-        if bad and t.attempt < run.policy.max_repairs:
+        hard = {i: v for i, v in bad.items() if v["verdict"] == "fail"}  # "partial" is kept and flagged, not re-planned
+        if hard and t.attempt < run.policy.max_repairs:
             fb = "\n".join(f"- requirement {i}: {v['verdict']}: {v['issue']}" for i, v in bad.items())
             cs.status = "discarded"
             d.ledger.save(cs)

@@ -126,7 +126,7 @@ def test_rejection_returns_requirements_to_backlog(env):
 def test_reviewer_gap_triggers_repair_with_feedback(env):
     k, reqs, erp, ledger, h = env
     h["llm"] = ScriptLlm([plan_supplier_field([100001]), plan_supplier_field([100001])],
-                         review=[{"verdicts": [{"id": 100001, "verdict": "partial", "issue": "officer name is missing"}]},
+                         review=[{"verdicts": [{"id": 100001, "verdict": "fail", "issue": "officer name is missing"}]},
                                  {"verdicts": [{"id": 100001, "verdict": "pass", "issue": ""}]}])
     run = k.start("p", [100001], {"use_analyst": False})
     wait_for(k, run, ("done",))
@@ -134,6 +134,17 @@ def test_reviewer_gap_triggers_repair_with_feedback(env):
     plan_prompts = [u for s, u in h["llm"].prompts if "solution engineer" in s or "FEEDBACK" in u]
     assert any("officer name is missing" in u for u in plan_prompts)  # the second plan saw the reviewer's complaint
     assert sorted({t.attempt for t in run.tasks if t.kind == "plan"}) == [0, 1]
+
+
+def test_partial_verdict_is_applied_but_not_called_verified(env):
+    k, reqs, erp, ledger, h = env
+    h["llm"] = ScriptLlm([plan_supplier_field([100001])],
+                         review=[{"verdicts": [{"id": 100001, "verdict": "partial", "issue": "no approval step"}]}])
+    run = k.start("p", [100001], {"use_analyst": False})
+    wait_for(k, run, ("done",))
+    r = reqs.get(100001)
+    assert r.status == "built" and "no approval step" in r.notes
+    assert sorted({t.attempt for t in run.tasks if t.kind == "plan"}) == [0]  # no repair round for a partial
 
 
 def test_apply_failure_rolls_back_and_gives_up_after_retries(env):

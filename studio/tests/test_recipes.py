@@ -84,3 +84,15 @@ def test_workflow_state_field_is_known_after_a_planned_workflow():
             "transitions": [{"state": "Draft", "action": "Approve", "next_state": "Approved", "allowed": "System Manager"}]},
            {"op": "create_report", "name": "By state", "doctype": "Supplier", "columns": ["name", "workflow_state"]}]
     assert "field_missing" not in codes(ops)
+
+
+def test_normalize_ops_repairs_common_model_slips():
+    from studio.spec import LlmProposal, normalize_ops
+    raw = [{"create_role": {"role_name": "X Role"}},
+           {"type": "Create-Notification", "name": "N one", "doctype": "Supplier", "event": "Value Change", "subject": "s",
+            "message": "m", "value_changed": ["disabled"], "recipients": [{"role": "System Manager", "field": None}]},
+           {"op": "create_notification", "name": "N two", "doctype": "Supplier", "event": "Days Before", "subject": "s",
+            "message": "m", "date_field": "creation", "days": "3", "recipients": [{"role": "System Manager"}]}]
+    prop = LlmProposal.model_validate({"ops": normalize_ops(raw)})
+    assert [o.op for o in prop.ops] == ["create_role", "create_notification", "create_notification"]
+    assert prop.ops[1].value_changed == "disabled" and prop.ops[2].days == 3
