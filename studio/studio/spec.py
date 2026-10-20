@@ -272,7 +272,31 @@ class CreateDashboard(_Op):
     cards: list[str] = Field(default_factory=list)   # labels of number cards
 
 
-RECORD_OPS = {"create_notification": "Notification", "create_report": "Report", "create_number_card": "Number Card",
+class CreateHtmlBlock(_Op):
+    op: Literal["create_html_block"] = "create_html_block"
+    name: str
+    html: str   # static HTML shown on a workspace; no scripts
+    style: str = ""  # CSS scoped to the block
+
+
+class WorkspaceShortcut(_Op):
+    label: str
+    doctype: str
+    view: Literal["List", "New", "Report Builder", "Dashboard"] = "List"
+
+
+class CreateWorkspace(_Op):
+    op: Literal["create_workspace"] = "create_workspace"
+    title: str
+    module: str = "Buying"
+    html_blocks: list[str] = Field(default_factory=list)  # names of HTML blocks shown first (banner)
+    cards: list[str] = Field(default_factory=list)        # number card labels
+    charts: list[str] = Field(default_factory=list)       # dashboard chart names
+    shortcuts: list[WorkspaceShortcut] = Field(default_factory=list)
+    roles: list[str] = Field(default_factory=list)        # empty = everyone with access to the linked data
+
+
+RECORD_OPS = {"create_html_block": "Custom HTML Block", "create_workspace": "Workspace", "create_notification": "Notification", "create_report": "Report", "create_number_card": "Number Card",
               "create_dashboard_chart": "Dashboard Chart", "create_dashboard": "Dashboard"}
 
 
@@ -280,7 +304,7 @@ Op = Annotated[
     Union[
         AddCustomField, SetProperty, AddClientScript, AddServerValidation, SetSetting,
         CreateRole, AddPermission, CreateDocType, CreateWorkflow, CreateNotification, CreateReport,
-        CreateNumberCard, CreateDashboardChart, CreateDashboard,
+        CreateNumberCard, CreateDashboardChart, CreateDashboard, CreateHtmlBlock, CreateWorkspace,
     ],
     Field(discriminator="op"),
 ]
@@ -291,6 +315,7 @@ RISK = {
     "set_property": 1, "add_client_script": 1, "add_server_validation": 1, "set_setting": 1,
     "add_permission": 2, "create_workflow": 2,
     "create_notification": 1, "create_report": 0, "create_number_card": 0, "create_dashboard_chart": 0, "create_dashboard": 0,
+    "create_html_block": 0, "create_workspace": 0,
 }
 RISK_LEVELS = ("low", "medium", "high")
 
@@ -341,6 +366,11 @@ def describe(op) -> str:
         return f'Create {op.graph.lower()} chart "{op.name}" on {op.doctype}'
     if t == "create_dashboard":
         return f'Create dashboard "{op.name}" with {len(op.charts)} chart(s) and {len(op.cards)} number card(s)'
+    if t == "create_html_block":
+        return f'Create workspace HTML block "{op.name}"'
+    if t == "create_workspace":
+        return (f'Create workspace "{op.title}" with {len(op.cards)} number card(s), {len(op.charts)} chart(s) and '
+                f'{len(op.shortcuts)} shortcut(s)')
     if t == "create_doctype":
         kind = "child table" if op.is_child_table else "DocType"
         s = f'Create {kind} "{op.name}" in module {op.module} with {len(op.fields)} fields'

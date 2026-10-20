@@ -57,7 +57,7 @@ STANDARD_DOC_METHODS = {
 PHASE = {"create_role": 0, "create_doctype": 1, "add_custom_field": 2, "set_property": 3, "add_client_script": 4,
          "add_server_validation": 4, "create_workflow": 5, "set_setting": 5, "add_permission": 6,
          "create_notification": 7, "create_report": 7, "create_number_card": 7, "create_dashboard_chart": 7,
-         "create_dashboard": 8}
+         "create_dashboard": 8, "create_html_block": 7, "create_workspace": 9}
 
 
 @dataclass
@@ -480,8 +480,9 @@ def _field_type(ctx, doctype: str, field: str) -> str:
 def _check_record(op, ctx, snap, add, i) -> None:
     t = op.op
     label = {"create_notification": "Notification", "create_report": "Report", "create_number_card": "Number Card",
-             "create_dashboard_chart": "Dashboard Chart", "create_dashboard": "Dashboard"}[t]
-    name = op.label if t == "create_number_card" else op.name
+             "create_dashboard_chart": "Dashboard Chart", "create_dashboard": "Dashboard",
+             "create_html_block": "Custom HTML Block", "create_workspace": "Workspace"}[t]
+    name = op.label if t == "create_number_card" else op.title if t == "create_workspace" else op.name
     if not re.match(r"^[A-Za-z0-9][A-Za-z0-9 _.\-()/&,]{2,120}$", name or ""):
         add("error", "record_name", f'Invalid {label} name "{name}" (3-120 letters, digits, spaces, - _ . ( ) / & ,).', i)
     if snap.doc_exists(label, name):
@@ -496,6 +497,36 @@ def _check_record(op, ctx, snap, add, i) -> None:
                 add("error", "card_missing", f'Number card "{c}" does not exist; create it earlier in the same change set.', i)
         if not op.charts and not op.cards:
             add("error", "dashboard_empty", "A dashboard needs at least one chart or number card.", i)
+        return
+    if t == "create_html_block":
+        low = op.html.lower() + op.style.lower()
+        if "<script" in low or "javascript:" in low or re.search(r"\bon[a-z]+\s*=", low):
+            add("error", "html_script", "HTML blocks may not contain scripts or event handlers.", i)
+        if "@import" in low or "url(http" in low:
+            add("error", "html_external", "HTML blocks may not load external resources.", i)
+        if not op.html.strip():
+            add("error", "html_empty", "The HTML block is empty.", i)
+        return
+    if t == "create_workspace":
+        for n in op.html_blocks:
+            if ("Custom HTML Block", n) not in ctx.planned_records and not snap.doc_exists("Custom HTML Block", n):
+                add("error", "block_missing", f'HTML block "{n}" does not exist; create it earlier in the same change set.', i)
+        for n in op.cards:
+            if ("Number Card", n) not in ctx.planned_records and not snap.doc_exists("Number Card", n):
+                add("error", "card_missing", f'Number card "{n}" does not exist; create it earlier in the same change set.', i)
+        for n in op.charts:
+            if ("Dashboard Chart", n) not in ctx.planned_records and not snap.doc_exists("Dashboard Chart", n):
+                add("error", "chart_missing", f'Dashboard chart "{n}" does not exist; create it earlier in the same change set.', i)
+        for sc in op.shortcuts:
+            if not ctx.doctype_exists(sc.doctype):
+                add("error", "doctype_missing", f'Shortcut DocType "{sc.doctype}" does not exist.' + _close(sc.doctype, snap.doctypes()), i)
+        for r in op.roles:
+            if not ctx.role_exists(r):
+                add("error", "role_missing", f'Role "{r}" does not exist.' + _close(r, snap.roles()), i)
+        if op.module not in snap.modules():
+            add("error", "module_missing", f'Module "{op.module}" does not exist.', i)
+        if not (op.cards or op.charts or op.shortcuts or op.html_blocks):
+            add("error", "workspace_empty", "A workspace needs at least one block.", i)
         return
     dt = op.doctype
     if not ctx.doctype_exists(dt):

@@ -207,7 +207,44 @@ def dashboard_payload(op) -> dict:
             "charts": [{"chart": c, "width": "Half"} for c in op.charts], "cards": [{"card": c} for c in op.cards]}
 
 
+def html_block_payload(op) -> dict:
+    return {"doctype": "Custom HTML Block", "name": op.name, "html": op.html, "style": op.style, "private": 0}
+
+
+def workspace_payload(op) -> dict:
+    import json
+    blocks: list = []
+
+    def add(kind: str, **data) -> None:
+        blocks.append({"id": f"b{len(blocks) + 1:02d}", "type": kind, "data": data})
+
+    add("header", text=f'<span class="h4"><b>{op.title}</b></span>', col=12)
+    for n in op.html_blocks:
+        add("custom_block", custom_block_name=n, col=12)
+    for n in op.cards:
+        add("number_card", number_card_name=n, col=4)
+    if op.cards:
+        add("spacer", col=12)
+    for n in op.charts:
+        add("chart", chart_name=n, col=6)
+    if op.shortcuts:
+        add("spacer", col=12)
+        add("header", text='<span class="h5"><b>Shortcuts</b></span>', col=12)
+        for sc in op.shortcuts:
+            add("shortcut", shortcut_name=sc.label, col=3)
+    d = {"doctype": "Workspace", "name": op.title, "label": op.title, "title": op.title, "public": 1, "module": op.module,
+         "content": json.dumps(blocks),
+         "custom_blocks": [{"custom_block_name": n, "label": n} for n in op.html_blocks],
+         "number_cards": [{"number_card_name": n, "label": n} for n in op.cards],
+         "charts": [{"chart_name": n, "label": n} for n in op.charts],
+         "shortcuts": [{"type": "DocType", "link_to": sc.doctype, "label": sc.label, "doc_view": sc.view}
+                       for sc in op.shortcuts],
+         "roles": [{"role": r} for r in op.roles]}
+    return d
+
+
 def record_payload(op) -> dict:
     return {"create_notification": notification_payload, "create_report": report_payload,
             "create_number_card": number_card_payload, "create_dashboard_chart": dashboard_chart_payload,
-            "create_dashboard": dashboard_payload}[op.op](op)
+            "create_dashboard": dashboard_payload, "create_html_block": html_block_payload,
+            "create_workspace": workspace_payload}[op.op](op)

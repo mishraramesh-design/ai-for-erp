@@ -20,7 +20,10 @@ OPS = [
     {"op": "create_number_card", "label": "High risk suppliers", "doctype": "Supplier",
      "filters": [{"field": "custom_risk", "value": "High"}]},
     {"op": "create_dashboard_chart", "name": "Suppliers by risk", "doctype": "Supplier", "group_by_field": "custom_risk"},
+    {"op": "create_html_block", "name": "demo-pilot banner", "html": "<div class='dp'>demo-pilot</div>", "style": ".dp{background:#FFE600;color:#000}"},
     {"op": "create_dashboard", "name": "SRM", "charts": ["Suppliers by risk"], "cards": ["High risk suppliers"]},
+    {"op": "create_workspace", "title": "SRM Home", "html_blocks": ["demo-pilot banner"], "cards": ["High risk suppliers"],
+     "charts": ["Suppliers by risk"], "shortcuts": [{"label": "Suppliers", "doctype": "Supplier"}]},
 ]
 
 
@@ -61,9 +64,14 @@ def test_apply_verify_undo_and_export(tmp_path):
     assert Applier(erp, snap).undo(cs2) == []
     assert erp.get_doc("Notification", "High risk supplier") is None
     out = build(ledger, reqs)
-    for fx in ("notification", "report", "number_card", "dashboard_chart", "dashboard"):
+    for fx in ("custom_html_block", "workspace", "notification", "report", "number_card", "dashboard_chart", "dashboard"):
         assert any(p.endswith(f"fixtures/{fx}.json") for p in out.files), (fx, sorted(out.files))
     rep = json.loads(next(v for p, v in out.files.items() if p.endswith("fixtures/report.json")))[0]
     assert rep["report_type"] == "Report Builder" and json.loads(rep["json"])["fields"][0] == ["name", "Supplier"]
     hooks = next(v for p, v in out.files.items() if p.endswith("hooks.py"))
     assert hooks.index("'Report'") < hooks.index("'Notification'") < hooks.index("'Dashboard'")
+
+
+def test_html_block_rejects_scripts():
+    got = codes([{"op": "create_html_block", "name": "bad block", "html": "<img src=x onerror=alert(1)>"}])
+    assert "html_script" in got

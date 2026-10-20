@@ -30,7 +30,7 @@ BLOCK_END = "# GENERATED BLOCK END"
 # Import order matters: masters before the documents that link to them.
 ORDER = ["Role", "Workflow State", "Workflow Action Master", "DocType", "Custom Field", "Property Setter",
          "Client Script", "Server Script", "Workflow", "Report", "Notification", "Number Card", "Dashboard Chart",
-         "Dashboard"]
+         "Dashboard", "Custom HTML Block", "Workspace"]
 
 
 DEFAULT_HOOKS = ('app_name = "csd_customizations"\napp_title = "CSD Customizations"\napp_publisher = "ai-for-erp"\n'

@@ -259,6 +259,12 @@ def _record_checks(op, d, add, i) -> None:
     elif t == "create_dashboard_chart":
         add(i, "chart reads the right DocType", d.get("document_type") == op.doctype, f"found {d.get('document_type')}")
         add(i, f"chart type is {op.chart_type}", d.get("chart_type") == op.chart_type, f"found {d.get('chart_type')}")
+    elif t == "create_html_block":
+        add(i, "HTML stored", (d.get("html") or "").strip() == op.html.strip())
+    elif t == "create_workspace":
+        add(i, "workspace is public", bool(d.get("public")))
+        add(i, "workspace blocks stored", len(d.get("number_cards") or []) == len(op.cards) and len(d.get("charts") or []) == len(op.charts)
+            and len(d.get("shortcuts") or []) == len(op.shortcuts) and len(d.get("custom_blocks") or []) == len(op.html_blocks))
     elif t == "create_dashboard":
         add(i, "dashboard charts stored", len(d.get("charts") or []) == len(op.charts), f"{len(d.get('charts') or [])} of {len(op.charts)}")
         add(i, "dashboard cards stored", len(d.get("cards") or []) == len(op.cards), f"{len(d.get('cards') or [])} of {len(op.cards)}")

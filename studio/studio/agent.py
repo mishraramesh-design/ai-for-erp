@@ -36,6 +36,8 @@ You output ONE JSON object:
  create_number_card {{label, doctype, function? Count|Sum|Average|Minimum|Maximum, field? (numeric, for non-Count), filters?, color?}}
  create_dashboard_chart {{name, doctype, chart_type? Group By|Count|Sum|Average, group_by_field? (Group By), date_field? (time axis for Count/Sum/Average), value_field?, graph? Bar|Line|Pie|Donut|Percentage, interval?, timespan?, filters?}}
  create_dashboard {{name, charts: [chart names created or existing], cards: [number card labels]}}   (shows charts and cards together at /app/dashboard-view/<name>)
+ create_html_block {{name, html, style?}}   (static banner/branding block for a workspace; no scripts, no external resources)
+ create_workspace {{title, module? (default Buying), html_blocks: [block names], cards: [number card labels], charts: [chart names], shortcuts: [{{label, doctype, view? List|New|Report Builder|Dashboard}}], roles?}}   (a landing page; create blocks/cards/charts earlier in the same ops list)
 Field types: {", ".join(FIELD_TYPES)}. Link fields need options = an EXISTING DocType name. Select options are newline-separated.
 Rules:
  - Use ONLY DocTypes, fields and roles that appear in the context below, or ones you create in the same ops list (create_role before use).

@@ -20,7 +20,7 @@ pytestmark = pytest.mark.skipif(not BENCH, reason="STUDIO_IT_BENCH not set")
 
 def test_recipes_round_trip(erp, tmp_path):
     t = uuid.uuid4().hex[:5]
-    names = {"n": f"Rn {t}", "r": f"Rr {t}", "c": f"Rc {t}", "ch": f"Rch {t}", "d": f"Rd {t}"}
+    names = {"n": f"Rn {t}", "r": f"Rr {t}", "c": f"Rc {t}", "ch": f"Rch {t}", "d": f"Rd {t}", "h": f"Rh {t}", "w": f"Rw {t}"}
     ops = [
         {"op": "create_notification", "name": names["n"], "doctype": "Supplier", "event": "Save", "subject": "S {{ doc.name }}",
          "message": "<p>{{ doc.supplier_name }}</p>", "condition": "doc.disabled == 1", "recipients": [{"role": "System Manager"}]},
@@ -28,7 +28,10 @@ def test_recipes_round_trip(erp, tmp_path):
          "filters": [{"field": "disabled", "value": 0}]},
         {"op": "create_number_card", "label": names["c"], "doctype": "Supplier", "filters": [{"field": "disabled", "value": 0}]},
         {"op": "create_dashboard_chart", "name": names["ch"], "doctype": "Supplier", "group_by_field": "supplier_group"},
+        {"op": "create_html_block", "name": names["h"], "html": "<div class='dp'>demo-pilot</div>", "style": ".dp{background:#FFE600;color:#000;padding:8px}"},
         {"op": "create_dashboard", "name": names["d"], "charts": [names["ch"]], "cards": [names["c"]]},
+        {"op": "create_workspace", "title": names["w"], "html_blocks": [names["h"]], "cards": [names["c"]], "charts": [names["ch"]],
+         "shortcuts": [{"label": "Suppliers", "doctype": "Supplier"}]},
     ]
     snap = Snapshot(erp, ttl=0)
     ap = Applier(erp, snap)
@@ -51,7 +54,8 @@ def test_recipes_round_trip(erp, tmp_path):
     hooks_path = os.path.join(pkg, "hooks.py")
     original = open(hooks_path).read()
     pairs = [("Notification", names["n"]), ("Report", names["r"]), ("Number Card", names["c"]),
-             ("Dashboard Chart", names["ch"]), ("Dashboard", names["d"])]
+             ("Dashboard Chart", names["ch"]), ("Dashboard", names["d"]),
+             ("Custom HTML Block", names["h"]), ("Workspace", names["w"])]
     try:
         out = build(ledger, reqs, original, prefix="")
         for rel, text in out.files.items():
