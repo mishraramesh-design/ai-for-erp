@@ -75,3 +75,12 @@ def test_apply_verify_undo_and_export(tmp_path):
 def test_html_block_rejects_scripts():
     got = codes([{"op": "create_html_block", "name": "bad block", "html": "<img src=x onerror=alert(1)>"}])
     assert "html_script" in got
+
+
+def test_workflow_state_field_is_known_after_a_planned_workflow():
+    ops = [{"op": "create_workflow", "name": "Supplier flow", "doctype": "Supplier",
+            "states": [{"state": "Draft", "doc_status": 0, "allow_edit": "System Manager"},
+                       {"state": "Approved", "doc_status": 0, "allow_edit": "System Manager"}],
+            "transitions": [{"state": "Draft", "action": "Approve", "next_state": "Approved", "allowed": "System Manager"}]},
+           {"op": "create_report", "name": "By state", "doctype": "Supplier", "columns": ["name", "workflow_state"]}]
+    assert "field_missing" not in codes(ops)

@@ -398,6 +398,7 @@ def validate(cs: ChangeSet, snap) -> list:
 
 
 def _check_workflow(op, ctx, snap, add, i) -> None:
+    ctx.planned_fields.setdefault(op.doctype, set()).add("workflow_state")  # Frappe adds this field with the workflow
     if not ctx.doctype_exists(op.doctype):
         add("error", "doctype_missing", f'DocType "{op.doctype}" does not exist.' + _close(op.doctype, snap.doctypes()), i)
         return
