@@ -441,7 +441,10 @@ def normalize_ops(ops) -> list:
         if isinstance(o.get("op"), str):
             o["op"] = o["op"].strip().lower().replace("-", "_").replace(" ", "_")
         for k in ("value_changed", "date_field", "sort_by", "field"):
-            if isinstance(o.get(k), list):
+            if isinstance(o.get(k), dict):
+                v = o[k].get("field") or o[k].get("fieldname") or next(iter(o[k].values()), None)
+                o[k] = str(v) if v else None
+            elif isinstance(o.get(k), list):
                 o[k] = str(o[k][0]) if o[k] else None
             elif o.get(k) is not None and not isinstance(o[k], str) and o.get("op") in RECORD_OPS:
                 o[k] = str(o[k])
