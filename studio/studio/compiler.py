@@ -9,6 +9,23 @@ def b(v) -> int:
     return 1 if v else 0
 
 
+_ISO_DATE = __import__("re").compile(r"^\d{4}-\d{2}-\d{2}$")
+_ISO_DT = __import__("re").compile(r"^\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}(:\d{2})?$")
+
+
+def norm_default(fieldtype: str, default):
+    """Frappe only accepts "Today"/"Now" or an ISO literal as a Date/Datetime default; anything else breaks the table."""
+    if default in (None, "") or fieldtype not in ("Date", "Datetime", "Time"):
+        return default
+    d = str(default).strip()
+    low = d.lower()
+    if fieldtype == "Date":
+        return "Today" if low in ("today", "now", "current date") else d if _ISO_DATE.match(d) else None
+    if fieldtype == "Datetime":
+        return "Now" if low in ("now", "today", "current datetime") else d if _ISO_DT.match(d) else None
+    return "Now" if low in ("now", "current time") else d if __import__("re").match(r"^\d{2}:\d{2}(:\d{2})?$", d) else None
+
+
 def custom_field_payload(op) -> dict:
     d = {
         "doctype": "Custom Field", "dt": op.doctype, "fieldname": op.fieldname, "label": op.label,
@@ -16,7 +33,7 @@ def custom_field_payload(op) -> dict:
         "hidden": b(op.hidden), "read_only": b(op.read_only),
     }
     for k in ("insert_after", "options", "default", "description", "depends_on"):
-        v = getattr(op, k)
+        v = norm_default(op.fieldtype, op.default) if k == "default" else getattr(op, k)
         if v not in (None, ""):
             d[k] = v
     return d
@@ -71,7 +88,7 @@ def _field_row(f, first_idx_flag: bool = False) -> dict:
         "read_only": b(f.read_only), "hidden": b(f.hidden),
     }
     for k in ("options", "default", "description", "depends_on", "fetch_from"):
-        v = getattr(f, k)
+        v = norm_default(f.fieldtype, f.default) if k == "default" else getattr(f, k)
         if v not in (None, ""):
             row[k] = v
     return row

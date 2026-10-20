@@ -102,3 +102,10 @@ def test_administrator_role_cannot_be_granted():
     ops = [{"op": "create_doctype", "name": "Zed Doc", "fields": [{"fieldname": "title", "label": "Title", "fieldtype": "Data"}],
             "permissions": [{"role": "Administrator", "read": True}]}]
     assert "perm_system_role" in codes(ops)
+
+
+def test_date_defaults_are_normalised_for_frappe():
+    from studio.compiler import norm_default
+    assert norm_default("Date", "today") == "Today" and norm_default("Date", "Now") == "Today"
+    assert norm_default("Datetime", "today") == "Now" and norm_default("Date", "2026-10-21") == "2026-10-21"
+    assert norm_default("Date", "next week") is None and norm_default("Data", "today") == "today"
