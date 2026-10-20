@@ -189,7 +189,7 @@ class Kernel:
                 gid = f"g{n + 1}"
                 n += 1
                 label = " / ".join(x for x in (key[1], key[2]) if x) or key[0]
-                run.groups[gid] = {"label": label, "ids": [r.id for r in chunk], "guidance": guidance, "feedback": "", "hints": {},
+                run.groups[gid] = {"label": label, "ids": [r.id for r in chunk], "all_ids": [r.id for r in chunk], "guidance": guidance, "feedback": "", "hints": {},
                                    "approach": {}, "cs_id": "", "attempt": 0, "closed": False, "outcome": ""}
                 run.tasks.append(Task(f"{gid}.triage", "triage", gid))
                 run.tasks.append(Task(f"{gid}.analyze", "analyze", gid, deps=[f"{gid}.triage"]))
@@ -502,6 +502,8 @@ class Kernel:
         bad = {i: v for i, v in verdicts.items() if v["verdict"] != "pass"}
         self._log(run, t.id, "ok" if not bad else "warn",
                   f"Reviewer: {len(verdicts) - len(bad)} pass, {len(bad)} need work.", tier="model")
+        for i, v in bad.items():
+            self._log(run, t.id, "warn", f"[{i}] {v['verdict']}: {v['issue']}", tier="model")
         res = {"verdicts": {str(i): v for i, v in verdicts.items()}}
         if bad and t.attempt < run.policy.max_repairs:
             fb = "\n".join(f"- requirement {i}: {v['verdict']}: {v['issue']}" for i, v in bad.items())
@@ -596,6 +598,20 @@ class Kernel:
     def _repair(self, run: Run, t: Task, g: dict, feedback: str, why: str) -> Outcome:
         d = self._make_deps()
         ids = list(g["ids"])
+        if t.attempt >= run.policy.max_repairs and len(ids) > 1 and not g.get("split"):
+            # divide and conquer: one stubborn requirement must not sink its neighbours
+            spawn = []
+            for rid in ids:
+                sid = f"{t.group}s{rid}"
+                run.groups[sid] = {"label": f"{g['label']} · {rid}", "ids": [rid], "all_ids": [rid], "guidance": g.get("guidance", ""),
+                                   "feedback": "", "hints": {k: v for k, v in g["hints"].items() if k == str(rid)},
+                                   "approach": {k: v for k, v in g["approach"].items() if k == str(rid)},
+                                   "cs_id": "", "attempt": 0, "closed": False, "outcome": "", "split": True}
+                spawn.extend(self._chain(sid, 0, [t.id]))
+            d.reqs.mark(ids, "backlog", note=f"Splitting into single requirements: {why}")
+            self._close(run, t.group, f"split into {len(ids)}", skip_after=t)
+            self._log(run, t.id, "warn", f"{why}; retrying each of the {len(ids)} requirements on its own.", tier="rule")
+            return Outcome("done", f"split into {len(ids)} groups", {"split": len(ids)}, spawn=spawn)
         if t.attempt >= run.policy.max_repairs:
             d.reqs.mark(ids, "blocked", note=f"{why} after {t.attempt + 1} attempt(s): {feedback[:240]}")
             self._close(run, t.group, "blocked", skip_after=t)
@@ -620,6 +636,6 @@ class Kernel:
         d = {"id": run.id, "title": run.title, "status": run.status, "created": run.created, "ended": run.ended,
              "error": run.error, "policy": asdict(run.policy), "tiers": tiers,
              "tasks": [t.public() for t in run.tasks], "events": run.events[since:], "next": len(run.events),
-             "groups": {k: {kk: v for kk, v in g.items() if kk in ("label", "ids", "cs_id", "outcome", "closed", "attempt")} for k, g in run.groups.items()},
+             "groups": {k: {kk: v for kk, v in g.items() if kk in ("label", "ids", "all_ids", "cs_id", "outcome", "closed", "attempt")} for k, g in list(run.groups.items())},
              "pending_approvals": [t.id for t in run.tasks if t.status == "held"]}
         return d

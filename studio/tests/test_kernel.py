@@ -175,3 +175,27 @@ def test_nothing_waiting_is_rejected(env):
     reqs.mark([100001], "verified")
     with pytest.raises(ValueError):
         k.start("p", [100001])
+
+
+def test_failing_group_is_split_into_single_requirements(env):
+    k, reqs, erp, ledger, h = env
+
+    class SplitLlm(ScriptLlm):
+        def complete_json(self, system, user, max_tokens=None):
+            if "closing fit-gap" in system:
+                self.calls += 1
+                ids = ids_in(user)
+                if len(ids) > 1:  # the multi-requirement plan always trips the validator
+                    return {"title": "t", "summary": "s", "covered": ids, "not_covered": [], "ops": [
+                        {"op": "add_server_validation", "doctype": "Supplier", "event": "before_save", "name": "bad",
+                         "script": "x = getattr(doc, 'a')"}]}
+                return plan_supplier_field(ids)
+            return super().complete_json(system, user, max_tokens)
+
+    h["llm"] = SplitLlm([{"x": 0}])
+    h["enabled"]["reviewer"] = False
+    run = k.start("p", [100001, 100003], {"auto_low": True})
+    wait_for(k, run, ("done", "failed", "waiting_approval"), 30)
+    assert any(g.get("split") for g in run.groups.values())
+    assert run.groups["g1"]["outcome"].startswith("split")
+    assert {"g1s100001", "g1s100003"} <= set(run.groups)

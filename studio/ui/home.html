@@ -157,7 +157,7 @@ function runHtml(r){
    ${cs.status==='applied'?`<div class="row"><button class="bad" data-undo="${cs.id}">Undo this change</button></div>`:''}</div>`:'';
   const appr=held?`<div class="card" style="background:var(--hold-bg);margin:10px 0 0"><b>Waiting for your approval</b><div>${esc(held.note)}. Review the operations above, then decide.</div>
    <div class="row"><button class="p" data-approve="${held.id}">Approve and apply</button><input id="rj${gid}" placeholder="reason if rejecting" style="max-width:260px"><button class="bad" data-reject="${held.id}" data-g="${gid}">Reject</button></div></div>`:'';
-  return `<div class="card"><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><h3 style="margin:0">${esc(g.label)}</h3><span class="muted">${g.ids.length} requirement(s)</span>${g.outcome?tag(g.outcome,{verified:'ok',built:'ok',blocked:'bad',failed:'bad',rejected:''}[g.outcome]):''}</div>${pipes}${csHtml}${appr}</div>`}).join('');
+  return `<div class="card"><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><h3 style="margin:0">${esc(g.label)}</h3><span class="muted">${(g.all_ids||g.ids).length} requirement(s)</span>${g.outcome?tag(g.outcome,{verified:'ok',built:'ok',blocked:'bad',failed:'bad',rejected:''}[g.outcome]):''}</div>${pipes}${csHtml}${appr}</div>`}).join('');
  return `<h2>${esc(r.title)} ${chip}</h2><p class="sub">${T.rule||0} rule steps · ${T.engine||0} engine steps · ${T.model||0} model steps · ${T.human||0} human · ${u.calls||0} model calls, ${(u.tokens_in||0)+(u.tokens_out||0)} tokens
  ${['running','waiting_approval'].includes(r.status)?' · <a href="#" id="cx">Cancel run</a>':''}</p>${r.error?`<p class="bad">${esc(r.error)}</p>`:''}${groups}
  <div class="card"><h3>Event log</h3><div class="log" id="lg">${LOG.map(e=>`<div class="${e.level}">${esc(e.tier?('['+e.tier+'] '):'')}${esc(e.text)}</div>`).join('')}</div></div>
@@ -167,7 +167,7 @@ V.run.after=(id)=>{
  async function tick(){if(N!==NAV)return;const r=await api(`/api/runs/${id}?since=${since}`);if(r.detail||N!==NAV)return;
   LOG=LOG.concat(r.events);since=r.next;const full=await api(`/api/runs/${id}`);if(N!==NAV)return;
   const y=$('#lg')?$('#lg').scrollTop:0;$('#rv').innerHTML=runHtml({...full,events:[]});bind();const lg=$('#lg');if(lg)lg.scrollTop=lg.scrollHeight;
-  const ids=[...new Set(Object.values(full.groups).flatMap(g=>g.ids))];loadReqs(ids);
+  const ids=[...new Set(Object.values(full.groups).flatMap(g=>g.all_ids||g.ids))];loadReqs(ids);
   if(['running','waiting_approval'].includes(full.status))timer=setTimeout(tick,full.status==='running'?1200:3000)}
  async function loadReqs(ids){if(!ids.length)return;const l=await api('/api/requirements?gap=false&ids='+ids.join(','));const el=$('#rq');if(!el||N!==NAV)return;
   el.innerHTML=`<table><tr><th>ID</th><th>Requirement</th><th>Status</th></tr>${(l.items||[]).map(r=>`<tr><td>${r.id}</td><td>${esc(r.text.slice(0,180))}${r.notes?`<div class="muted">${esc(r.notes.slice(0,200))}</div>`:''}</td><td>${tag(r.status)}</td></tr>`).join('')}</table>`}

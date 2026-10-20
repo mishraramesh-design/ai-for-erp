@@ -24,7 +24,8 @@ You output ONE JSON object:
  set_property {{doctype, fieldname? (omit for form-level), property in {sorted(PROPERTY_TYPES)}, value}}
  add_client_script {{doctype, name, script}}  (JavaScript using frappe.ui.form.on('<DocType>', {{...}}); no fetch, no external URLs)
  add_server_validation {{doctype, event in before_insert|before_validate|before_save|after_insert|after_save|before_submit|after_submit|before_cancel|after_cancel|before_delete|after_delete, name, script}}
-   (Frappe restricted Python: NO imports; use frappe.throw(), frappe.db.get_value(), frappe.utils.* ; read fields as doc.<fieldname>; keep tunable numbers as UPPERCASE constants at the top)
+   (Frappe restricted Python: NO imports; use frappe.throw(), frappe.db.get_value(), frappe.utils.* ; read fields as doc.<fieldname>; keep tunable numbers as UPPERCASE constants at the top;
+    NEVER use getattr, setattr, hasattr-style tricks, underscore-prefixed names, imports, open, eval or exec: use doc.get('field'), doc.fieldname, frappe.db.get_value, frappe.utils.getdate/flt/cint)
  set_setting {{doctype in {sorted(SETTING_DOCTYPES)}, field, value}}
  create_role {{role_name}}
  add_permission {{doctype, role, permlevel?, read, write, create, delete, submit, cancel, amend, report, export, print, email, share}}
