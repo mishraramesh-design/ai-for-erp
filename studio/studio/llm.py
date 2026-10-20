@@ -72,10 +72,20 @@ def call_provider(kind: str, base_url: str, api_key: str, model: str, system: st
         u = d.get("usage") or {}
         return extract_json(text), {"in": int(u.get("input_tokens") or 0), "out": int(u.get("output_tokens") or 0)}
     url = (base_url or "https://api.openai.com/v1").rstrip("/") + "/chat/completions"
-    body = {"model": model, "response_format": {"type": "json_object"}, "max_completion_tokens": max_tokens,
-            "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}]}
-    r = _post(url, {"Authorization": f"Bearer {api_key}"}, body, timeout)
-    d = r.json()
-    u = d.get("usage") or {}
-    return (extract_json(d["choices"][0]["message"].get("content") or ""),
-            {"in": int(u.get("prompt_tokens") or 0), "out": int(u.get("completion_tokens") or 0)})
+    # Reasoning models spend completion tokens on hidden thinking; when the budget runs out the answer is empty
+    # (finish_reason "length"). Retry once with a larger budget instead of failing the whole task.
+    budget = max(max_tokens, 12000)
+    for attempt in range(2):
+        body = {"model": model, "response_format": {"type": "json_object"}, "max_completion_tokens": budget,
+                "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}]}
+        r = _post(url, {"Authorization": f"Bearer {api_key}"}, body, max(timeout, 240.0))
+        d = r.json()
+        u = d.get("usage") or {}
+        choice = d["choices"][0]
+        text = choice["message"].get("content") or ""
+        if text.strip() or choice.get("finish_reason") != "length" or attempt:
+            break
+        budget *= 2
+    if not text.strip():
+        raise LlmError(f"The model returned no answer (finish reason: {choice.get('finish_reason')}; token budget {budget}).")
+    return (extract_json(text), {"in": int(u.get("prompt_tokens") or 0), "out": int(u.get("completion_tokens") or 0)})

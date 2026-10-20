@@ -203,3 +203,24 @@ def test_promote_and_reuse_pattern(env):
     r = route("Block purchase order when total exceeds limit 25", {"doctype": "Purchase Order"}, snap, pats, None)
     assert r.kind == "pattern", r.kind
     assert r.changeset.ops[0].doctype == "Purchase Order" and "LIMIT_PCT = 25" in r.changeset.ops[0].script
+
+
+def test_openai_empty_answer_on_length_retries_with_bigger_budget(monkeypatch):
+    from studio import llm
+
+    calls = []
+
+    class R:
+        def __init__(self, content, reason):
+            self._d = {"choices": [{"message": {"content": content}, "finish_reason": reason}], "usage": {}}
+
+        def json(self):
+            return self._d
+
+    def fake_post(url, headers, body, timeout, retry_codes=()):
+        calls.append(body["max_completion_tokens"])
+        return R("" if len(calls) == 1 else '{"ok": 1}', "length" if len(calls) == 1 else "stop")
+
+    monkeypatch.setattr(llm, "_post", fake_post)
+    out, _ = llm.call_provider("openai", "", "k", "gpt-5", "s", "u")
+    assert out == {"ok": 1} and calls[1] == calls[0] * 2
