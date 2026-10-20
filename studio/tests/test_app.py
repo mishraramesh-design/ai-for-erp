@@ -115,3 +115,18 @@ def test_requirements_import_and_run_guards(client):
     assert client.get("/api/runs/nope").status_code == 404
     assert client.post("/api/runs/nope/approve", json={"task": "x"}).status_code == 409
     assert client.get("/api/requirements/stats").json()["totals"]["total"] == 2
+
+
+def test_export_endpoints_and_token_never_returned(client, tmp_path):
+    import io
+    import zipfile
+    login(client)
+    r = client.put("/api/github", json={"repo": "o/r", "base": "main", "token": "ghp_secret_1"}).json()
+    assert r["token_set"] and "ghp_secret_1" not in str(r)
+    assert "ghp_secret_1" not in (tmp_path / "vault.json").read_text() if (tmp_path / "vault.json").exists() else True
+    p = client.get("/api/export").json()
+    assert p["change_sets"] == [] and any(f.endswith("hooks.py") for f in p["files"])
+    z = zipfile.ZipFile(io.BytesIO(client.get("/api/export/bundle").content))
+    assert any(n.endswith("studio_manifest.json") for n in z.namelist())
+    assert client.post("/api/export/publish", json={}).status_code == 409  # nothing verified yet
+    assert client.get("/api/export").status_code == 200

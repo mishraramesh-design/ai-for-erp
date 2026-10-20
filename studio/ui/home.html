@@ -18,7 +18,7 @@ h2{margin:0 0 4px;font-size:20px}h3{margin:0 0 8px;font-size:15px}.sub{color:var
 label{display:block;font-size:12px;color:var(--muted);margin:10px 0 3px}
 input,select,textarea{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg);font:inherit}
 input[type=checkbox]{width:auto}
-button{padding:8px 14px;border:1px solid var(--line);border-radius:8px;background:var(--surface2);color:var(--fg);font:inherit;cursor:pointer}
+button,a.btn{display:inline-block;text-decoration:none;padding:8px 14px;border:1px solid var(--line);border-radius:8px;background:var(--surface2);color:var(--fg);font:inherit;cursor:pointer}
 button.p{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600}button.bad{color:var(--bad)}button:disabled{opacity:.5;cursor:default}
 .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;align-items:center}
 .ok{color:var(--ok)}.bad{color:var(--bad)}.muted{color:var(--muted)}
@@ -41,7 +41,7 @@ ul.lines{margin:6px 0 0;padding-left:18px}
 </style></head><body>
 <header><div class="brand">◆ ERPNext Studio</div><span class="chip" id="ver"></span><div class="sp"></div><button id="out">Sign out</button></header>
 <div class="app"><nav>
-<a data-t="overview">Overview</a><a data-t="reqs">Requirements</a><a data-t="runs">Runs</a><a href="/workbench">Workbench <span class="chip">preview</span></a>
+<a data-t="overview">Overview</a><a data-t="reqs">Requirements</a><a data-t="runs">Runs</a><a data-t="export">Export</a><a href="/workbench">Workbench <span class="chip">preview</span></a>
 <small>Setup</small><a data-t="models">Models</a><a data-t="erp">ERPNext</a></nav>
 <main id="m"></main></div>
 <script>
@@ -177,6 +177,35 @@ V.run.after=(id)=>{
   document.querySelectorAll('[data-undo]').forEach(b=>b.onclick=async()=>{b.disabled=true;const r=await api(`/api/changesets/${b.dataset.undo}/undo`,{method:'POST',body:{}});clearTimeout(timer);tick()});
   const cx=$('#cx');if(cx)cx.onclick=async e=>{e.preventDefault();await api(`/api/runs/${id}/cancel`,{method:'POST',body:{}});clearTimeout(timer);tick()}}
  bind();const lg=$('#lg');if(lg)lg.scrollTop=lg.scrollHeight;tick()};
+
+/* ---------------------------------------------------------------- export */
+let XP={pr:null,drift:null,msg:''};
+V.export=async()=>{const [e,g]=await Promise.all([api('/api/export'),api('/api/github')]);
+ const cnt=Object.entries(e.counts||{}).map(([k,v])=>`<span class="chip">${esc(k)} ${v}</span>`).join(' ')||'<span class="muted">nothing yet</span>';
+ const items=(e.items||[]).map(i=>`<div class="card"><b>${esc(i.title||i.id)}</b> ${tag(i.risk,i.risk==='high'?'bad':i.risk==='medium'?'hold':'ok')} <span class="muted">requirements ${esc((i.requirements||[]).join(', '))}</span><ul>${(i.lines||[]).map(l=>`<li>${esc(l)}</li>`).join('')}</ul></div>`).join('');
+ const sk=(e.skipped||[]).map(x=>`<li>${esc(x.title||x.id)} <span class="muted">· ${esc(x.reason)}</span></li>`).join('');
+ const dr=XP.drift?`<div class="card"><b>Drift against the development site</b> <span class="muted">${XP.drift.differs?XP.drift.differs+' item(s) differ':'everything matches'}</span><table>${XP.drift.items.filter(r=>r.state!=='same').map(r=>`<tr><td>${esc(r.doctype)}</td><td>${esc(r.name)}</td><td>${tag(r.state,r.state==='missing'?'bad':'hold')}</td><td class="muted">${esc((r.fields||[]).join(', '))}</td></tr>`).join('')||'<tr><td class="muted">no differences</td></tr>'}</table></div>`:'';
+ const pr=XP.pr?`<div class="card"><b>Pull request #${XP.pr.number}</b> ${tag(XP.pr.merged?'merged':XP.pr.state,XP.pr.merged?'ok':'run')} <a href="${esc(XP.pr.url)}" target="_blank" rel="noopener">open on GitHub</a>
+   <div class="muted">Merging starts the release build: CI bakes the change into the ERPNext image. Production is only updated when you pull that image there.</div>
+   <div class="row"><button id="prs">Refresh</button>${XP.pr.merged?'':'<button class="p" id="prm">Merge into main</button>'}</div></div>`:'';
+ return `<h2>Export</h2><p class="sub">Verified changes become files in your <b>csd_customizations</b> app, delivered as a pull request. Nothing reaches production from here.</p>
+  <div class="card"><b>What will ship</b> <span class="muted">${(e.change_sets||[]).length} verified change set(s)</span><div style="margin-top:8px">${cnt}</div>
+   ${sk?`<div class="muted" style="margin-top:8px">Left out:<ul>${sk}</ul></div>`:''}
+   <div class="row"><button class="p" id="xpub" ${(e.change_sets||[]).length&&g.token_set&&g.repo?'':'disabled'}>Publish pull request</button><a class="btn" href="/api/export/bundle">Download zip</a><button id="xdr">Check drift</button><span id="xmsg" class="muted">${esc(XP.msg)}</span></div></div>
+  ${pr}${dr}${items}
+  <div class="card"><b>GitHub</b><span class="muted"> · a fine-grained token with Contents and Pull requests (write) on this one repository</span><div class="grid">
+   <div><label>Repository</label><input id="gr" placeholder="owner/name" value="${esc(g.repo)}"></div><div><label>Base branch</label><input id="gb" value="${esc(g.base||'main')}"></div>
+   <div><label>Token ${g.token_set?'(saved, leave empty to keep)':''}</label><input id="gt" type="password" autocomplete="off"></div></div>
+   <div class="row"><button id="gs">Save</button><button id="gtst">Test connection</button><span id="gmsg" class="muted"></span></div></div>`};
+V.export.after=()=>{const m=t=>$('#xmsg').textContent=t;
+ $('#gs').onclick=async()=>{const r=await api('/api/github',{method:'PUT',body:{repo:$('#gr').value,base:$('#gb').value,token:$('#gt').value}});$('#gmsg').textContent=r.detail||'Saved';go('export')};
+ $('#gtst').onclick=async()=>{const r=await api('/api/github/test',{method:'POST',body:{}});$('#gmsg').innerHTML=r.detail?`<span class="bad">${esc(r.detail)}</span>`:`<span class="ok">Connected to ${esc(r.repo)}${r.can_push?'':' (no push access!)'}</span>`};
+ $('#xdr').onclick=async()=>{m('Checking…');const r=await api('/api/export/drift');if(r.detail){m(r.detail);return}XP.drift=r;go('export')};
+ $('#xpub').onclick=async()=>{m('Publishing…');const r=await api('/api/export/publish',{method:'POST',body:{}});
+  if(r.detail){m(r.detail);return}if(!r.changed){XP.msg=r.message;go('export');return}XP.pr={number:r.number,url:r.url,state:'open',merged:false};XP.msg='Pull request opened';go('export')};
+ const prs=$('#prs');if(prs)prs.onclick=async()=>{const r=await api('/api/export/pr/'+XP.pr.number);if(!r.detail){XP.pr={...XP.pr,...r}}go('export')};
+ const prm=$('#prm');if(prm)prm.onclick=async()=>{if(prm.dataset.sure!=='1'){prm.dataset.sure='1';prm.textContent='Click again to merge and start the release build';return}
+  const r=await api('/api/export/pr/'+XP.pr.number+'/merge',{method:'POST',body:{}});XP.msg=r.detail||(r.merged?'Merged. CI is building the release image.':r.message);if(r.merged)XP.pr.merged=true;go('export')}};
 
 /* ---------------------------------------------------------------- shell */
 async function go(t){stop();NAV++;let arg='';if(t.startsWith('run/')){arg=t.slice(4);t='run'}t=V[t]?t:'overview';
