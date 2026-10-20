@@ -126,7 +126,7 @@ def _run(llm, system: str, user: str, snap, source: str, message: str, created_b
         except ValidationError as e:
             msg = "; ".join(f"{'.'.join(str(x) for x in er['loc'])}: {er['msg']}" for er in e.errors()[:8])
             prompt = f"{user}\n\nYOUR PREVIOUS ANSWER WAS NOT VALID AGAINST THE SCHEMA:\n{msg}\nReturn corrected JSON."
-            res.reply = "The model returned a malformed change; retrying."
+            res.reply = f"The model returned a malformed change: {msg[:240]}"
             continue
         if not prop.ops:
             res.reply = prop.reply or "Nothing to change."

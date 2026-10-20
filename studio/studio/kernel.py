@@ -535,8 +535,11 @@ class Kernel:
             return out
         if bad:  # out of repairs: build what passed, hand the rest back with the reviewer's reason
             for i, v in bad.items():
-                d.reqs.mark([i], "needs_input", note=f"Reviewer: {v['issue']}")
-            cs.requirement_ids = [i for i in cs.requirement_ids if i not in bad]
+                if v["verdict"] == "partial":  # keep it: built and traceable, but never called verified
+                    g.setdefault("partial", {})[str(i)] = v["issue"][:300]
+                else:
+                    d.reqs.mark([i], "needs_input", note=f"Reviewer: {v['issue']}")
+            cs.requirement_ids = [i for i in cs.requirement_ids if i not in bad or bad[i]["verdict"] == "partial"]
             d.ledger.save(cs)
         return Outcome("done", f"{len(bad)} unresolved" if bad else "all claims pass", res)
 
@@ -610,9 +613,13 @@ class Kernel:
         inconclusive = any(c.status == "inconclusive" for c in checks) or any(x["status"] == "inconclusive" for x in tests)
         untested = any(o.op == "add_server_validation" for o in cs.ops) and not any(x["status"] == "pass" for x in tests)
         status = "built" if (inconclusive or untested) else "verified"
-        d.reqs.mark(cs.requirement_ids, status, cs.id, evidence=evidence[:60], by=f"run:{run.id}",
+        part = {int(k): v for k, v in (g.get("partial") or {}).items()}
+        full = [i for i in cs.requirement_ids if i not in part]
+        d.reqs.mark(full, status, cs.id, evidence=evidence[:60], by=f"run:{run.id}",
                     note="Applied, but no behavioural test passed for its validation rule: needs a person to check." if status == "built"
                     else "Verified on the live site.")
+        for i, why in part.items():  # reviewer said "partial": applied and checked, but a person decides if it is enough
+            d.reqs.mark([i], "built", cs.id, evidence=evidence[:60], by=f"run:{run.id}", note=f"Partly covered: {why}")
         for n in cs.not_covered:
             try:
                 d.reqs.mark([int(n["id"])], "needs_input", note=str(n.get("reason", ""))[:300])
@@ -665,6 +672,6 @@ class Kernel:
         d = {"id": run.id, "title": run.title, "status": run.status, "created": run.created, "ended": run.ended,
              "error": run.error, "policy": asdict(run.policy), "tiers": tiers,
              "tasks": [t.public() for t in run.tasks], "events": run.events[since:], "next": len(run.events),
-             "groups": {k: {kk: v for kk, v in g.items() if kk in ("label", "ids", "all_ids", "cs_id", "outcome", "closed", "attempt")} for k, g in list(run.groups.items())},
+             "groups": {k: {kk: v for kk, v in g.items() if kk in ("label", "ids", "all_ids", "cs_id", "outcome", "closed", "attempt", "partial")} for k, g in list(run.groups.items())},
              "pending_approvals": [t.id for t in run.tasks if t.status == "held"]}
         return d
