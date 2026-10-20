@@ -595,15 +595,18 @@ class Kernel:
             out.result = {**res, "undone": not problems, **out.result}
             return out
         inconclusive = any(c.status == "inconclusive" for c in checks) or any(x["status"] == "inconclusive" for x in tests)
-        status = "built" if inconclusive else "verified"
-        d.reqs.mark(cs.requirement_ids, status, cs.id, evidence=evidence[:60], by=f"run:{run.id}")
+        untested = any(o.op == "add_server_validation" for o in cs.ops) and not any(x["status"] == "pass" for x in tests)
+        status = "built" if (inconclusive or untested) else "verified"
+        d.reqs.mark(cs.requirement_ids, status, cs.id, evidence=evidence[:60], by=f"run:{run.id}",
+                    note="Applied, but no behavioural test passed for its validation rule: needs a person to check." if status == "built"
+                    else "Verified on the live site.")
         for n in cs.not_covered:
             try:
                 d.reqs.mark([int(n["id"])], "needs_input", note=str(n.get("reason", ""))[:300])
             except (KeyError, TypeError, ValueError):
                 continue
         self._log(run, t.id, "ok", f"Verified on the live site: {res['passed']}/{res['checks']} checks, {len(tests)} behavioural test(s)"
-                  + (" (some inconclusive: left as built)" if inconclusive else "") + ".", tier="engine")
+                  + (" (some inconclusive: left as built)" if inconclusive else " (a validation rule has no passing behavioural test: left as built)" if untested else "") + ".", tier="engine")
         self._close(run, t.group, status)
         return Outcome("done", f"{res['passed']}/{res['checks']} checks pass", res)
 
