@@ -1,0 +1,206 @@
+"""Export: turn the verified change sets in the ledger into files of the `csd_customizations` Frappe app.
+
+The result is deterministic: the whole file set is regenerated from the ledger every time, so the same ledger always
+gives the same bytes, a re-export after an undo removes what was undone, and a diff against the last export shows
+exactly what changed (R15, Charter D15). Nothing here talks to ERPNext or to a model.
+
+What is written (paths are relative to the app package, `csd_customizations/`):
+  fixtures/<doctype>.json   one list per DocType (Custom Field, Property Setter, Client/Server Script, Role, DocType,
+                            Workflow State, Workflow Action Master, Workflow), imported by `bench migrate`
+  studio_apply.py           permissions and single-DocType settings, applied idempotently after every migrate
+  studio_manifest.json      which change set, requirements and operations produced what (traceability)
+  hooks.py                  only the GENERATED BLOCK between the markers is replaced
+"""
+from __future__ import annotations
+
+import json
+import pprint
+import re
+from dataclasses import dataclass, field
+from typing import Optional
+
+from .compiler import (client_script_payload, custom_field_payload, doctype_payload, property_setter_payload,
+                       property_value, server_script_payload, workflow_payload)
+from .spec import describe
+
+APP = "csd_customizations"
+PKG_PREFIX = "customizations/csd_customizations/csd_customizations/"
+BLOCK_START = "# GENERATED BLOCK START (written by the Studio exporter; do not edit)"
+BLOCK_END = "# GENERATED BLOCK END"
+# Import order matters: masters before the documents that link to them.
+ORDER = ["Role", "Workflow State", "Workflow Action Master", "DocType", "Custom Field", "Property Setter",
+         "Client Script", "Server Script", "Workflow"]
+
+
+def scrub(doctype: str) -> str:
+    return doctype.lower().replace(" ", "_").replace("-", "_")
+
+
+@dataclass
+class Export:
+    files: dict = field(default_factory=dict)      # path relative to the repo root -> text
+    change_sets: list = field(default_factory=list)
+    counts: dict = field(default_factory=dict)
+    skipped: list = field(default_factory=list)    # applied change sets left out, with the reason
+
+    def summary(self) -> dict:
+        return {"change_sets": len(self.change_sets), "counts": self.counts, "files": sorted(self.files),
+                "skipped": self.skipped}
+
+
+def _name_from_steps(cs, i: int, dt: str) -> Optional[str]:
+    for s in cs.steps:
+        if s.get("i") != i:
+            continue
+        for row in list(s.get("created") or []) + list(s.get("updated") or []):
+            if row and row[0] == dt and len(row) > 1:
+                return row[1]
+    return None
+
+
+def eligible(cs, reqs, only_verified: bool = True) -> tuple[bool, str]:
+    if cs.status != "applied":
+        return False, f"status is {cs.status}"
+    if not only_verified:
+        return True, ""
+    linked = [r for r in reqs.all() if cs.id in r.change_sets]
+    if not linked:
+        return False, "not linked to any requirement"
+    if not any(r.status == "verified" for r in linked):
+        return False, "no linked requirement is verified yet"
+    return True, ""
+
+
+def collect(ledger, reqs, only_verified: bool = True, ids: Optional[list] = None) -> tuple[list, list]:
+    chosen, skipped = [], []
+    for cs in sorted(ledger.list(limit=5000), key=lambda c: c.id):  # oldest first, so later changes win
+        if ids is not None and cs.id not in ids:
+            continue
+        ok, why = eligible(cs, reqs, only_verified)
+        (chosen if ok else skipped).append(cs if ok else {"id": cs.id, "title": cs.title, "reason": why})
+    return chosen, [s for s in skipped if s["reason"] not in ("status is proposed", "status is discarded", "status is undone",
+                                                              "status is failed")]
+
+
+def _docs(chosen: list) -> tuple[dict, list, list, list]:
+    """-> (fixtures by doctype {name: doc}, permissions, settings, manifest items)."""
+    fx: dict = {}
+    perms: dict = {}
+    sets: dict = {}
+    items: list = []
+
+    def put(dt: str, name: str, doc: dict) -> None:
+        doc = {**doc, "doctype": dt, "name": name}
+        fx.setdefault(dt, {})[name] = doc
+
+    for cs in chosen:
+        for i, op in enumerate(cs.ops):
+            t = op.op
+            if t == "add_custom_field":
+                p = custom_field_payload(op)
+                put("Custom Field", _name_from_steps(cs, i, "Custom Field") or f"{op.doctype}-{op.fieldname}", p)
+            elif t == "set_property":
+                p = property_setter_payload(op)
+                nm = _name_from_steps(cs, i, "Property Setter") or f"{op.doctype}-{op.fieldname or 'main'}-{op.property}"
+                put("Property Setter", nm, p)
+            elif t in ("add_client_script", "add_server_validation"):
+                dt = "Client Script" if t == "add_client_script" else "Server Script"
+                p = client_script_payload(op) if t == "add_client_script" else server_script_payload(op)
+                put(dt, p["name"], {k: v for k, v in p.items() if k != "name"})
+            elif t == "set_setting":
+                sets[(op.doctype, op.field)] = op.value
+            elif t == "create_role":
+                put("Role", op.role_name, {"role_name": op.role_name, "desk_access": 1})
+            elif t == "add_permission":
+                perms[(op.doctype, op.role, op.permlevel)] = {
+                    "doctype": op.doctype, "role": op.role, "permlevel": op.permlevel,
+                    "rights": [r for r in ("read", "write", "create", "delete", "submit", "cancel", "amend", "report",
+                                           "export", "print", "email", "share") if getattr(op, r)]}
+            elif t == "create_doctype":
+                p = doctype_payload(op)
+                put("DocType", op.name, {k: v for k, v in p.items() if k not in ("name", "doctype")})
+            elif t == "create_workflow":
+                for s in op.states:
+                    put("Workflow State", s.state, {"workflow_state_name": s.state})
+                for a in sorted({x.action for x in op.transitions}):
+                    put("Workflow Action Master", a, {"workflow_action_name": a})
+                p = workflow_payload(op)
+                put("Workflow", op.name, {k: v for k, v in p.items() if k not in ("doctype",)})
+        items.append({"change_set": cs.id, "title": cs.title, "requirements": sorted(cs.requirement_ids),
+                      "risk": cs.risk(), "session": cs.session_id, "created_by": cs.created_by,
+                      "operations": [describe(o) for o in cs.ops]})
+    return fx, list(perms.values()), [{"doctype": d, "field": f, "value": v} for (d, f), v in sets.items()], items
+
+
+def _json(obj) -> str:
+    return json.dumps(obj, indent=1, ensure_ascii=False, sort_keys=True, default=str) + "\n"
+
+
+def _apply_module(perms: list, sets: list) -> str:
+    return (
+        '"""Generated by the ERPNext Studio exporter. Do not edit: re-export instead.\n\n'
+        'Permissions and single-DocType settings cannot be expressed as fixtures without creating duplicates on every\n'
+        'migrate, so they are re-applied here, idempotently, after each `bench migrate`.\n"""\n'
+        "import frappe\n\n"
+        f"PERMISSIONS = {json.dumps(perms, indent=1, ensure_ascii=False, sort_keys=True)}\n\n"
+        f"SETTINGS = {json.dumps(sets, indent=1, ensure_ascii=False, sort_keys=True, default=str)}\n\n\n"
+        "def run():\n"
+        "    from frappe.core.page.permission_manager import permission_manager as pm\n"
+        "    for p in PERMISSIONS:\n"
+        "        if not frappe.db.exists('DocType', p['doctype']) or not frappe.db.exists('Role', p['role']):\n"
+        "            continue\n"
+        "        pm.add(p['doctype'], p['role'], p['permlevel'])\n"
+        "        for right in p['rights']:\n"
+        "            pm.update(p['doctype'], p['role'], p['permlevel'], right, 1)\n"
+        "    for s in SETTINGS:\n"
+        "        if frappe.db.exists('DocType', s['doctype']):\n"
+        "            frappe.db.set_single_value(s['doctype'], s['field'], s['value'])\n"
+        "    frappe.db.commit()\n"
+    )
+
+
+def hooks_block(fx: dict, has_apply: bool) -> str:
+    lines = [BLOCK_START]
+    fixtures = [{"dt": dt, "filters": [["name", "in", sorted(fx[dt])]]} for dt in ORDER if dt in fx]
+    lines.append("fixtures = " + pprint.pformat(fixtures, width=110))
+    lines.append(f'after_migrate = ["{APP}.studio_apply.run"]' if has_apply else "after_migrate = []")
+    lines.append(BLOCK_END)
+    return "\n".join(lines)
+
+
+def splice_hooks(text: str, block: str) -> str:
+    pat = re.compile(re.escape(BLOCK_START) + r".*?" + re.escape(BLOCK_END), re.S)
+    if pat.search(text):
+        return pat.sub(lambda _m: block, text)
+    return text.rstrip("\n") + "\n\n" + block + "\n"
+
+
+def build(ledger, reqs, hooks_text: str = "", only_verified: bool = True, ids: Optional[list] = None,
+          prefix: str = PKG_PREFIX) -> Export:
+    chosen, skipped = collect(ledger, reqs, only_verified, ids)
+    fx, perms, sets, items = _docs(chosen)
+    out = Export(change_sets=[c.id for c in chosen], skipped=skipped)
+    for dt in ORDER:
+        if dt in fx:
+            out.files[f"{prefix}fixtures/{scrub(dt)}.json"] = _json(list(fx[dt].values()))
+            out.counts[dt] = len(fx[dt])
+    has_apply = bool(perms or sets)
+    if has_apply:
+        out.files[f"{prefix}studio_apply.py"] = _apply_module(perms, sets)
+        out.counts["Permissions"], out.counts["Settings"] = len(perms), len(sets)
+    out.files[f"{prefix}studio_manifest.json"] = _json({"app": APP, "change_sets": items})
+    out.files[f"{prefix}hooks.py"] = splice_hooks(hooks_text or "", hooks_block(fx, has_apply))
+    out.files[prefix[:-len(APP + "/")] + "TRACEABILITY.md"] = _trace(items, reqs)
+    return out
+
+
+def _trace(items: list, reqs) -> str:
+    rows = ["# Traceability", "", "Generated by the ERPNext Studio exporter. Requirement -> change set -> operations.", ""]
+    for it in items:
+        rows.append(f"## {it['title'] or it['change_set']}  (`{it['change_set']}`, risk {it['risk']})")
+        for rid in it["requirements"]:
+            r = reqs.get(rid)
+            rows.append(f"- Requirement {rid}: {(r.text if r else '')[:240]}")
+        rows.extend(f"  - {line}" for line in it["operations"])
+        rows.append("")
+    return "\n".join(rows) + "\n"
