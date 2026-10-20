@@ -1,13 +1,15 @@
-# The Studio on your server. One container, one published port, one named volume.
+# Paste into Hostinger Docker Manager (or: docker compose -f studio.compose.yml up -d).
+# Model keys, servers and credentials are entered in the Studio UI, not here.
 name: studio
 services:
   studio:
-    image: ${DOCKERHUB_NAMESPACE}/ai-for-erp:${STUDIO_TAG:-studio-latest}
-    env_file: .env
+    image: YOUR_DOCKERHUB_USERNAME/ai-for-erp:studio-latest   # CHANGE
     environment:
       STUDIO_DATA_DIR: /data
+      STUDIO_ADMIN_PASSWORD: "CHANGE-ME"                       # CHANGE: the UI login password
+      # STUDIO_SECRET_KEY: ""   # optional; if unset a key is generated once and kept in the data volume
     ports:
-      - "${STUDIO_PORT:-18100}:8100"
+      - "18100:8100"
     volumes:
       - studio-data:/data
     restart: unless-stopped

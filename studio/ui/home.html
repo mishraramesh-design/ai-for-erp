@@ -1,0 +1,77 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ERPNext Studio</title>
+<style>
+:root{--bg:#F2F4F7;--surface:#fff;--surface2:#F7F8FA;--line:#DDE1E8;--fg:#171B24;--muted:#586174;--accent:#2B50D1;--accent-soft:#E6ECFD;--ok:#1D6B45;--ok-bg:#E2F3E9;--hold:#9A4A00;--hold-bg:#FFE7CC;--bad:#9B1C1C}
+@media (prefers-color-scheme:dark){:root{--bg:#12151C;--surface:#1B2029;--surface2:#222834;--line:#2C3340;--fg:#E8ECF3;--muted:#98A2B5;--accent:#7C9BFF;--accent-soft:#242E4D;--ok:#6FD3A0;--ok-bg:#173326;--hold:#FFB46B;--hold-bg:#3A2A14;--bad:#FF8A8A}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.5 "IBM Plex Sans",system-ui,sans-serif}
+header{display:flex;gap:12px;align-items:center;padding:10px max(16px,env(safe-area-inset-left));background:var(--surface);border-bottom:1px solid var(--line)}
+.brand{font-weight:600}.sp{flex:1}.chip{font-size:12px;padding:3px 10px;border-radius:99px;background:var(--surface2);border:1px solid var(--line);color:var(--muted)}
+.app{display:grid;grid-template-columns:200px minmax(0,1fr);min-height:calc(100vh - 49px)}
+nav{padding:14px 10px;border-right:1px solid var(--line);background:var(--surface);display:flex;flex-direction:column;gap:2px}
+nav a{padding:8px 12px;border-radius:8px;color:var(--fg);text-decoration:none;cursor:pointer}nav a.on{background:var(--accent-soft);color:var(--accent);font-weight:600}
+nav small{margin:12px 12px 4px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-size:11px}
+main{padding:24px max(16px,env(safe-area-inset-right));max-width:900px}
+h2{margin:0 0 4px;font-size:20px}.sub{color:var(--muted);margin:0 0 20px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+label{display:block;font-size:12px;color:var(--muted);margin:10px 0 3px}
+input,select,textarea{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg);font:inherit}
+button{padding:8px 14px;border:1px solid var(--line);border-radius:8px;background:var(--surface2);color:var(--fg);font:inherit;cursor:pointer}
+button.p{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;align-items:center}
+.ok{color:var(--ok)}.bad{color:var(--bad)}.muted{color:var(--muted)}
+.tag{display:inline-block;font-size:12px;padding:2px 8px;border-radius:99px}.tag.ok{background:var(--ok-bg)}.tag.hold{background:var(--hold-bg);color:var(--hold)}
+table{width:100%;border-collapse:collapse}td,th{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line)}
+@media (max-width:760px){.app{grid-template-columns:minmax(0,1fr)}nav{flex-direction:row;overflow-x:auto;border-right:0;border-bottom:1px solid var(--line)}nav small{display:none}}
+</style></head><body>
+<header><div class="brand">◆ ERPNext Studio</div><span class="chip" id="ver"></span><div class="sp"></div><button id="out">Sign out</button></header>
+<div class="app"><nav>
+<a data-t="overview">Overview</a><a href="/workbench">Workbench <span class="chip">preview</span></a>
+<small>Setup</small><a data-t="models">Models</a><a data-t="servers">Servers</a></nav>
+<main id="m"></main></div>
+<script>
+const $=s=>document.querySelector(s),api=async(p,o)=>{const r=await fetch(p,o&&{method:o.method,headers:{'Content-Type':'application/json'},body:JSON.stringify(o.body)});if(r.status===401)location.href='/login';return r.json()};
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const V={};
+V.overview=async()=>{const s=await api('/api/status');$('#ver').textContent='v'+s.version;
+ const step=(ok,t,d,go)=>`<div class="card"><span class="tag ${ok?'ok':'hold'}">${ok?'done':'to do'}</span> <b>${t}</b><div class="muted">${d}</div>${ok?'':`<div class="row"><button class="p" onclick="go('${go}')">Set up</button></div>`}</div>`;
+ return `<h2>Welcome</h2><p class="sub">Three steps take you from this screen to a working ERPNext development site.</p>
+ ${step(s.llm,'1 · Connect a model','Add your API key and choose a model for each agent role.','models')}
+ ${step(s.servers>0,'2 · Add your server','The Studio installs a development ERPNext there over SSH.','servers')}
+ <div class="card"><span class="tag hold">coming next</span> <b>3 · Install ERPNext and start building</b><div class="muted">One-click install, then requirements, plans and approvals. The <a href="/workbench">Workbench preview</a> shows how this will look, using scripted data.</div></div>`};
+V.models=async()=>{const l=await api('/api/settings/llm');
+ const roles=l.roles.map(r=>`<div><label>${r}</label><input data-r="${r}" value="${esc(l.models[r]||'')}" placeholder="model name"></div>`).join('');
+ return `<h2>Models</h2><p class="sub">Use a strong model for planning and a cheaper one for routine steps. Leave a role blank to skip it.</p>
+ <div class="card"><label>API base URL</label><input id="bu" value="${esc(l.base_url)}">
+ <label>API key ${l.key_set?'<span class="ok">· saved (leave blank to keep)</span>':''}</label><input id="ak" type="password" autocomplete="off" placeholder="${l.key_set?'••••••••':'paste key'}">
+ <label>Monthly budget, USD (0 = no limit)</label><input id="bd" type="number" min="0" value="${l.monthly_budget_usd}"></div>
+ <div class="card"><b>Model per role</b><div class="grid">${roles}</div></div>
+ <div class="row"><button class="p" id="sv">Save</button><button id="ts">Test connection</button><span id="msg"></span></div>`};
+V.servers=async()=>{const s=await api('/api/servers');
+ const rows=s.map(x=>`<tr><td><b>${esc(x.name)}</b><div class="muted">${esc(x.role)}</div></td><td>${esc(x.ssh_user)}@${esc(x.host)}:${x.ssh_port}</td><td>${esc(x.status)}</td><td><button data-del="${x.id}">Remove</button></td></tr>`).join('');
+ return `<h2>Servers</h2><p class="sub">Where the Studio installs and manages ERPNext. Credentials are stored encrypted.</p>
+ <div class="card">${s.length?`<table><tr><th>Name</th><th>SSH</th><th>Status</th><th></th></tr>${rows}</table>`:'<span class="muted">No servers yet.</span>'}</div>
+ <div class="card"><b>Add server</b><div class="grid">
+ <div><label>Name</label><input id="sn" value="Hostinger dev"></div><div><label>Host or IP</label><input id="sh"></div>
+ <div><label>SSH port</label><input id="sp" type="number" value="22"></div><div><label>SSH user</label><input id="su" value="root"></div></div>
+ <label>SSH password (or paste a private key below)</label><input id="spw" type="password" autocomplete="off">
+ <label>SSH private key (optional)</label><textarea id="sk" rows="3" autocomplete="off"></textarea>
+ <div class="row"><button class="p" id="add">Add server</button><span id="msg"></span></div></div>`};
+V.models.after=()=>{
+ $('#sv').onclick=save;$('#ts').onclick=async()=>{await save(true);$('#msg').textContent='Testing…';const r=await api('/api/settings/llm/test',{method:'POST',body:{}});
+  $('#msg').innerHTML=r.ok?`<span class="ok">Connected · ${esc(r.model)} replied "${esc(r.reply)}"</span>`:`<span class="bad">${esc(r.error)}</span>`};
+ async function save(q){const models={};document.querySelectorAll('[data-r]').forEach(i=>models[i.dataset.r]=i.value.trim());
+  await api('/api/settings/llm',{method:'PUT',body:{base_url:$('#bu').value,api_key:$('#ak').value,models,monthly_budget_usd:+$('#bd').value||0}});
+  if(q!==true)$('#msg').innerHTML='<span class="ok">Saved</span>';}};
+V.servers.after=()=>{
+ $('#add').onclick=async()=>{if(!$('#sh').value.trim()){$('#msg').innerHTML='<span class="bad">Host is required</span>';return}
+  await api('/api/servers',{method:'POST',body:{name:$('#sn').value,host:$('#sh').value.trim(),ssh_port:+$('#sp').value||22,ssh_user:$('#su').value,ssh_password:$('#spw').value,ssh_private_key:$('#sk').value}});go('servers')};
+ document.querySelectorAll('[data-del]').forEach(b=>b.onclick=async()=>{await fetch('/api/servers/'+b.dataset.del,{method:'DELETE'});go('servers')})};
+V.overview.after=()=>{};
+async function go(t){t=V[t]?t:'overview';history.replaceState(0,'','#'+t);
+ document.querySelectorAll('nav a[data-t]').forEach(a=>a.classList.toggle('on',a.dataset.t===t));
+ $('#m').innerHTML=await V[t]();V[t].after&&V[t].after();}
+document.querySelectorAll('nav a[data-t]').forEach(a=>a.onclick=()=>go(a.dataset.t));
+$('#out').onclick=async()=>{await api('/api/logout',{method:'POST',body:{}});location.href='/login'};
+go(location.hash.slice(1)||'overview');
+</script></body></html>

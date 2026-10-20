@@ -1,0 +1,911 @@
+<title>ERPNext Studio Simulation v3</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Concept: an IDE-style shell where every step is tagged by tier (rule, recipe, pattern, model) so the deterministic share is always visible. */
+:root{
+  --bg:#F2F4F7;--surface:#FFFFFF;--surface2:#F7F8FA;--line:#DDE1E8;--fg:#171B24;--muted:#586174;
+  --accent:#2B50D1;--accent-fg:#FFFFFF;--accent-soft:#E6ECFD;
+  --rule:#1D6B45;--rule-bg:#E2F3E9;--recipe:#0B6B72;--recipe-bg:#DDF2F3;--pattern:#5B3FA8;--pattern-bg:#ECE6FA;--decision:#0F5FA8;--decision-bg:#DCEBFA;--model:#7A4B00;--model-bg:#FCEFD0;
+  --bad:#9B1C1C;--bad-bg:#FBE1E1;--ok:#1D6B45;--ok-bg:#E2F3E9;--info:#1C3F9E;--info-bg:#DDE8FD;--hold:#9A4A00;--hold-bg:#FFE7CC;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;--mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#12151B;--surface:#1A1E26;--surface2:#20252E;--line:#2D3440;--fg:#E7EAF0;--muted:#9AA4B5;
+  --accent:#8CA3FF;--accent-fg:#0B1020;--accent-soft:#1F2A4D;
+  --rule:#6FD39B;--rule-bg:#173225;--recipe:#6FD6DE;--recipe-bg:#12363A;--pattern:#BBA5F5;--pattern-bg:#2B2250;--decision:#7FB8F0;--decision-bg:#14304D;--model:#F0C36A;--model-bg:#3A2E12;
+  --bad:#FF9C9C;--bad-bg:#3C1B1B;--ok:#6FD39B;--ok-bg:#173225;--info:#9DB5FF;--info-bg:#1F2A4D;--hold:#FFBB7A;--hold-bg:#3F2A12;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#12151B;--surface:#1A1E26;--surface2:#20252E;--line:#2D3440;--fg:#E7EAF0;--muted:#9AA4B5;
+  --accent:#8CA3FF;--accent-fg:#0B1020;--accent-soft:#1F2A4D;
+  --rule:#6FD39B;--rule-bg:#173225;--recipe:#6FD6DE;--recipe-bg:#12363A;--pattern:#BBA5F5;--pattern-bg:#2B2250;--decision:#7FB8F0;--decision-bg:#14304D;--model:#F0C36A;--model-bg:#3A2E12;
+  --bad:#FF9C9C;--bad-bg:#3C1B1B;--ok:#6FD39B;--ok-bg:#173225;--info:#9DB5FF;--info-bg:#1F2A4D;--hold:#FFBB7A;--hold-bg:#3F2A12;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:14px;line-height:1.45;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:12px}
+button{font:inherit;color:inherit}
+h3{margin:0 0 8px;font-size:14px;font-weight:600}
+.wrap{max-width:1500px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+.top{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 14px}
+.brand{font-weight:600;font-size:15px}
+.sim{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:3px 9px;border-radius:10px;background:var(--model-bg);color:var(--model)}
+.sp{flex:1}
+.meter{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}.meter b{color:var(--fg)}
+.chip{display:inline-block;font-size:11px;padding:2px 8px;border-radius:9px;background:var(--surface2);border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+.chip.rule{background:var(--rule-bg);color:var(--rule);border-color:transparent}
+.chip.recipe{background:var(--recipe-bg);color:var(--recipe);border-color:transparent}
+.chip.pattern{background:var(--pattern-bg);color:var(--pattern);border-color:transparent}
+.chip.decision{background:var(--decision-bg);color:var(--decision);border-color:transparent}
+.chip.model{background:var(--model-bg);color:var(--model);border-color:transparent}
+.chip.bad{background:var(--bad-bg);color:var(--bad);border-color:transparent}
+.chip.ok{background:var(--ok-bg);color:var(--ok);border-color:transparent}
+.chip.info{background:var(--info-bg);color:var(--info);border-color:transparent}
+.chip.hold{background:var(--hold-bg);color:var(--hold);border-color:transparent}
+.tour{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;background:var(--accent-soft);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.tour .step{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+.tour h2{margin:0;font-size:15px;font-weight:600}.tour p{margin:2px 0 0;color:var(--muted);font-size:13px;max-width:80ch}.tour .txt{flex:1;min-width:240px}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:7px;padding:7px 13px;cursor:pointer;font-size:13px}
+.btn:hover{border-color:var(--accent)}.btn.pri{background:var(--accent);border-color:var(--accent);color:var(--accent-fg);font-weight:500}
+.btn:disabled{opacity:.5;cursor:default}.btn.sm{padding:4px 10px;font-size:12px}
+.btn:focus-visible,.tab:focus-visible,select:focus-visible,input:focus-visible,.node:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.app{display:grid;grid-template-columns:200px minmax(0,1fr);gap:12px;align-items:start}
+.nav{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px;display:flex;flex-direction:column;gap:2px;position:sticky;top:8px}
+.nav .grp{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:8px 10px 2px}
+.tab{display:flex;align-items:center;justify-content:space-between;gap:8px;text-align:left;border:0;background:none;border-radius:6px;padding:7px 10px;cursor:pointer;color:var(--muted);font-size:13px}
+.tab[aria-selected="true"]{background:var(--accent-soft);color:var(--accent);font-weight:600}
+.tab .n{font-size:11px;background:var(--hold-bg);color:var(--hold);border-radius:8px;padding:0 6px}
+main{min-width:0;display:flex;flex-direction:column;gap:12px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;min-width:0}
+.row{display:flex;flex-wrap:wrap;gap:12px}.col{flex:1;min-width:260px}.ctr{align-items:center}
+.muted{color:var(--muted)}.small{font-size:12px}.mono{font-family:var(--mono);font-size:12px}
+.field{display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--muted)}
+.input{border:1px solid var(--line);background:var(--surface2);color:var(--fg);border-radius:6px;padding:6px 8px;font:inherit;font-size:13px;min-width:0;width:100%}
+.flow{display:flex;flex-wrap:wrap;gap:6px;align-items:stretch}
+.flow .st{flex:1;min-width:120px;border:1px solid var(--line);border-radius:8px;padding:7px 9px;font-size:12px;background:var(--surface2)}
+.flow .st b{display:block;font-size:12px;margin-top:2px}
+.st.rule{background:var(--rule-bg);border-color:transparent}.st.model{background:var(--model-bg);border-color:transparent}.st.recipe{background:var(--recipe-bg);border-color:transparent}
+.tg{font-size:10px;font-weight:600;letter-spacing:.05em;text-transform:uppercase}
+.tg.rule{color:var(--rule)}.tg.recipe{color:var(--recipe)}.tg.pattern{color:var(--pattern)}.tg.decision{color:var(--decision)}.tg.model{color:var(--model)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.kpi{border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:var(--surface2)}
+.kpi b{display:block;font-size:20px;font-weight:600;font-variant-numeric:tabular-nums}.kpi span{font-size:11px;color:var(--muted)}
+.bar{display:flex;height:10px;border-radius:5px;overflow:hidden;background:var(--line)}
+.bar.big{height:16px;border-radius:8px}
+.s-rule{background:var(--rule)}.s-recipe{background:var(--recipe)}.s-pattern{background:var(--pattern)}.s-decision{background:var(--decision)}.s-model{background:#D99A1E}
+.seg-backlog{background:#9AA4B5}.seg-planned{background:#E0B84A}.seg-built{background:#5B8DEF}.seg-verified{background:#2E8B57}.seg-blocked{background:#C0504D}.seg-needs_input{background:#B07AD0}.seg-held{background:#E08A3C}.seg-standard{background:#6CA9A0}
+.legend{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:11px;color:var(--muted)}.legend i{display:inline-block;width:9px;height:9px;margin-right:4px;border-radius:2px;vertical-align:baseline}
+table{border-collapse:collapse;width:100%;font-size:13px}th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:11px;color:var(--muted);font-weight:500}td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}.scroll{overflow-x:auto}
+pre{margin:0;padding:10px;background:var(--surface2);border:1px solid var(--line);border-radius:8px;font-family:var(--mono);font-size:12px;line-height:1.5;overflow:auto;white-space:pre}
+.ops{margin:6px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:5px;font-size:13px}.ops li{display:flex;gap:8px;align-items:flex-start}.ops .t{flex:1;min-width:0}
+.hr{border:0;border-top:1px solid var(--line);margin:10px 0}
+.alert{border-radius:8px;padding:8px 12px;font-size:13px}.alert.bad{background:var(--bad-bg);color:var(--bad)}.alert.ok{background:var(--ok-bg);color:var(--ok)}.alert.hold{background:var(--hold-bg);color:var(--hold)}
+/* task graph */
+.gwrap{overflow:auto;border:1px solid var(--line);border-radius:8px;background:var(--surface2)}
+.graph{position:relative}
+.graph svg{position:absolute;left:0;top:0;pointer-events:none}
+.lane{position:absolute;left:0;right:0;border-bottom:1px dashed var(--line)}
+.lane span{position:absolute;left:8px;top:6px;width:128px;font-size:11px;font-weight:600;color:var(--muted);line-height:1.25}
+.node{position:absolute;width:168px;height:58px;border:1.5px solid var(--line);border-left-width:5px;border-radius:7px;background:var(--surface);padding:4px 7px;cursor:pointer;font-size:11px;line-height:1.25;overflow:hidden;text-align:left}
+.node b{display:block;font-size:11.5px;font-weight:600;max-height:2.5em;overflow:hidden}
+.node.t-rule{border-left-color:var(--rule)}.node.t-recipe{border-left-color:var(--recipe)}.node.t-pattern{border-left-color:var(--pattern)}.node.t-decision{border-left-color:var(--decision)}.node.t-model{border-left-color:#D99A1E}
+.node.waiting{opacity:.62;border-style:dashed}.node.running{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
+.node.done{background:var(--ok-bg)}.node.held{background:var(--hold-bg);border-color:var(--hold)}.node.blocked{background:var(--bad-bg)}.node.undone{opacity:.5}
+.node.sel{outline:2px solid var(--accent);outline-offset:1px}
+.node .meta{position:absolute;left:7px;bottom:3px;right:6px;display:flex;justify-content:space-between;color:var(--muted);font-size:10px}
+/* preview */
+.pv{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface)}
+.pv .bar2{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:8px 10px;border-bottom:1px solid var(--line);background:var(--surface2);font-size:12px}
+.pv .url{flex:1;min-width:140px;border:1px solid var(--line);border-radius:6px;padding:4px 8px;background:var(--surface);color:var(--muted);font-family:var(--mono);font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pv .body{padding:14px 16px}.pv h4{margin:0 0 10px;font-size:16px;font-weight:600}
+.ff{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px 18px;margin-bottom:10px}
+.ff .lb{font-size:12px;color:var(--muted);margin-bottom:3px}.ff .v{background:var(--surface2);border-radius:6px;padding:6px 9px;font-size:13px;min-height:30px}
+.ff .new{outline:2px dashed var(--accent);outline-offset:3px;border-radius:6px}.ff .new .lb{color:var(--accent);font-weight:600}
+.tabs2{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:10px;flex-wrap:wrap}
+.tabs2 button{border:0;background:none;padding:6px 12px;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;font-size:13px}
+.tabs2 button.on{color:var(--accent);border-bottom-color:var(--accent);font-weight:600}
+.chat{display:flex;flex-direction:column;gap:8px;max-height:460px;overflow:auto}
+.msg{border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:13px;background:var(--surface2)}
+.msg.you{background:var(--accent-soft);align-self:flex-end;max-width:92%}
+.msg .who{font-size:11px;font-weight:600;margin-bottom:2px}
+.over{background:var(--bad-bg)}
+.agent{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--surface);display:flex;flex-direction:column;gap:6px;min-width:0}
+.agents{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:10px}
+.rc{border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:var(--surface2);font-size:12px}
+.rcs{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:8px}
+textarea.input{font-family:var(--mono);font-size:12px;line-height:1.5;resize:vertical}
+.cv{display:flex;flex-wrap:wrap;align-items:stretch;gap:6px}.cv .bx{flex:1;min-width:130px;border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:var(--surface2);font-size:12px}.cv .ar{align-self:center;color:var(--muted)}
+.opt{display:block;cursor:pointer}.opt.on{border-color:var(--accent)}
+@media (max-width:860px){.app{grid-template-columns:minmax(0,1fr)}.nav{position:static;flex-direction:row;overflow-x:auto}.nav .grp{display:none}.tab{white-space:nowrap}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand"><a href="/" style="color:inherit;text-decoration:none">← ◆ ERPNext Studio</a></div>
+    <span class="sim">Preview · scripted data, not connected yet</span>
+    <span class="chip">Project: CSD RFP · pilot</span>
+    <span class="chip ok">ERPNext v15 · 203.0.113.10:18090 · healthy</span>
+    <div class="sp"></div><div class="meter" id="meter"></div>
+  </header>
+  <section class="tour" id="tour"></section>
+  <div class="app"><nav class="nav" id="nav" role="tablist" aria-label="Studio sections"></nav><main id="main"></main></div>
+</div>
+
+<script>
+/* ============ data: 47 pilot requirements are real rows from the uploaded matrix ============ */
+const PREQ = [[1, "srm", "Partial", "The Supplier Management function in ERP system should support CSD in managing its relationship with Suppliers. The system to provide a centralized platform for…"], [7, "srm", "Partial", "System to prompt below-mentioned criteria before enabling registration of Supplier - e.g.  Supplier to provide information of their existence / establishment for…"], [10, "srm", "Partial", "System to provide auto-validation of Supplier registration data as per guidelines set by CSD."], [12, "srm", "Partial", "System to retrieve necessary details fro m the external regulatory bodies and auto populate the details to avoid manual data entry."], [15, "srm", "Partial", "System should generate a unique number for each Supplier as per rules / attributes set for Supplier master."], [17, "srm", "Partial", "The system should be capable of grouping Suppliers into different categories, including but not limited to Domestic Suppliers and other relevant sub-categories."], [18, "srm", "Partial", "System should be able to classify different sub-categories including but not limited to:  MSME  Start-ups  Large Firms etc."], [21, "srm", "Partial", "The system should allow Branch users to update Supplier records, including modifying details such as bank account information."], [26, "srm", "No", "Reports/ Dashboards:  System should display Suppliers based on Supplier grouping/ classification.  System should filter Suppliers based on various criteria. …"], [414, "srm", "Partial", "System to provide forms to capture all eligibility criteria specified by CSD along with supporting documents."], [418, "srm", "Partial", "System to provide ability for new introductions or change requests, with provisions for uploading supporting documents."], [420, "srm", "Partial", "Provision in the system for listing products with Index Number."], [422, "srm", "Partial", "Ability to submit retail rate, wholesale rate, and proposed offer rate to CSD."], [424, "srm", "No", "Provision in the system to declare the source of supply and Label Registration."], [199, "scm", "No", "System to enable Provisional Demand (PD) process, which consists of collecting demand data (both PD and FD) from Unit Run Canteens (URCs). This data is then validated…"], [200, "scm", "Partial", "System to facilitate URCs to place orders or purchase requisitions through web-interface."], [201, "scm", "Partial", "System to provide ability to validate orders, authenticate URCs' payments, and authorize transactions in real-time mode. Indicative activities include: •…"], [202, "scm", "No", "PD and system to follow CSD defined (configurable in system) demand cycle. The cycle begins with URCs submitting PD Depot, which forwards the PD along with MSTC data…"], [203, "scm", "No", "The system to enable a process-driven workflow tailored to the operational needs of the CSD for submitting Provisional Demands (PD), validating demands, and obtaining…"], [207, "scm", "Partial", "System to provide automated order processing to reduce manual entry and processing time."], [208, "scm", "No", "System to provide ability to generate PD (Provisional Demand) schedule for supply chain management."], [209, "scm", "No", "System to provide PD function which should help to predict the future demands for products based on historical data and current trends. For Liquor only"], [210, "scm", "Partial", "System should have provision to map monthly quotas for each beneficiary based on their ranks and designation."], [211, "scm", "Partial", "In the system, URCs to act as the demand requester, while the LIF branch will serve as the demand reviewer in the workflow."], [212, "scm", "Partial", "Demands or orders will be consolidated centrally within the system."], [213, "scm", "Partial", "Provision in the system to define maximum and minimum order acceptance thresholds."], [107, "case", "Yes", " Provision in the system to receive quality related complaints from beneficiaries, or Branch officials through multiple channels (e.g., chatbot, URC portal or any…"], [108, "case", "Yes", "System to allow beneficiaries to lodge complaints through multiple modes including chatbot, email, SMS, portal/ web interface, etc."], [109, "case", "Yes", "Provision to initiate inquiry and / or act against Supplier(s) who receive considerable number of complaints. The threshold of complaint numbers should be…"], [110, "case", "Yes", " Provision in the system to track and provide index-wise complaints received along with their frequency.  Additionally, system to compare complaint details for…"], [111, "case", "Yes", "System to provide a dashboard for complaints and issues, and penal action to be designed in accordance with the policy defined by CSD."], [179, "case", "Partial", "System should provide an integrated unified dashboard for authorized users to view the grievance data in a graphical format from – • AFD • eCommerce (to be…"], [180, "case", "Partial", "System should allow authorized users to view the details / drill down of any grievance displayed on the dashboard."], [181, "case", "Partial", "System should enable authorized users to search / filter / drill down to grievance details."], [182, "case", "Partial", "System should be able to track SLAs by highlighting the grievance status in different colors."], [183, "case", "Yes", "System should be able to highlight grievances that are escalated."], [184, "case", "Partial", "System should allow customers to submit grievances, track status, and provide feedback via a web portal Chatbot / mobile application."], [185, "case", "Partial", "The grievance form shall include details such as URC from where the product is purchased, grievance category, product description, date of product purchase, grievance…"], [186, "case", "Partial", "For every grievance created in the system, a unique reference ID shall be created."], [187, "case", "Partial", "Basis on the reference ID, customers will have the ability to track the status of grievances (e.g., Submitted, Under Review, More Information Required, Resolved)."], [188, "case", "Partial", "The system shall have automated notifications to customers about updates w.r.t to their grievances."], [191, "case", "Partial", "The system shall allow concerned branch to either provide resolution details and decisions or forward / reassign the grievance to appropriate branch."], [192, "case", "Yes", "The system shall have defined rules for managing escalations to concerned authorities if grievances are not resolved within defined SLAs."], [193, "case", "Partial", "The system shall provide the ability to mark grievances as resolved or closed. Customers will be notified on the final resolution status."], [195, "case", "Partial", "The system shall allow requisite branch users to generate reports on the number of grievances, types, resolution times, etc. - customizable report generation based on…"], [196, "case", "No", "Reports on grievance volume, types, resolution times, and customer satisfaction. Performance metrics and overall system efficiency."], [197, "case", "Partial", "Analytics Dashboard - Visual representation of grievance data (e.g., charts, graphs). - Insights into trends and patterns to identify systemic / recurring issues in…"]];            // [id, module, claimed fit, text]
+const RT = Object.fromEntries(PREQ.map(r => [r[0], r]));
+const MODNAME = {srm:'Supplier Relationship', scm:'Supply Chain · URC demand', case:'Grievance & Case Management'};
+const PRICES0 = {mini:{name:'gpt-4o-mini',in:0.15,out:0.60}, strong:{name:'gpt-4o',in:2.50,out:10.00}, claude:{name:'claude-sonnet (example)',in:3.00,out:15.00}};
+const AG = {
+  architect:{n:'Solution Architect',g:'Orchestration',job:'Splits requirements into work items, picks the lane and module pack, orders them by dependency, asks you what it cannot decide.',emits:['work_plan','question'],no:'Never writes to ERPNext. Its plan is checked by rules before anything runs.',tok:[14000,3500]},
+  reconciler:{n:'Reconciler',g:'Orchestration',job:'Finds overlapping roles, fields and scripts proposed by different lanes and merges them into one.',emits:['merge_roles','dedupe_fields'],no:'No model. Pure rules.',tok:null},
+  builder:{n:'App Builder',g:'Skill',job:'Turns a group of requirements (such as grievance handling) into one blueprint: build on a standard DocType or create a new one, then hands pieces to the skill agents.',emits:['blueprint'],no:'Cannot apply anything itself.',tok:[10000,4000]},
+  configure:{n:'Configure agent',g:'Skill',job:'Settings, naming series, email alerts, assignment rules, SLA records.',emits:['set_setting','naming_series','email_alert','assignment_rule','sla_record'],no:'No scripts, no new DocTypes.',tok:[4000,1000]},
+  customize:{n:'Customize agent',g:'Skill',job:'Custom fields, property setters, mandatory-if rules, validation scripts, new DocTypes and child tables.',emits:['custom_field','property_setter','mandatory_if','validate_script','new_doctype','child_table'],no:'No permission changes, no data deletion.',tok:[8000,3000]},
+  uiux:{n:'UI/UX agent',g:'Skill',job:'Form tabs and layout, list columns and indicators, number cards, charts, web forms, workspace shortcuts.',emits:['form_tabs','list_indicator','list_columns','number_card','dashboard_chart','web_form','workspace_shortcut'],no:'No scripts that write data.',tok:[9000,3500]},
+  flow:{n:'Workflow & Permissions agent',g:'Skill',job:'Roles, permission matrix, approval workflows, escalation rules. Always treated as high risk.',emits:['role_matrix','approval_workflow','escalation_rule'],no:'Cannot approve its own change.',tok:[9000,3000]},
+  report:{n:'Report agent',g:'Skill',job:'Report builder reports and read-only script reports.',emits:['report_builder','script_report_readonly'],no:'Read-only queries only.',tok:[6000,1800]},
+  reviewer:{n:'Reviewer',g:'Quality',job:'Checks that a verified change really covers the requirement text. Marks pass, partial or fail.',emits:['coverage_verdict'],no:'Cannot change anything.',tok:[5000,800]},
+  tester:{n:'Tester',g:'Quality',job:'Writes behaviour tests (submit, escalate, close, reject bad input) that the Engine runs against the site.',emits:['behaviour_test'],no:'Tests clean up after themselves.',tok:[6000,1500]},
+  auditor:{n:'Fit-gap Auditor',g:'Quality',job:'Probes the live site to confirm or downgrade every "standard fit" claim in the matrix.',emits:['probe','verdict'],no:'Read-only.',tok:[5000,1000]},
+  docs:{n:'Docs & UAT writer',g:'Quality',job:'User guides and UAT scripts per module from the change sets.',emits:['document'],no:'Not run in this simulation.',tok:[6000,2500]},
+};
+const AGENT_ORDER = ['architect','reconciler','builder','configure','customize','uiux','flow','report','reviewer','tester','auditor','docs'];
+const PROFILE_MAP = {
+  economy:{architect:['mini','strong'],builder:['mini','strong'],flow:['mini','strong'],customize:['mini','strong'],uiux:['mini','strong']},
+  balanced:{architect:['strong',null],builder:['mini','strong'],flow:['mini','strong'],customize:['mini','strong'],uiux:['mini','strong']},
+  quality:{architect:['strong',null],builder:['strong',null],flow:['strong',null],customize:['strong',null],uiux:['strong',null]},
+};
+const PACKS = [
+  {n:'Buying · SRM',dts:['Supplier','Supplier Group','Supplier Quotation','Request for Quotation','Purchase Order','Purchase Receipt','Buying Settings'],gaps:'41 SRM gap requirements'},
+  {n:'Stock · Supply chain',dts:['Item','Warehouse','Material Request','Stock Entry','Delivery Note','Bin','Batch','Stock Reconciliation'],gaps:'58 supply chain gap requirements'},
+  {n:'Selling · URC orders',dts:['Customer','Quotation','Sales Order','Delivery Note','Selling Settings','Pricing Rule'],gaps:'53 URC and order gap requirements'},
+  {n:'Support · Cases',dts:['Issue','Service Level Agreement','Support Settings','Issue Type','Issue Priority','Web Form','Email Account'],gaps:'21 grievance requirements in this pilot'},
+];
+const RECIPES = [
+  ['naming_series','configure','low','series pattern','Sets autoname and the series list','Series generates the next name'],
+  ['email_alert','configure','low','doctype, state, recipients, template','Notification record','Alert fires on a test save'],
+  ['sla_record','configure','low','doctype, priority, response and resolution time','Service Level Agreement','SLA row stored and active'],
+  ['custom_field','customize','low','doctype, label, type, options','Custom Field','Field exists with the same type'],
+  ['mandatory_if','customize','low','doctype, field, controlling field, value','Property Setter','Property read back'],
+  ['validate_script','customize','medium','doctype, rule, message','Server Script (checked for safety)','Bad input is rejected'],
+  ['new_doctype','customize','low','name, fields, naming','DocType (custom)','Table is queryable'],
+  ['child_table','customize','low','parent, child fields','DocType + Table field','Rows save under the parent'],
+  ['form_tabs','uiux','low','doctype, tabs and their fields','Tab and Section Break fields','Every field appears once'],
+  ['list_indicator','uiux','low','doctype, rule, colour','Client Script / list settings','Row colour rule stored'],
+  ['number_card','uiux','low','doctype, filter, function','Number Card','Card returns a value'],
+  ['dashboard_chart','uiux','low','doctype, group by, type','Dashboard Chart','Chart returns data'],
+  ['web_form','uiux','medium','doctype, fields, login rule','Web Form','Form route responds'],
+  ['role_matrix','flow','high','roles and permissions per doctype','Role + Custom DocPerm','Permission read back'],
+  ['approval_workflow','flow','high','doctype, states, roles','Workflow + States + Actions','No dead-end or unreachable state'],
+  ['report_builder','report','low','doctype, columns, group by','Report','Report runs and returns rows'],
+];
+const VALIDATORS = ['Typed schema for every operation','Fieldname collision and reserved words','Link and child table targets exist','depends_on and mandatory_depends_on refer to real fields','Roles exist before they are used','Script safety (no imports, no raw SQL, no network)','Permission escalation check','Workflow dead ends and unreachable states','Naming series collisions','Version compatibility with the site','Dependency order (role before permission, doctype before link)','Idempotence: applying twice changes nothing'];
+const TIERS = ['rule','recipe','pattern','decision','model'];
+const TIER_LABEL = {rule:'Rule',recipe:'Recipe',pattern:'Saved pattern',decision:'Decision model',model:'LLM'};
+const RISK_RANK = {low:0,medium:1,high:2};
+const LANES = [['plan','Plan and reconcile'],['case','Grievance case app (new build)'],['srm','Supplier relationship'],['scm','Supply chain demand'],['ship','Verify, test, export']];
+const STATUS_LABEL = {backlog:'backlog',planned:'planned',held:'held for approval',built:'built, partial',verified:'verified',blocked:'blocked',needs_input:'needs a decision'};
+const STAGE_FLOW = [['Requirement row','','read from Excel'],['Triage','rule','external systems screened out'],['Decision gateway','decision','class, recipe, confidence'],['Architect','model','plan, lanes, order'],['Reconciler','rule','merge overlaps'],['Skill agent + pack','model','or recipe, or saved pattern'],['Validators','rule','12 checks'],['Policy gate','rule','risk decides'],['Apply','rule','with snapshot'],['Verify','rule','read back live'],['Tester + Reviewer','model','behaviour, coverage'],['Export','rule','customization app']];
+const PATTERN_IDS = ['C7','M2','T1','T2'];
+
+/* ============ work items (the Architect's output) ============ */
+function nodeDefs(f, dec){
+  const iss = f === 'issue', dt = iss ? 'Issue' : 'Grievance Case';
+  return [
+  {id:'A0',lane:'plan',agent:'architect',tier:'model',deps:[],risk:'low',reqs:[],title:'Decompose 47 requirements into 22 work items and order them',
+   ops:['22 work items in 3 lanes','2 questions for you, 3 requirements ruled out'],pack:'all packs',
+   spec:{work_items:22,lanes:{case:10,srm:3,scm:4,verify_export:4,reconcile:1},foundation:iss?'extend Issue + Service Level Agreement':'new DocType Grievance Case',ruled_out:[12,26,201],questions:[1,109]}},
+  {id:'X1',lane:'plan',agent:'reconciler',tier:'rule',deps:['A0'],risk:'low',reqs:[],title:'Reconcile overlaps: one role "Branch Officer", one URC field',
+   ops:['Roles "Branch Reviewer" (case) and "Branch Supplier Editor" (SRM) have the same Supplier access: merged into "Branch Officer"','Field "URC" requested by two lanes: one Link field'],pack:'rules',
+   spec:{merged_roles:{from:['Branch Reviewer','Branch Supplier Editor'],to:'Branch Officer'},deduped_fields:['URC']}},
+  {id:'C1',lane:'case',agent:'builder',tier:'recipe',deps:['A0'],risk:'low',reqs:[185],pack:'Support · Cases',recipe:iss?'custom_field ×6':'new_doctype ×3',fx:iss?{custom_field:6}:{doctype:3},
+   title:iss?'Extend standard Issue: URC, product, purchase date, category, branch, satisfaction':'Create DocTypes Grievance Case, Grievance Category, Grievance Action',
+   ops:iss?['Add Link field "URC"','Add Data field "Product Description"','Add Date field "Date of Purchase"','Add Link field "Grievance Category"','Add Link field "Branch"','Add Rating field "Customer Satisfaction"']:['Create DocType "Grievance Case" with 14 fields','Create DocType "Grievance Category"','Create child DocType "Grievance Action"'],
+   checks:iss?['Issue.custom_urc exists, type Link','Issue.custom_grievance_category exists','Issue.custom_customer_satisfaction exists, type Rating']:['DocType "Grievance Case" exists, all fields present','Table tabGrievance Case is queryable'],
+   spec:iss?{op:'add_custom_field',doctype:'Issue',fields:['urc','product_description','date_of_purchase','grievance_category','branch','customer_satisfaction']}:{op:'create_doctype',name:'Grievance Case',fields:14}},
+  {id:'C2',lane:'case',agent:'configure',tier:'rule',deps:['C1'],risk:'low',reqs:[186],pack:'Support · Cases',recipe:'naming_series',fx:{property_setter:1},title:'Reference ID: naming series GRV-.YYYY.-.#####',
+   ops:['Set naming series of '+dt+' to GRV-.YYYY.-.#####'],checks:['Next name generated: GRV-2026-00001'],spec:{op:'set_naming_series',doctype:dt,series:'GRV-.YYYY.-.#####'}},
+  {id:'C3',lane:'case',agent:'flow',tier:'recipe',deps:['X1','C1'],risk:'high',reqs:[191],pack:'Support · Cases',recipe:'role_matrix',fx:{role:3,custom_docperm:5},title:'Roles and permissions: Branch Officer, Complaint Officer, Grievance Admin',
+   ops:['Create roles Branch Officer, Complaint Officer, Grievance Admin','Grant '+dt+': Branch Officer read, write, share','Grant '+dt+': Complaint Officer read, write, assign','Grant '+dt+': Grievance Admin all except delete'],
+   checks:['3 roles exist','5 permission rules read back for '+dt],impact:'Adds access to '+dt+' only. No existing role loses access.',spec:{op:'role_matrix',roles:['Branch Officer','Complaint Officer','Grievance Admin'],doctype:dt}},
+  {id:'C4',lane:'case',agent:'flow',tier:'recipe',deps:['C3'],risk:'high',reqs:[193],pack:'Support · Cases',recipe:'approval_workflow',fx:{workflow:1,workflow_state:6,workflow_action_master:5},title:'Workflow: Submitted, Under Review, More Information Required, Escalated, Resolved, Closed',
+   ops:['6 states','9 transitions with roles','Resolved and Closed lock the document'],checks:['Workflow active on '+dt,'No dead-end or unreachable state','All 9 transitions use existing roles'],
+   impact:'Applies to '+dt+' documents. '+(iss?'Existing Issues keep their status field; the workflow is limited to Issue Type "Grievance".':'New DocType, no existing data.'),
+   spec:{op:'approval_workflow',doctype:dt,states:['Submitted','Under Review','More Information Required','Escalated','Resolved','Closed'],transitions:9}},
+  {id:'C5',lane:'case',agent:iss?'configure':'customize',tier:iss?'recipe':'model',deps:['C1'],risk:'medium',reqs:[192],pack:'Support · Cases',recipe:iss?'sla_record':'free-form',fx:iss?{service_level_agreement:3}:{server_script:1},
+   title:iss?'Service Level Agreement per category with escalation priority':'SLA clock and scheduled escalation job (custom code)',
+   ops:iss?['SLA "Quality": respond 4h, resolve 3 days','SLA "Service": respond 8h, resolve 5 days','SLA "Other": respond 1 day, resolve 7 days']:['Add due-date calculation on '+dt,'Add scheduled server script that escalates overdue cases'],
+   checks:iss?['3 Service Level Agreement records active']:['Server script stored, enabled, event Scheduler'],spec:iss?{op:'sla_record',doctype:'Issue',levels:3}:{op:'server_script',event:'Scheduler Event',purpose:'escalate overdue grievances'}},
+  {id:'C6',lane:'case',agent:'configure',tier:'recipe',deps:['C4'],risk:'low',reqs:[188],pack:'Support · Cases',recipe:'email_alert',fx:{notification:4},title:'Email alerts on every state change to customer and branch',
+   ops:['4 notifications: Submitted, More Information Required, Escalated, Resolved'],checks:['4 notifications enabled','Alert fires on a test save'],spec:{op:'email_alert',doctype:dt,events:4}},
+  {id:'C7',lane:'case',agent:'uiux',tier:'model',deps:['C2','C4'],risk:'medium',reqs:[184,187],pack:'Support · Cases',recipe:'free-form',fx:{web_form:1,client_script:1},title:'Customer portal: grievance form and status tracking by reference ID',
+   ops:['Web Form "Lodge a grievance" with the fields in requirement 185','Status page: customer enters reference ID and sees the workflow state','Login not required for tracking by reference ID'],
+   checks:['Web Form published, route responds','Status page returns state for GRV-2026-00001'],
+   spec:{op:'web_form',route:'lodge-grievance',fields:9,status_lookup:'reference_id'}},
+  {id:'C8',lane:'case',agent:'uiux',tier:'recipe',deps:['C5'],risk:'low',reqs:[111,179,180,181,182,183,197],pack:'Support · Cases',recipe:'number_card ×6, dashboard_chart ×3, list_indicator',fx:{number_card:6,dashboard_chart:3,client_script:1},title:'Dashboard: 6 number cards, 3 charts, SLA colours, escalated highlight',
+   ops:['6 Number Cards: open, overdue, escalated, resolved today, average resolution, satisfaction','3 Charts: by category, by branch, monthly trend','List colours: overdue red, near breach amber, escalated bold'],
+   checks:['6 cards return values','3 charts return data','List indicator rule stored'],spec:{op:'dashboard',cards:6,charts:3,indicator:'sla_status'}},
+  {id:'C9',lane:'case',agent:'report',tier:'recipe',deps:['C1'],risk:'low',reqs:[110,195,196],pack:'Support · Cases',recipe:'report_builder ×3',fx:{report:3},title:'Reports: by category, resolution time, repeat complaints per supplier',
+   ops:['Report "Grievances by category and frequency"','Report "Resolution time by branch"','Report "Complaints per supplier"'],checks:['3 reports run and return rows'],spec:{op:'report_builder',reports:3}},
+  {id:'C10',lane:'case',agent:'architect',tier:dec?'decision':'rule',deps:['A0'],risk:'low',reqs:[107,108],pack:'rules',blocked:'Chatbot and SMS intake need an external gateway. Studio configures ERPNext only.',title:'Chatbot and SMS intake',ops:[],spec:dec?{question:'requirement_class',answer:'external_system',p:0.95}:{triage:'external_channel',matched:['chatbot','SMS']}},
+  {id:'S1',lane:'srm',agent:'customize',tier:'recipe',deps:['A0'],risk:'medium',reqs:[7,10,15,17,18,21],pack:'Buying · SRM',recipe:'custom_field ×4, mandatory_if, validate_script',fx:{custom_field:4,property_setter:2,server_script:1},title:'Supplier registration fields, mandatory rules, registration checks',
+   ops:['Select field Supplier Category (Domestic, Foreign, Government)','Select field Sub-category, shown when Domestic','Int field Year of Establishment, mandatory','Check field Registration Documents Received','Server script: enabled supplier needs the registration fields'],
+   checks:['4 fields exist with the right types','Server script stored and enabled'],spec:{op:'custom_field',doctype:'Supplier',fields:['supplier_category','supplier_sub_category','year_of_establishment','registration_docs_received']}},
+  {id:'S2',lane:'srm',agent:'customize',tier:'recipe',deps:['A0'],risk:'low',reqs:[414,418,420,422,424],pack:'Buying · SRM',recipe:'child_table, new_doctype, custom_field ×2',fx:{doctype:2,custom_field:3},title:'Supplier products table, Supplier Change Request, compliance fields',
+   ops:['Child table "Supplier Product" (8 fields)','Table field "Products" on Supplier','DocType "Supplier Change Request"','Check field Turnover Certificate Attached, Data field Factory Location'],
+   checks:['DocType Supplier Product exists, 8 fields','DocType Supplier Change Request exists'],spec:{op:'child_table',parent:'Supplier',child:'Supplier Product',fields:8}},
+  {id:'S3',lane:'srm',agent:'flow',tier:'recipe',deps:['X1','S1','S2'],risk:'high',reqs:[],pack:'Buying · SRM',recipe:'role_matrix',fx:{custom_docperm:6},title:'Permissions for Branch Officer on Supplier, Product, Change Request',
+   ops:['Branch Officer: Supplier read, write','Branch Officer: Supplier Change Request create, read','Purchase User: Supplier Change Request read'],checks:['6 permission rules read back'],impact:'Extends access on 3 doctypes. Nobody loses access.',spec:{op:'role_matrix',role:'Branch Officer',doctypes:['Supplier','Supplier Product','Supplier Change Request']}},
+  {id:'M1',lane:'scm',agent:'flow',tier:'model',deps:['X1'],risk:'high',reqs:[199,202,203,208,211,212],pack:'Stock · Supply chain',recipe:'free-form',fx:{doctype:2,workflow:1,workflow_state:5},title:'Provisional Demand: DocType, URC to Depot to LIF workflow, consolidation, schedule',
+   ops:['DocType "Provisional Demand" with URC, cycle, items','Workflow: Draft, Depot Review, LIF Review, Consolidated, Rejected','Cycle schedule setting','Consolidated view of approved demands'],
+   checks:['DocType exists','Workflow active, no dead end','Schedule setting stored'],impact:'New DocType and workflow. Material Request is untouched.',
+   spec:{op:'create_doctype',name:'Provisional Demand',workflow:['Draft','Depot Review','LIF Review','Consolidated','Rejected']}},
+  {id:'M2',lane:'scm',agent:'customize',tier:'model',deps:['M1'],risk:'medium',reqs:[210,213],pack:'Stock · Supply chain',recipe:'free-form',fx:{doctype:1,server_script:1},title:'Monthly quota by rank and designation, min and max order limits',
+   ops:['DocType "Quota Rule" (rank, designation, item group, monthly quantity)','Validation script: demand above quota or outside min/max is rejected'],checks:['DocType Quota Rule exists','Script rejects a demand above quota'],spec:{op:'create_doctype',name:'Quota Rule',validation:'quota and min/max'}},
+  {id:'M3',lane:'scm',agent:'uiux',tier:'recipe',deps:['M1'],risk:'low',reqs:[200,207],pack:'Stock · Supply chain',recipe:'form_tabs, list_indicator, web_form',fx:{client_script:1,property_setter:4},title:'URC demand screen: tabs, status colours, web entry',
+   ops:['Form tabs: Demand, Items, Approval','List colours by workflow state','Automatic totals on item rows'],checks:['Tabs stored','Indicator rule stored'],spec:{op:'form_tabs',doctype:'Provisional Demand',tabs:3}},
+  {id:'M4',lane:'scm',agent:'architect',tier:dec?'decision':'model',deps:['A0'],risk:'low',reqs:[209],pack:'rules',blocked:'Demand forecasting needs a forecasting model, not a configuration.',title:'Forecast demand from history',ops:[],spec:dec?{question:'requirement_class',answer:'needs_model_not_config',p:0.93}:{triage:'needs_model_not_config'}},
+  {id:'R1',lane:'ship',agent:'reviewer',tier:'model',deps:['C8','C9','S3','M2','M3'],risk:'low',reqs:[],pack:'all packs',title:'Coverage review of every change set',ops:['Compares each requirement text with what was built'],
+   spec:{pass:35,partial:[{id:10,why:'Script checks fields are filled; guideline-based format checks are not covered'},{id:184,why:'Web portal done; chatbot and mobile app are outside scope'}]}},
+  {id:'T1',lane:'ship',agent:'tester',tier:'model',deps:['C6','C7','C8'],risk:'low',reqs:[],pack:'Support · Cases',fx:{test:4},title:'Behaviour tests: submit, SLA breach escalates, close notifies',ops:['Submit a grievance on the portal','Backdate a case: it escalates','Resolve and close: customer is notified','Open a closed case: edit is refused'],
+   tests:[['Submit via web form returns a reference ID','pass'],['Overdue case becomes Escalated','pass'],['Closing sends a notification','pass'],['Closed case cannot be edited','inconclusive']],spec:{op:'behaviour_tests',count:4}},
+  {id:'T2',lane:'ship',agent:'tester',tier:'model',deps:['S3','M2','M3'],risk:'low',reqs:[],pack:'Buying · SRM',fx:{test:5},title:'Behaviour tests: registration rules, change request, demand quota',ops:['Enable supplier without documents: refused','Change request without supplier: refused','Demand above quota: refused'],
+   tests:[['Supplier without documents cannot be enabled','pass'],['Change request needs a supplier','pass'],['Product row needs an item','pass'],['Demand above quota is refused','pass'],['Min order limit enforced','pass']],spec:{op:'behaviour_tests',count:5}},
+  {id:'E1',lane:'ship',agent:'reconciler',tier:'rule',deps:['T1','T2','R1'],risk:'low',reqs:[],pack:'rules',title:'Export customization app and traceability matrix',ops:['Write fixtures, DocType files, tests, manifest','Write requirement to change-set trace back to the matrix'],spec:{op:'export',app:'csd_customizations'}},
+  ];
+}
+
+/* ============ state ============ */
+let S;
+function fresh(){
+  return {tab:'over',loaded:false,bp:false,foundation:'issue',profile:null,roles:{},prices:JSON.parse(JSON.stringify(PRICES0)),
+    nodes:[],byId:{},runNo:0,running:false,runDone:false,par:3,policy:'medium',inject:true,fast:false,log:[],usage:[],eng:0,
+    status:{},notes:{},sel:null,changes:[],history:[],patterns:[],patternsOn:false,chat:[],chatBusy:false,
+    ws:{p1:false,p2:false,p3:null,tab:'reg',view:'supplier',ba:'after'},visitedDet:false,exported:false,promo:0,promoBusy:false,audited:false,
+    play:{recipe:'custom_field',doctype:'Supplier',label:'Registered Capital',type:'Data',options:'',when:'supplier_type',equals:'Company',field:'tax_id',states:'Draft, Under Review, Approved',role:'Purchase Manager'},
+    decisionOn:true,dec:{provider:'laya',auto:0.90,human:0.60,pick:209,calibrated:false},mode:'kernel+lf',backend:{customize:'langflow',uiux:'langflow'},visitedDecision:false,visitedPrompts:false,visitedOrch:false,labels:0,
+    prompts:null,promptAgent:'customize',audit:[],flowAgent:'customize',flowPub:{},
+    qtab:'audit',confirmUndo:null,answers:{},questions:[],regress:false,benchmark:false,wroteback:false};
+}
+function resetRun(){
+  S.nodes = nodeDefs(S.foundation, S.decisionOn).map(d => ({...d,st:'waiting',phase:'',failedOnce:false,done:false,tier0:d.tier}));
+  if (S.patternsOn) S.nodes.forEach(n => { if (PATTERN_IDS.includes(n.id)) n.tier = 'pattern'; });
+  S.byId = Object.fromEntries(S.nodes.map(n => [n.id,n]));
+  S.log = []; S.usage = []; S.eng = 0; S.changes = []; S.questions = []; S.runDone = false; S.sel = null; S.exported = false; S.promo = 0;
+  S.status = {}; S.notes = {}; PREQ.forEach(r => S.status[r[0]] = 'backlog');
+}
+function setProfile(p){
+  S.profile = p;
+  for (const a of AGENT_ORDER){ if (!AG[a].tok) continue; const m = (PROFILE_MAP[p][a]) || ['mini',null]; S.roles[a] = {primary:m[0],fb:m[1],on:true}; }
+}
+function init(){ S = fresh(); resetRun(); setProfile('balanced'); S.profile = null; initPrompts(); buildDec(); }
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const sleep = ms => new Promise(r => setTimeout(r, ms * (S.fast ? 0.15 : 1)));
+const money = v => '$' + v.toFixed(v < 1 ? 3 : 2);
+const stamp = () => new Date(Date.UTC(2026,9,20,14,2,0) + S.log.length * 1700).toISOString().slice(11,19);
+function say(who,text){ S.log.push({who,text,t:stamp()}); render(); }
+function usage(agent,esc2){ const r = S.roles[agent]; if (!r) return; const m = esc2 && r.fb ? r.fb : r.primary; const t = AG[agent].tok; const k = agent === 'architect' && S.decisionOn ? 0.45 : 1; S.usage.push({agent,model:m,i:Math.round(t[0]*k),o:Math.round(t[1]*k)}); }
+function ucost(u,m){ const p = S.prices[m || u.model]; return u.i/1e6*p.in + u.o/1e6*p.out; }
+function totals(){
+  let c = 0, base = 0; const by = {};
+  for (const u of S.usage){ const k = ucost(u); c += k; base += ucost(u,'strong'); by[u.agent] = (by[u.agent]||0) + k; }
+  const tc = {rule:0,recipe:0,pattern:0,decision:0,model:0}; S.nodes.forEach(n => { if (n.st !== 'waiting' || S.running || S.runDone) tc[n.tier]++; });
+  const all = tc.rule + tc.recipe + tc.pattern + tc.model; const share = all ? (all - tc.model) / all : 0;
+  return {c,base,by,calls:S.usage.length,tc,all,share};
+}
+function counts(ids){ const o = {}; ids.forEach(i => { const s = S.status[i]; o[s] = (o[s]||0) + 1; }); return o; }
+const allIds = () => PREQ.map(r => r[0]);
+function mark(ids,st,note){ ids.forEach(i => { S.status[i] = st; if (note !== undefined) S.notes[i] = note; }); }
+const dtName = () => S.foundation === 'issue' ? 'Issue' : 'Grievance Case';
+function modelSteps(f){ return nodeDefs(f, S.decisionOn).filter(n => n.tier === 'model').length; }
+
+/* ============ orchestration: a dependency-driven scheduler ============ */
+function terminal(n){ return n.st === 'done' || n.st === 'blocked'; }
+function pump(){
+  if (!S.running) return;
+  const run = S.nodes.filter(n => n.st === 'running').length; let cap = S.par - run;
+  for (const n of S.nodes){ if (cap <= 0) break;
+    if (n.st === 'waiting' && n.deps.every(d => terminal(S.byId[d]))){ n.st = 'running'; cap--; exec(n); } }
+  if (S.nodes.every(terminal)){ S.running = false; S.runDone = true; finishRun(); }
+  render();
+}
+function finishRun(){
+  const t = totals(); S.runNo++;
+  S.history.push({n:S.runNo,patterns:S.patternsOn,model:t.tc.model,all:t.all,cost:t.c,calls:t.calls,verified:counts(allIds()).verified||0});
+  say('engine','run complete: ' + t.tc.model + ' of ' + t.all + ' work items needed an LLM'); S.eng++;
+}
+function tierText(n){ return {rule:'rule',recipe:'recipe ' + (n.recipe||''),pattern:'saved pattern',model:'model'}[n.tier]; }
+async function exec(n){
+  const a = n.agent, A = AG[a];
+  say('engine',`${n.id} started: ${n.title}`); S.eng++;
+  if (n.blocked){
+    n.phase = 'triage'; if (n.tier === 'model') usage(a); await sleep(500);
+    if (n.tier === 'decision'){ say('decision',`${n.id} classified as ${n.spec.answer} (p ${n.spec.p.toFixed(2)}): above the auto threshold, blocked`); S.eng++; }
+    n.st = 'blocked'; mark(n.reqs,'blocked',n.blocked); say('engine',`${n.id} blocked: ${n.blocked}`); return pump();
+  }
+  n.phase = 'drafting';
+  if (n.tier === 'model'){
+    if (n.id === 'A0' && S.decisionOn){ const c = decCounts(); say('decision',`classified ${PREQ.length} requirements: ${c.auto} confident, ${c.llm} sent to the Architect, ${c.human} sent to you`); S.eng++; await sleep(500); }
+    usage(a); say(a,`${n.id} drafted: ${n.ops.length ? n.ops[0] : n.title}${viaText(a)}`); await sleep((n.id === 'A0' ? 1500 : 1100) + (viaText(a) ? 250 : 0)); }
+  else { say('engine',`${n.id} ${tierText(n)}: spec produced without a model`); S.eng++; await sleep(350); }
+  if (n.id === 'A0') return planDone(n);
+  if (n.id === 'X1'){ say('engine','overlap found: ' + n.ops[0]); S.eng++; }
+  if (S.inject && n.id === 'M1' && !n.failedOnce){
+    n.failedOnce = true; n.phase = 'validating'; await sleep(500);
+    say('engine','M1 validation error: workflow state "Rejected" has no way out and is not a final state'); S.eng++;
+    usage(a); say(a,'M1 repaired: Rejected is now a final state'); await sleep(900);
+  }
+  n.phase = 'validating'; await sleep(450); say('engine',`${n.id} validators passed (12 checks)`); S.eng++;
+  if (RISK_RANK[n.risk] > ({low:0,medium:1,high:2}[S.policy] ?? 1)){
+    n.st = 'held'; n.phase = 'waiting for you'; mark(n.reqs,'held'); say('engine',`${n.id} risk ${n.risk} is above policy: held for approval`); S.eng++; return pump();
+  }
+  return applyPhase(n);
+}
+function planDone(n){
+  PREQ.forEach(r => { S.status[r[0]] = 'planned'; });
+  mark([12,26],'blocked','Architect: needs a link to external bodies / reports are not buildable yet');
+  mark([201],'blocked','Triage rule: needs a payment gateway integration');
+  mark([1],'needs_input','Architect asked: what must the centralized platform show beyond the Supplier form?');
+  mark([109],'needs_input','Architect asked: what complaint count per supplier triggers an inquiry?');
+  S.questions = [{id:1,q:'What must the centralized platform show beyond the Supplier form: an overview page, or only list filters?'},{id:109,q:'How many complaints against one supplier should trigger an inquiry, and over what period?'}];
+  say('architect','plan ready: 22 work items, 2 questions for you, 3 requirements ruled out by rules'); n.st = 'done'; n.phase = ''; pump();
+}
+async function applyPhase(n){
+  if (S.decisionOn){ say('decision',`${n.id} guard: reversible, in scope, existing data untouched (p ${(0.95 + (n.id.charCodeAt(1) % 5) / 100).toFixed(2)})`); S.eng++; }
+  n.st = 'running'; n.phase = 'applying'; mark(n.reqs.filter(i => !['blocked','needs_input','built'].includes(S.status[i])),'planned');
+  await sleep(300 + 120 * n.ops.length); say('engine',`${n.id} applied ${n.ops.length} operation(s) with a snapshot`); S.eng++;
+  n.phase = 'verifying'; await sleep(550);
+  if (S.inject && n.id === 'C7' && !n.failedOnce){
+    n.failedOnce = true; say('engine','C7 verification failed: web form route "lodge-grievance" returns 404 (form not published)'); S.eng++;
+    say('engine','rolled back to snapshot'); await sleep(600); n.phase = 'repairing';
+    usage(n.agent,true); say('engine','repair failed twice on the cheap model: escalating to ' + (S.roles[n.agent].fb ? S.prices[S.roles[n.agent].fb].name : 'same model')); await sleep(1200);
+    say(n.agent,'C7 repaired: form set to published'); n.phase = 'applying'; await sleep(700); n.phase = 'verifying'; await sleep(500);
+  }
+  const ck = n.checks ? n.checks.length : (n.ops.length || 1);
+  say('engine',`${n.id} verified: ${ck} of ${ck} checks read back from the live site`); S.eng++;
+  if (n.tests){ n.phase = 'testing'; await sleep(500); n.tests.forEach(t => say('tester',`${t[1]}: ${t[0]}`)); }
+  if (n.id === 'R1'){
+    mark([10],'built','Reviewer: script checks fields are filled; guideline-based format checks are not covered');
+    mark([184],'built','Reviewer: web portal done; chatbot and mobile app are outside scope');
+    say('reviewer','10 partial, 184 partial; the rest pass');
+  }
+  n.st = 'done'; n.phase = '';
+  const partial = (S.status[10] === 'built' ? [10] : []).concat(S.status[184] === 'built' ? [184] : []);
+  mark(n.reqs.filter(i => !partial.includes(i)),'verified','Verified by the Engine: ' + ck + ' checks');
+  if (n.ops.length && n.id !== 'R1' && n.id !== 'E1') S.changes.unshift({id:n.id,title:n.title,risk:n.risk,tier:n.tier,status:'applied',ids:n.reqs,ops:n.ops});
+  if (n.id === 'E1'){ S.exported = true; }
+  pump();
+}
+function startRun(){
+  if (S.running) return; resetRun(); S.running = true; S.tab = 'run'; S.sel = null;
+  say('you',`Started pilot run ${S.runNo + 1}: 47 requirements, 3 modules. Auto-apply ${({low:'low risk only',medium:'low and medium risk',high:'everything'})[S.policy]}.`);
+  pump();
+}
+function approve(id){
+  const n = S.byId[id]; if (!n || n.st !== 'held') return; S.labels++; say('you',`Approved ${id}`); applyPhase(n);
+}
+function approveAll(){ S.nodes.filter(n => n.st === 'held').forEach(n => approve(n.id)); }
+function dependents(id){
+  const out = new Set(); const walk = x => S.nodes.forEach(n => { if (n.st === 'done' && n.deps.includes(x) && !out.has(n.id)){ out.add(n.id); walk(n.id); } }); walk(id); return [...out];
+}
+function undoSet(id){
+  const ids = [id, ...dependents(id)];
+  ids.forEach(x => { const n = S.byId[x]; n.st = 'undone'; mark(n.reqs,'backlog','Undone by you'); S.changes.forEach(c => { if (c.id === x) c.status = 'undone'; }); });
+  S.confirmUndo = null; say('you',`Undid ${ids.join(', ')}`);
+}
+
+/* ============ views ============ */
+const tchip = t => `<span class="chip ${t}">${TIER_LABEL[t]}</span>`;
+const rchip = r => `<span class="chip ${r === 'high' ? 'bad' : r === 'medium' ? 'model' : 'ok'}">${r} risk</span>`;
+function sbar(ids){
+  const c = counts(ids), o = ['verified','built','planned','held','needs_input','blocked','backlog'];
+  return '<div class="bar" role="img" aria-label="status mix">' + o.filter(k => c[k]).map(k => `<div class="seg-${k}" style="width:${c[k]/ids.length*100}%"></div>`).join('') + '</div>';
+}
+const slegend = () => '<div class="legend">' + ['backlog','planned','held','built','verified','needs_input','blocked'].map(k => `<span><i class="seg-${k}"></i>${STATUS_LABEL[k]}</span>`).join('') + '</div>';
+const schip = st => `<span class="chip ${({verified:'ok',blocked:'bad',built:'info',held:'hold',planned:'model',needs_input:'info'})[st]||''}">${STATUS_LABEL[st]}</span>`;
+function cascadeBar(){
+  const t = totals(); if (!t.all) return '<div class="small muted">Starts when a run starts.</div>';
+  return `<div class="bar big" role="img" aria-label="tier mix">${TIERS.map(k => t.tc[k] ? `<div class="s-${k}" style="width:${t.tc[k]/t.all*100}%"></div>` : '').join('')}</div>
+   <div class="legend" style="margin-top:6px">${TIERS.map(k => `<span><i class="s-${k}"></i>${TIER_LABEL[k]} ${t.tc[k]}`+'</span>').join('')}</div>`;
+}
+
+function viewOver(){
+  const mods = ['srm','scm','case'].map(m => {
+    const ids = PREQ.filter(r => r[1] === m).map(r => r[0]);
+    const kind = {srm:'Configure and customize',scm:'Workflow, customize, UI/UX',case:'Full app build'}[m];
+    const real = {srm:'41 gaps in the matrix',scm:'58 gaps in the matrix',case:'grievance cluster in Procurement'}[m];
+    return `<div class="card col"><h3>${MODNAME[m]}</h3><div class="small muted" style="margin-bottom:6px">${kind} · ${ids.length} pilot requirements · ${real}</div>${sbar(ids)}</div>`; }).join('');
+  const t = totals();
+  return `<div class="row">${mods}</div>
+  <div class="card"><h3>Architecture</h3><div class="cv"><div class="bx"><b>Studio web app</b><br>chat, runs, approvals</div><span class="ar">→</span><div class="bx" style="border-color:var(--rule)"><span class="tg rule">Orchestration kernel</span><br>task graph, gates, retries, budget, audit. Always authoritative.</div><span class="ar">→</span><div class="bx" style="border-color:var(--decision)"><span class="tg decision">Decision gateway</span><br>fast choices with confidence</div><div class="bx" style="border-color:#D99A1E"><span class="tg model">Agent flows</span><br>Langflow canvas, prompt registry, LLMs</div><span class="ar">→</span><div class="bx" style="border-color:var(--rule)"><span class="tg rule">Engine</span><br>validators, apply, verify, undo</div><span class="ar">→</span><div class="bx"><b>ERPNext v15</b></div></div></div>
+  <div class="card"><h3>How one requirement moves through the Studio</h3><div class="flow">${STAGE_FLOW.map(s => `<div class="st ${s[1]}"><span class="tg ${s[1]}">${s[1] === 'rule' ? 'Engine · rule' : s[1] === 'model' ? 'LLM when needed' : s[1] === 'decision' ? 'Decision model' : 'Input'}</span><b>${s[0]}</b><span class="muted">${s[2]}</span></div>`).join('')}</div>
+  <p class="small muted" style="margin:8px 0 0">The Engine decides and writes. A decision model only picks among known options with a confidence score; an LLM only proposes a typed spec when rules, recipes, saved patterns and the decision model could not answer.</p></div>
+  <div class="row"><div class="card col"><h3>Who solved each work item</h3>${cascadeBar()}<p class="small muted" style="margin:8px 0 0">${t.all ? Math.round(t.share*100) + '% of work items needed no LLM.' : 'Rule, recipe, saved pattern, decision model, then LLM.'}</p></div>
+  <div class="card col"><h3>Pilot status</h3>${sbar(allIds())}<div style="margin-top:6px">${slegend()}</div>
+  <div class="kpis" style="margin-top:10px"><div class="kpi"><b>${money(t.c)}</b><span>model spend</span></div><div class="kpi"><b>${S.history.length}</b><span>runs finished</span></div><div class="kpi"><b>${S.changes.filter(c => c.status === 'applied').length}</b><span>change sets live</span></div></div></div></div>
+  ${S.history.length ? viewHistory() : ''}`;
+}
+function viewHistory(){
+  return `<div class="card"><h3>Run history: what saved patterns change</h3><div class="scroll"><table><thead><tr><th>Run</th><th>Saved patterns</th><th class="num">Work items needing a model</th><th class="num">Model calls</th><th class="num">Spend</th><th class="num">Verified</th></tr></thead><tbody>${S.history.map(h => `<tr><td>${h.n}</td><td>${h.patterns ? 'used' : 'none yet'}</td><td class="num">${h.model} of ${h.all}</td><td class="num">${h.calls}</td><td class="num">${money(h.cost)}</td><td class="num">${h.verified} of 47</td></tr>`).join('')}</tbody></table></div><p class="small muted" style="margin:8px 0 0">Scripted numbers. A real run shows its own.</p></div>`;
+}
+function viewReqs(){
+  if (!S.loaded) return `<div class="card"><h3>Requirements</h3><p class="muted">Upload the RFP fitment matrix. The Studio reads it deterministically: no model.</p><div class="row ctr"><span class="chip">ERPNext_FunctionalFitmentMatrix_CSD_RFP.xlsx</span><button class="btn pri" data-act="load">Upload this file</button></div></div>`;
+  const blocks = ['srm','scm','case'].map(m => {
+    const rows = PREQ.filter(r => r[1] === m).map(r => `<tr><td class="mono">[${r[0]}]</td><td>${esc(r[3])}<div class="small muted">Matrix says: ${r[2] === 'Yes' ? 'standard fit' : r[2] === 'Partial' ? 'partial fit' : 'no fit'}${S.notes[r[0]] ? ' · ' + esc(S.notes[r[0]]) : ''}</div></td><td>${schip(S.status[r[0]])}</td></tr>`).join('');
+    return `<div class="card"><h3>${MODNAME[m]}</h3><div class="scroll"><table><thead><tr><th>ID</th><th>Requirement (shortened)</th><th>Studio status</th></tr></thead><tbody>${rows}</tbody></table></div></div>`; }).join('');
+  return `<div class="card"><h3>1,544 requirements read · 915 standard · 629 gaps · 47 chosen for the pilot</h3><div class="small muted" style="margin-bottom:8px">Pilot scope: Supplier Relationship (14 rows), Supply Chain demand (12 rows) and the Grievance case-management cluster (21 rows). All rows are real, shortened for display.</div>${sbar(allIds())}<div style="margin-top:6px">${slegend()}</div></div>${blocks}`;
+}
+function viewBuilder(){
+  const iss = S.foundation === 'issue', a = modelSteps('issue'), b = modelSteps('new');
+  const caps = [
+    ['Intake: web form and email','184, 185','UI/UX agent: web_form · Configure agent: email account','partial','Chatbot and mobile app are outside scope'],
+    ['Reference ID and tracking','186, 187','naming_series rule · web form status lookup','ok',''],
+    ['Classification and SLA','182, 192','sla_record recipe (or custom code on a new DocType)','ok',''],
+    ['Workflow, assignment, forwarding','191, 193','approval_workflow recipe · role_matrix recipe','ok','Held for your approval'],
+    ['Notifications','188','email_alert recipe','ok',''],
+    ['Dashboard and colours','111, 179–183, 197','number_card, dashboard_chart, list_indicator recipes','ok',''],
+    ['Reports','110, 195, 196','report_builder recipe','ok',''],
+    ['Chatbot and SMS channels','107, 108','external gateway','bad','Blocked by rule: not an ERPNext configuration'],
+    ['Supplier inquiry threshold','109','needs a decision from you','info','Asked in Approvals'],
+  ].map(c => `<tr><td><b>${c[0]}</b></td><td class="mono">${c[1]}</td><td>${c[2]}</td><td><span class="chip ${c[3]}">${{ok:'buildable',partial:'partly buildable',bad:'blocked',info:'needs input'}[c[3]]}</span><div class="small muted">${c[4]}</div></td></tr>`).join('');
+  const bp = !S.bp ? '' : `<div class="card"><h3>Blueprint (${iss ? 'built on standard Issue' : 'new DocType'})</h3><div class="rcs">
+    <div class="rc"><b>${dtName()}</b><br>${iss ? '6 custom fields, naming series GRV-.YYYY.-.#####, limited to Issue Type "Grievance"' : '14 fields, 3 DocTypes, naming series GRV-.YYYY.-.#####'}</div>
+    <div class="rc"><b>Workflow</b><br>Submitted → Under Review → More Information Required → Escalated → Resolved → Closed</div>
+    <div class="rc"><b>Roles</b><br>Branch Officer (merged with SRM), Complaint Officer, Grievance Admin</div>
+    <div class="rc"><b>SLA</b><br>${iss ? '3 Service Level Agreement records (standard feature)' : 'Due-date calculation and scheduled escalation job (custom code)'}</div>
+    <div class="rc"><b>Notifications</b><br>4 email alerts to customer and branch</div>
+    <div class="rc"><b>Portal</b><br>Web form and status lookup by reference ID</div>
+    <div class="rc"><b>Dashboard</b><br>6 number cards, 3 charts, SLA colours</div>
+    <div class="rc"><b>Reports</b><br>By category, resolution time, repeat complaints per supplier</div></div></div>`;
+  return `<div class="card"><h3>Case-management App Builder · Grievance handling (21 requirements)</h3>
+    <p class="small muted" style="margin:0 0 8px">Before building, the Engine reads the live site and checks what ERPNext already provides.</p>
+    <div class="row">${[['Issue DocType','present'],['Service Level Agreement','present'],['Support Settings','present'],['Web Form and portal','present'],['Workflow engine','present']].map(x => `<span class="chip ok">✓ ${x[0]}: ${x[1]}</span>`).join('')}</div>
+    <div class="row" style="margin-top:12px">
+      <label class="card col" style="cursor:pointer;${iss ? 'border-color:var(--accent)' : ''}"><input type="radio" name="fnd" value="issue" ${iss ? 'checked' : ''}> <b>Extend standard Issue (recommended)</b><div class="small muted">Less custom code, upgrade safe, SLA and portal come with ERPNext. Estimated model steps: <b>${a}</b> of 23.</div></label>
+      <label class="card col" style="cursor:pointer;${!iss ? 'border-color:var(--accent)' : ''}"><input type="radio" name="fnd" value="new" ${!iss ? 'checked' : ''}> <b>New Grievance Case DocType</b><div class="small muted">Clean data model, but SLA, escalation and portal need custom code. Estimated model steps: <b>${b}</b> of 23.</div></label></div>
+    <div style="margin-top:12px"><button class="btn pri" data-act="bp" ${S.bp ? 'disabled' : ''}>${S.bp ? 'Blueprint generated' : 'Generate blueprint'}</button></div></div>
+    <div class="card"><h3>Capabilities and where each requirement goes</h3><div class="scroll"><table><thead><tr><th>Capability</th><th>Requirement IDs</th><th>Built by</th><th>Result</th></tr></thead><tbody>${caps}</tbody></table></div></div>${bp}`;
+}
+function viewAgents(){
+  const t = totals();
+  const opt = sel => Object.entries(S.prices).map(([k,m]) => `<option value="${k}" ${sel === k ? 'selected' : ''}>${esc(m.name)}</option>`).join('');
+  const cards = AGENT_ORDER.map(a => { const A = AG[a], r = S.roles[a];
+    return `<div class="agent"><div class="row ctr" style="gap:6px"><b>${A.n}</b><span class="chip ${A.tok ? 'model' : 'rule'}">${A.tok ? 'uses a model' : 'no model'}</span><span class="chip">${A.g}</span></div>
+     <div class="small">${A.job}</div><div class="small muted">Can emit: ${A.emits.map(e => `<span class="mono">${e}</span>`).join(', ')}</div><div class="small muted">Limits: ${A.no}</div>
+     ${A.tok && r ? `<div class="row ctr" style="gap:6px"><select class="input" style="width:auto" data-role="${a}" data-k="primary" aria-label="${A.n} model">${opt(r.primary)}</select><span class="small muted">escalate</span><select class="input" style="width:auto" data-role="${a}" data-k="fb" aria-label="${A.n} escalation model"><option value="">none</option>${opt(r.fb)}</select><span class="small muted">${t.by[a] ? money(t.by[a]) : ''}</span></div>` : ''}</div>`; }).join('');
+  const packs = PACKS.map(p => `<div class="rc"><b>${p.n}</b><br>${p.dts.map(d => `<span class="chip" style="margin:1px">${d}</span>`).join('')}<div class="muted" style="margin-top:4px">${p.gaps}</div></div>`).join('');
+  return `<div class="card"><div class="row ctr"><h3 style="margin:0">Agent roster: skills × module knowledge</h3><span class="sp"></span><span class="small muted">Profile</span>${['economy','balanced','quality'].map(p => `<button class="btn sm ${S.profile === p ? 'pri' : ''}" data-act="profile" data-arg="${p}">${p[0].toUpperCase() + p.slice(1)}</button>`).join('')}</div>
+   <p class="small muted" style="margin:6px 0 10px">A work item runs on one skill agent with the right module pack loaded. That avoids a separate agent for every module and change type.</p><div class="agents">${cards}</div></div>
+  <div class="card"><h3>Module knowledge packs (built from the site's own metadata at deploy)</h3><div class="rcs">${packs}</div></div>
+  <div class="card"><h3>Prices (example values, edit them)</h3><div class="scroll"><table><thead><tr><th>Model</th><th class="num">input $/M</th><th class="num">output $/M</th></tr></thead><tbody>${Object.entries(S.prices).map(([k,m]) => `<tr><td>${esc(m.name)}</td><td class="num"><input class="input" style="width:70px;text-align:right" data-price="${k}" data-pk="in" value="${m.in}" aria-label="${esc(m.name)} input price"></td><td class="num"><input class="input" style="width:70px;text-align:right" data-price="${k}" data-pk="out" value="${m.out}" aria-label="${esc(m.name)} output price"></td></tr>`).join('')}</tbody></table></div>
+  <p class="small muted" style="margin:8px 0 0">Spent this run ${money(t.c)}; saved against a strong model for everything: ${money(Math.max(0,t.base - t.c))}. Budget stop: $25 or 5,000 calls.</p></div>`;
+}
+/* deterministic layer + playground */
+const EXIST = () => { const e = {Supplier:['supplier_name','supplier_group','supplier_type','country','disabled','tax_id','default_currency','website'],Issue:['subject','raised_by','status','priority','issue_type','customer','description','resolution_details','opening_date']};
+  if (S.byId.S1 && S.byId.S1.st === 'done') e.Supplier = e.Supplier.concat(['custom_supplier_category','custom_year_of_establishment']);
+  if (S.byId.C1 && S.byId.C1.st === 'done') e.Issue = e.Issue.concat(['custom_urc','custom_grievance_category']); return e; };
+const ROLES = () => { let r = ['System Manager','Purchase User','Purchase Manager','Stock User','Support Team']; if (S.byId.C3 && S.byId.C3.st === 'done') r = r.concat(['Branch Officer','Complaint Officer','Grievance Admin']); return r; };
+const snake = s => 'custom_' + s.trim().toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'');
+function playResult(){
+  const p = S.play, ex = EXIST()[p.doctype] || [], errs = [], checks = []; let spec = {};
+  const near = f => ex.find(x => x.includes(f) || f.includes(x)) || ex.find(x => x.slice(0,4) === f.slice(0,4));
+  if (p.recipe === 'custom_field'){
+    const fn = snake(p.label); spec = {op:'add_custom_field',doctype:p.doctype,fieldname:fn,label:p.label,fieldtype:p.type};
+    if (p.type === 'Select') spec.options = p.options.split(',').map(s => s.trim()).filter(Boolean);
+    if (!p.label.trim()) errs.push('Label is empty.'); if (ex.includes(fn)) errs.push(`Fieldname "${fn}" already exists on ${p.doctype}.`);
+    if (p.type === 'Select' && !(spec.options||[]).length) errs.push('A Select field needs at least one option.');
+    checks.push(`${p.doctype}.${fn} exists`,`type is ${p.type}`);
+  } else if (p.recipe === 'mandatory_if'){
+    spec = {op:'set_property',doctype:p.doctype,fieldname:p.field,property:'mandatory_depends_on',value:`eval:doc.${p.when}=="${p.equals}"`};
+    [p.field,p.when].forEach(f => { if (!ex.includes(f)) errs.push(`Field "${f}" does not exist on ${p.doctype}.` + (near(f) ? ` Did you mean "${near(f)}"?` : '')); });
+    checks.push(`Property mandatory_depends_on on ${p.doctype}.${p.field} reads back the same value`);
+  } else {
+    const st = p.states.split(',').map(s => s.trim()).filter(Boolean);
+    spec = {op:'approval_workflow',doctype:p.doctype,states:st,transitions:st.slice(1).map((s,i) => ({from:st[i],to:s,role:p.role}))};
+    if (st.length < 2) errs.push('A workflow needs at least two states.'); if (!ROLES().includes(p.role)) errs.push(`Role "${p.role}" does not exist. Add a create_role step first.`);
+    checks.push('Workflow is active','No dead-end or unreachable state',`${Math.max(0,st.length - 1)} transitions use existing roles`);
+  }
+  return {spec,errs,checks};
+}
+function viewDet(){
+  const t = totals(), res = playResult(), p = S.play;
+  const used = {}; S.nodes.forEach(n => { if (n.recipe && n.st !== 'waiting') n.recipe.split(',').forEach(x => { const k = x.trim().split(' ')[0]; used[k] = (used[k]||0) + 1; }); });
+  const rc = RECIPES.map(r => `<div class="rc"><div class="row ctr" style="gap:6px"><b class="mono">${r[0]}</b>${rchip(r[2])}<span class="chip">${AG[r[1]].n.replace(' agent','')}</span></div><div class="muted" style="margin-top:3px">Needs: ${r[3]}</div><div class="muted">Writes: ${r[4]}</div><div class="muted">Verifies: ${r[5]}</div>${used[r[0]] ? `<div style="margin-top:3px"><span class="chip recipe">used ${used[r[0]]}× this run</span></div>` : ''}</div>`).join('');
+  const learned = S.runDone ? PATTERN_IDS.map(id => S.byId[id]).filter(n => n.tier0 === 'model').map(n => n.title) : [];
+  const pat = S.patterns.length ? S.patterns.map(x => `<li><span class="chip pattern">saved</span> <span class="t">${esc(x)}</span></li>`).join('') : '';
+  const inp = (k,l,tp) => `<label class="field">${l}${tp === 'sel' ? '' : `<input class="input" data-play="${k}" value="${esc(p[k])}">`}</label>`;
+  const sel = (k,l,vals) => `<label class="field">${l}<select class="input" data-play="${k}">${vals.map(v => `<option ${p[k] === v ? 'selected' : ''}>${v}</option>`).join('')}</select></label>`;
+  const form = p.recipe === 'custom_field' ? sel('doctype','DocType',['Supplier','Issue']) + inp('label','Label') + sel('type','Field type',['Data','Select','Check','Int','Date']) + (p.type === 'Select' ? inp('options','Options (comma separated)') : '')
+   : p.recipe === 'mandatory_if' ? sel('doctype','DocType',['Supplier','Issue']) + inp('field','Make this field mandatory') + inp('when','when this field') + inp('equals','equals')
+   : sel('doctype','DocType',['Supplier','Issue']) + inp('states','States in order') + inp('role','Role for every transition');
+  return `<div class="card"><h3>Deterministic layer: who solved each work item</h3>${cascadeBar()}<p class="small muted" style="margin:8px 0 0">Order of attempts: rules, recipes, saved patterns, the decision model (a fast choice with a confidence), then an LLM. The LLM is the last resort and returns only a typed spec. See the Decision layer tab.</p></div>
+  <div class="card"><div class="row ctr"><h3 style="margin:0">Try a recipe (no model is called)</h3><span class="sp"></span>${[['custom_field','Add field'],['mandatory_if','Mandatory when'],['approval_workflow','Workflow']].map(x => `<button class="btn sm ${p.recipe === x[0] ? 'pri' : ''}" data-act="recipe" data-arg="${x[0]}">${x[1]}</button>`).join('')}</div>
+   <div class="row" style="margin-top:10px"><div class="col" style="display:flex;flex-direction:column;gap:8px">${form}</div>
+   <div class="col"><div class="small muted" style="margin-bottom:4px">Typed spec produced</div><pre>${esc(JSON.stringify(res.spec,null,2))}</pre>
+   <div style="margin-top:8px">${res.errs.length ? res.errs.map(e => `<div class="alert bad" style="margin-bottom:4px">Validator: ${esc(e)}</div>`).join('') : '<div class="alert ok">All validators pass. The Engine would apply this.</div>'}</div>
+   <div class="small muted" style="margin-top:6px">After applying, the verifier reads back: ${res.checks.map(esc).join(' · ')}</div></div></div>
+   <p class="small muted" style="margin:8px 0 0">The site state matters: change the DocType or complete the run, and the same input gets a different verdict.</p></div>
+  <div class="card"><h3>Recipe library (${RECIPES.length} shipped)</h3><div class="rcs">${rc}</div></div>
+  <div class="row"><div class="card col"><h3>Validators (always run before apply)</h3><ul class="ops">${VALIDATORS.map(v => `<li><span class="chip rule">rule</span><span class="t">${v}</span></li>`).join('')}</ul></div>
+  <div class="card col"><h3>Saved patterns</h3><p class="small muted" style="margin:0 0 6px">A model-built change that verified and passed tests can become a pattern. The next similar requirement then needs no model.</p>
+   ${S.runDone && !S.patterns.length ? `<div class="alert hold" style="margin-bottom:8px">${learned.length} verified changes can be saved as patterns.</div><ul class="ops">${learned.map(x => `<li><span class="chip model">candidate</span><span class="t">${esc(x)}</span></li>`).join('')}</ul><div style="margin-top:8px"><button class="btn pri" data-act="savepat">Save as patterns</button></div>` : pat ? `<ul class="ops">${pat}</ul>` : '<p class="small muted">None yet. Finish a run first.</p>'}</div></div>`;
+}
+/* task graph */
+const NW = 168, NH = 58, GX = 52, GY = 12, LW = 136;
+function viewRun(){
+  const nodes = S.nodes, depth = {};
+  const d = n => depth[n.id] ?? (depth[n.id] = n.deps.length ? 1 + Math.max(...n.deps.map(x => d(S.byId[x]))) : 0); nodes.forEach(d);
+  const slot = {}, laneRows = {}; nodes.forEach(n => { const k = n.lane + '|' + depth[n.id]; n.row = slot[k] = (slot[k] ?? -1) + 1; laneRows[n.lane] = Math.max(laneRows[n.lane] || 1, n.row + 1); });
+  const ly = {}; let y = 0; LANES.forEach(l => { ly[l[0]] = y; y += (laneRows[l[0]] || 1) * (NH + GY) + 10; });
+  const maxD = Math.max(...Object.values(depth)), W = LW + (maxD + 1) * (NW + GX), H = y;
+  const pos = n => ({x: LW + depth[n.id] * (NW + GX), y: ly[n.lane] + 6 + n.row * (NH + GY)});
+  const lanes = LANES.map(l => `<div class="lane" style="top:${ly[l[0]]}px;height:${(laneRows[l[0]] || 1) * (NH + GY) + 10}px"><span>${l[1]}</span></div>`).join('');
+  const edges = nodes.flatMap(n => n.deps.map(dp => { const a = pos(S.byId[dp]), b = pos(n), x1 = a.x + NW, y1 = a.y + NH/2, x2 = b.x, y2 = b.y + NH/2, mx = (x1 + x2)/2; return `<path d="M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}" fill="none" stroke="var(--line)" stroke-width="1.5"/>`; })).join('');
+  const nd = nodes.map(n => { const p = pos(n); const ic = {waiting:'○',running:'●',done:'✓',held:'⏸',blocked:'✕',undone:'↺'}[n.st];
+    return `<div class="node t-${n.tier} ${n.st} ${S.sel === n.id ? 'sel' : ''}" tabindex="0" role="button" data-node="${n.id}" style="left:${p.x}px;top:${p.y}px" aria-label="${n.id} ${esc(n.title)} ${n.st}"><b>${n.id} · ${esc(n.title)}</b><span class="meta"><span>${esc(AG[n.agent].n.replace(' agent','').replace('Workflow & Permissions','Workflow'))}</span><span>${ic} ${n.st === 'running' ? n.phase : n.st}</span></span></div>`; }).join('');
+  const opts = `<label class="small muted">Auto-apply <select class="input" style="width:auto" id="policy" ${S.running ? 'disabled' : ''}><option value="medium" ${S.policy === 'medium' ? 'selected' : ''}>low + medium risk</option><option value="low" ${S.policy === 'low' ? 'selected' : ''}>low risk only</option></select></label>
+   <label class="small muted">Parallel agents <select class="input" style="width:auto" id="par" ${S.running ? 'disabled' : ''}>${[1,2,3,4].map(x => `<option ${S.par === x ? 'selected' : ''}>${x}</option>`).join('')}</select></label>
+   <label class="small muted"><input type="checkbox" id="decon" ${S.decisionOn ? 'checked' : ''} ${S.running ? 'disabled' : ''}> decision gateway</label><label class="small muted"><input type="checkbox" id="inject" ${S.inject ? 'checked' : ''}> inject failures</label><label class="small muted"><input type="checkbox" id="fast" ${S.fast ? 'checked' : ''}> fast</label>`;
+  const held = nodes.filter(n => n.st === 'held').length;
+  const detail = S.sel ? nodeDetail(S.byId[S.sel]) : '<div class="card"><p class="muted" style="margin:0">Click a work item to see its typed hand-off: what went in, what the agent or recipe returned, the checks, and the requirements it covers.</p></div>';
+  return `<div class="card"><div class="row ctr"><h3 style="margin:0">Pilot run · Architect's task graph</h3><span class="sp"></span>${opts}${!S.running ? `<button class="btn pri sm" data-act="run">${S.runNo ? 'Run again' : 'Start run'}</button>` : '<span class="chip info">running</span>'}</div>
+   <div class="legend" style="margin:8px 0">${TIERS.map(k => `<span><i class="s-${k}"></i>${TIER_LABEL[k]}</span>`).join('')}<span>○ waiting ● running ✓ done ⏸ held ✕ blocked</span></div>
+   <div class="small muted" style="margin-bottom:6px">Orchestration: ${MODES[S.mode].short} · Agent steps through Langflow: ${AGENT_ORDER.filter(a => AG[a].tok && S.backend[a] === 'langflow' && S.mode !== 'kernel').map(a => AG[a].n.replace(' agent','')).join(', ') || 'none'} · Decision gateway: ${S.decisionOn ? PROVIDERS[S.dec.provider].n : 'off'}</div>
+   ${held ? `<div class="alert hold" style="margin-bottom:8px">${held} work item(s) held for your approval. Independent lanes keep going; dependent items wait. <button class="btn sm" data-act="tab" data-arg="approvals">Open approvals</button></div>` : ''}
+   <div class="gwrap"><div class="graph" style="width:${W}px;height:${H}px">${lanes}<svg width="${W}" height="${H}" aria-hidden="true">${edges}</svg>${nd}</div></div></div>${detail}
+   <div class="card"><h3>Live log</h3><div style="max-height:260px;overflow:auto;font-family:var(--mono);font-size:12px;line-height:1.55" id="log">${S.log.map(l => `<div><span class="muted">${l.t}</span> <b style="color:${l.who === 'engine' ? 'var(--rule)' : l.who === 'you' ? 'var(--fg)' : l.who === 'decision' ? 'var(--decision)' : 'var(--model)'}">${l.who}</b> ${esc(l.text)}</div>`).join('') || '<span class="muted">Nothing yet.</span>'}</div></div>`;
+}
+function nodeDetail(n){
+  const A = AG[n.agent]; const t = totals();
+  return `<div class="card"><div class="row ctr"><h3 style="margin:0">${n.id} · ${esc(n.title)}</h3><span class="sp"></span>${tchip(n.tier)}${rchip(n.risk)}<span class="chip">${n.st}</span></div>
+   <div class="small muted" style="margin:6px 0">Agent: ${A.n}${n.tier === 'model' && viaText(n.agent) ? viaText(n.agent) : ''} · Module pack: ${n.pack} · ${n.recipe ? 'Recipe: ' + n.recipe + ' · ' : ''}Depends on: ${n.deps.join(', ') || 'none'}</div>
+   <div class="row"><div class="col"><div class="small muted">Handed in</div><pre>${esc(JSON.stringify({requirements:n.reqs,pack:n.pack,depends_on:n.deps,allowed_ops:A.emits.slice(0,4)},null,1))}</pre></div>
+   <div class="col"><div class="small muted">${n.tier === 'model' ? 'Returned by the model (typed spec only)' : n.tier === 'pattern' ? 'Expanded from a saved pattern' : n.tier === 'decision' ? 'Answered by the decision model (a choice and a probability, never a spec)' : 'Produced by the ' + (n.tier === 'rule' ? 'rule' : 'recipe')}</div><pre>${esc(JSON.stringify(n.spec,null,1))}</pre></div></div>
+   ${n.ops.length ? `<div class="small muted" style="margin-top:8px">Operations</div><ul class="ops">${n.ops.map(o => `<li><span class="t">${esc(o)}</span></li>`).join('')}</ul>` : ''}
+   ${n.checks ? `<div class="small muted" style="margin-top:8px">Checks read back from the live site</div><ul class="ops">${n.checks.map(c => `<li><span>${n.st === 'done' ? '✓' : '○'}</span><span class="t">${esc(c)}</span></li>`).join('')}</ul>` : ''}
+   ${n.tests ? `<div class="small muted" style="margin-top:8px">Tests</div><ul class="ops">${n.tests.map(c => `<li><span class="chip ${c[1] === 'pass' ? 'ok' : 'hold'}">${c[1]}</span><span class="t">${esc(c[0])}</span></li>`).join('')}</ul>` : ''}
+   ${n.reqs.length ? `<div class="small muted" style="margin-top:8px">Requirements covered</div><ul class="ops">${n.reqs.map(i => `<li>${schip(S.status[i])}<span class="t"><span class="mono">[${i}]</span> ${esc(RT[i][3])}</span></li>`).join('')}</ul>` : ''}
+   ${n.blocked ? `<div class="alert bad" style="margin-top:8px">${esc(n.blocked)}</div>` : ''}</div>`;
+}
+function viewWork(){
+  const w = S.ws, s1 = S.byId.S1.st === 'done', s2 = S.byId.S2.st === 'done', c1 = S.byId.C1.st === 'done', ba = w.ba === 'after';
+  const prompts = [['p1','On the Supplier form, group the fields into Registration, Products and Compliance tabs, and show Supplier Category as a badge in the list.'],['p2','Add a Priority field to ' + dtName() + ' that is mandatory when the category is Quality, and colour overdue SLA rows red.'],['p3','Remove the Year of Establishment field from Supplier.']];
+  const msgs = S.chat.map(m => m.you ? `<div class="msg you">${esc(m.text)}</div>` : `<div class="msg"><div class="who" style="color:${m.who === 'engine' ? 'var(--rule)' : m.who === 'architect' ? 'var(--accent)' : 'var(--model)'}">${m.who}${m.tier ? ' · ' + m.tier : ''}</div>${m.html}</div>`).join('');
+  let pv = '';
+  const f = (lb,v,nw) => `<div class="${nw ? 'new' : ''}"><div class="lb">${lb}${nw ? ' · Studio' : ''}</div><div class="v">${v}</div></div>`;
+  if (w.view === 'supplier'){
+    const removed = w.p3 === 'removed';
+    const reg = (s1 ? f('Supplier Category','Domestic ▾',1) + f('Sub-category','MSME ▾',1) + (removed ? '' : f('Year of Establishment','2009',1)) + f('Registration Documents Received','☐ Received',1) : '');
+    const prod = s2 ? `<div class="new"><div class="lb small" style="color:var(--accent);font-weight:600">Products · Studio</div><div class="v">Paracetamol 500 mg · 24.00 / ORS sachet · 12.00</div></div>` : '<div class="muted small">Products table appears after S2.</div>';
+    const comp = s2 ? f('Turnover Certificate Attached','☐',1) + f('Factory Location','Kochi',1) : '<div class="muted small">Compliance fields appear after S2.</div>';
+    const base = f('Supplier Name','Shree Medicals Pvt Ltd') + f('Supplier Group','Pharma') + f('Country','India');
+    if (w.p1 && ba){
+      const tabs = [['reg','Registration'],['prod','Products'],['comp','Compliance']];
+      pv = `<h4>Supplier SUP-0042</h4><div class="ff">${base}</div><div class="tabs2">${tabs.map(t => `<button class="${w.tab === t[0] ? 'on' : ''}" data-act="wtab" data-arg="${t[0]}">${t[1]}</button>`).join('')}</div>${w.tab === 'reg' ? `<div class="ff">${reg}</div>` : w.tab === 'prod' ? prod : `<div class="ff">${comp}</div>`}
+        <div class="small muted" style="margin-top:6px">List view</div><div class="scroll"><table><thead><tr><th>Supplier</th><th>Group</th><th>Category</th></tr></thead><tbody><tr><td>Shree Medicals</td><td>Pharma</td><td><span class="chip info">Domestic</span></td></tr><tr><td>Al Noor Traders</td><td>Surgical</td><td><span class="chip">Foreign</span></td></tr></tbody></table></div>`;
+    } else pv = `<h4>Supplier SUP-0042</h4><div class="ff">${base}${reg}${s2 ? f('Products','2 rows',1) + comp : ''}</div><div class="small muted" style="margin-top:6px">List view</div><div class="scroll"><table><thead><tr><th>Supplier</th><th>Group</th></tr></thead><tbody><tr><td>Shree Medicals</td><td>Pharma</td></tr><tr><td>Al Noor Traders</td><td>Surgical</td></tr></tbody></table></div>`;
+  } else {
+    const pr = w.p2 && ba, rows = [['GRV-2026-00012','Expired product at URC Kochi','Quality','Escalated','High','overdue'],['GRV-2026-00013','Delay in delivery','Service','Under Review','Medium','near'],['GRV-2026-00014','Billing query','Other','Submitted','Low','ok']];
+    pv = c1 ? `<h4>${dtName()} list</h4><div class="scroll"><table><thead><tr><th>ID</th><th>Subject</th><th>Category</th><th>Status</th>${pr ? '<th>Priority</th>' : ''}<th>SLA</th></tr></thead><tbody>${rows.map(r => `<tr class="${pr && r[5] === 'overdue' ? 'over' : ''}"><td class="mono">${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td>${pr ? `<td>${r[4]}${r[2] === 'Quality' ? ' *' : ''}</td>` : ''}<td>${r[5] === 'overdue' ? 'Overdue' : r[5] === 'near' ? 'Due soon' : 'On track'}</td></tr>`).join('')}</tbody></table></div>${pr ? '<div class="small muted" style="margin-top:6px">* Priority is mandatory because the category is Quality. Overdue rows are red.</div>' : ''}` : '<p class="muted">The grievance case does not exist yet. Run the pilot first.</p>';
+  }
+  const impact = w.p3 === 'impact' ? `<div class="alert hold" style="margin-top:10px"><b>Impact analysis.</b> "Year of Establishment" is used by: server script "Supplier registration checks", the mandatory rule from work item S1, and requirement 17. Removing it makes requirement 17 unmet and breaks the script. <div class="row" style="margin-top:6px"><button class="btn sm" data-act="p3keep">Keep the field</button><button class="btn sm" data-act="p3go">Remove and update the script (undoable)</button></div></div>` : '';
+  return `<div class="row"><div class="card col" style="flex:1 1 380px"><h3>Ask the Studio</h3>
+    <div class="small muted" style="margin-bottom:8px">Try a request. The Architect plans it; the Engine checks it against the real site before anything changes.</div>
+    <div class="row" style="flex-direction:column;gap:6px;margin-bottom:10px">${prompts.map(p => `<button class="btn sm" style="text-align:left" data-act="ask" data-arg="${p[0]}" ${S.chatBusy ? 'disabled' : ''}>${esc(p[1])}</button>`).join('')}</div>
+    <div class="chat" id="chat">${msgs || '<span class="muted small">No messages yet.</span>'}</div></div>
+   <div class="col" style="flex:1.4 1 460px"><div class="pv"><div class="bar2"><span class="muted">Live ERPNext</span>
+    <button class="btn sm ${w.view === 'supplier' ? 'pri' : ''}" data-act="wview" data-arg="supplier">Supplier</button><button class="btn sm ${w.view === 'grv' ? 'pri' : ''}" data-act="wview" data-arg="grv">${dtName()}</button>
+    <span class="sp"></span><button class="btn sm ${ba ? '' : 'pri'}" data-act="wba" data-arg="before">Before</button><button class="btn sm ${ba ? 'pri' : ''}" data-act="wba" data-arg="after">After</button></div>
+    <div class="bar2"><span class="url">http://203.0.113.10:18090/app/${w.view === 'supplier' ? 'supplier' : dtName().toLowerCase().replace(' ','-')}</span></div>
+    <div class="body">${pv}${impact}</div></div></div></div>`;
+}
+async function ask(k){
+  if (S.chatBusy) return; const w = S.ws; const q = {p1:'On the Supplier form, group the fields into Registration, Products and Compliance tabs, and show Supplier Category as a badge in the list.',p2:'Add a Priority field to ' + dtName() + ' that is mandatory when the category is Quality, and colour overdue SLA rows red.',p3:'Remove the Year of Establishment field from Supplier.'}[k];
+  S.chatBusy = true; S.chat.push({you:1,text:q}); render();
+  const add = (who,html,tier) => { S.chat.push({who,html,tier}); render(); const c = $('#chat'); if (c) c.scrollTop = c.scrollHeight; };
+  await sleep(600);
+  const s1 = S.byId.S1.st === 'done', c1 = S.byId.C1.st === 'done';
+  if ((k !== 'p2' && !s1) || (k === 'p2' && !c1)){
+    add('engine','The Engine checked the live site: the fields this request refers to do not exist yet. Nothing to change. Run the pilot first (Runs tab), then ask again.'); S.chatBusy = false; return render(); }
+  if (k === 'p1'){
+    add('architect','1 work item · UI/UX lane · Buying pack. Recipes: form_tabs, list_badge. Risk low. Model used only for this plan.','model'); await sleep(900);
+    add('uiux','Expanded recipes without a model: 3 tabs (Registration, Products, Compliance) from the fields that exist, plus a badge on Supplier Category.','recipe'); usage('architect'); await sleep(800);
+    add('engine','Validators: every field appears exactly once; no mandatory field is hidden in a collapsed tab. Applied 6 property changes. Read back from the site: all match. Undo available.'); w.p1 = true; w.view = 'supplier'; w.ba = 'after'; w.tab = 'reg';
+  } else if (k === 'p2'){
+    add('architect','2 work items · Customize and UI/UX lanes · Support pack. Recipes: custom_field, mandatory_if, list_indicator. Risk low.','model'); usage('architect'); await sleep(900);
+    add('uiux','Field Priority added; mandatory when category is Quality; overdue rows get a red indicator. No model needed after planning.','recipe'); await sleep(800);
+    add('engine','Validators passed (the controlling field "custom_grievance_category" exists). Applied and read back.'); w.p2 = true; w.view = 'grv'; w.ba = 'after';
+  } else {
+    add('architect','Request is destructive. Running impact analysis before anything else.','rule'); await sleep(700);
+    add('engine','Impact found: 1 server script, 1 mandatory rule, 1 requirement (17). The Engine will not remove this without your confirmation. See the preview.'); w.p3 = 'impact'; w.view = 'supplier';
+  }
+  S.chatBusy = false; render();
+}
+function viewApprovals(){
+  const held = S.nodes.filter(n => n.st === 'held'), qs = S.questions.filter(q => S.status[q.id] === 'needs_input');
+  const h = held.map(n => `<div class="card"><div class="row ctr"><h3 style="margin:0">${n.id} · ${esc(n.title)}</h3>${rchip(n.risk)}${tchip(n.tier)}</div>
+    <div class="small muted" style="margin:6px 0">${n.impact ? 'Impact: ' + esc(n.impact) : ''}</div><ul class="ops">${n.ops.map(o => `<li><span class="t">${esc(o)}</span></li>`).join('')}</ul>
+    <div style="margin-top:10px"><button class="btn pri" data-act="approve" data-arg="${n.id}">Approve and apply</button></div></div>`).join('');
+  const q = qs.map(x => `<div class="card"><h3>Decision needed for [${x.id}]</h3><div class="small muted" style="margin-bottom:6px">${esc(RT[x.id][3])}</div><p style="margin:0 0 8px"><b>${esc(x.q)}</b></p><div class="row"><input class="input col" data-ans="${x.id}" placeholder="Your answer" value="${esc(S.answers[x.id] || '')}" aria-label="Answer for requirement ${x.id}"><button class="btn" data-act="answer" data-arg="${x.id}">Answer</button></div></div>`).join('');
+  return (held.length > 1 ? `<div class="card"><button class="btn pri" data-act="approveall">Approve all ${held.length}</button> <span class="small muted">Each item is shown below with its impact.</span></div>` : '') + ((h || q) ? h + q : '<div class="card"><h3>Approvals</h3><p class="muted">Nothing waiting. Workflows and permissions are high risk and always come here, as do open questions.</p></div>');
+}
+function viewChanges(){
+  const cs = S.changes;
+  return cs.length ? cs.map(c => { const deps = S.confirmUndo === c.id ? dependents(c.id) : null;
+    return `<div class="card"><div class="row ctr"><h3 style="margin:0">${c.id} · ${esc(c.title)}</h3>${rchip(c.risk)}${tchip(c.tier)}<span class="chip ${c.status === 'applied' ? 'ok' : ''}">${c.status}</span><span class="sp"></span><button class="btn sm" data-act="undo" data-arg="${c.id}" ${c.status !== 'applied' ? 'disabled' : ''}>Undo</button></div>
+     <div class="small muted" style="margin:6px 0">Traced to ${c.ids.length ? c.ids.map(i => '[' + i + ']').join(' ') : 'supporting work, no requirement of its own'}</div>
+     ${deps ? `<div class="alert hold">${deps.length ? 'Undoing ' + c.id + ' also undoes ' + deps.join(', ') + ', which depend on it.' : 'Nothing else depends on this change.'} <button class="btn sm" data-act="undo2" data-arg="${c.id}">Confirm undo of ${1 + deps.length}</button> <button class="btn sm" data-act="undo0">Cancel</button></div>` : ''}
+     <ul class="ops">${c.ops.map(o => `<li><span class="t">${esc(o)}</span></li>`).join('')}</ul></div>`; }).join('')
+   : '<div class="card"><h3>Changes</h3><p class="muted">Applied change sets appear here. Undo is dependency-aware: it also undoes everything built on top.</p></div>';
+}
+function viewExport(){
+  const sum = {}; S.nodes.forEach(n => { if (n.st === 'done' && n.fx) for (const [k,v] of Object.entries(n.fx)) sum[k] = (sum[k]||0) + v; });
+  const line = (k,txt) => sum[k] ? `│  │  ├─ ${txt.padEnd(30)} ${sum[k]}\n` : '';
+  const ready = S.nodes.some(n => n.st === 'done');
+  const tree = `csd_customizations/\n├─ pyproject.toml\n├─ csd_customizations/\n│  ├─ hooks.py                  fixtures list, doc events\n│  ├─ fixtures/\n${line('custom_field','custom_field.json')}${line('property_setter','property_setter.json')}${line('role','role.json')}${line('custom_docperm','custom_docperm.json')}${line('workflow','workflow.json')}${line('workflow_state','workflow_state.json')}${line('workflow_action_master','workflow_action_master.json')}${line('notification','notification.json')}${line('service_level_agreement','service_level_agreement.json')}${line('server_script','server_script.json')}${line('client_script','client_script.json')}${line('number_card','number_card.json')}${line('dashboard_chart','dashboard_chart.json')}${line('report','report.json')}${line('web_form','web_form (module folder)')}│  ├─ doctype/                  ${sum.doctype || 0} DocType folders\n│  ├─ tests/                    ${sum.test || 0} behaviour tests\n│  └─ patches.txt\n└─ studio_manifest.json          47 requirements → change sets → files`;
+  const checks = ['App installs on a fresh site','bench migrate completes','Behaviour tests pass','No drift against the dev site','Approvals recorded for high-risk items'];
+  return `<div class="card"><div class="row ctr"><h3 style="margin:0">Customization app: csd_customizations</h3><span class="sp"></span>${S.exported ? '<span class="chip ok">built from this run</span>' : '<span class="chip">built at the end of a run</span>'}</div>
+   <p class="small muted" style="margin:6px 0 8px">Every change is also written as a normal Frappe app, so it can be reviewed in git and installed on any other site. Without this, the changes would live only in one database.</p>
+   <pre>${esc(ready ? tree : 'Run the pilot to generate the app.')}</pre>
+   ${S.exported ? `<div class="row" style="margin-top:10px"><button class="btn" data-act="noop">Commit to git</button><button class="btn" data-act="noop">Download zip</button><span class="small muted">Both are real actions in the product; here they do nothing.</span></div><pre style="margin-top:8px">bench get-app csd_customizations ./csd_customizations.git\nbench --site staging.example.com install-app csd_customizations\nbench --site staging.example.com migrate</pre>` : ''}</div>
+  <div class="card"><h3>Environments and promotion</h3><div class="row">
+   <div class="rc col"><b>Dev</b> <span class="chip ok">live</span><br>203.0.113.10:18090 · ERPNext v15 · the Studio builds here</div>
+   <div class="rc col"><b>Staging</b> <span class="chip ${S.promo >= 1 ? 'ok' : ''}">${S.promo >= 1 ? 'app installed' : 'not created'}</span><br>Fresh site, app installed, tests run</div>
+   <div class="rc col"><b>Production</b> <span class="chip ${S.promo >= 2 ? 'ok' : ''}">${S.promo >= 2 ? 'promoted' : 'not promoted'}</span><br>Needs your approval</div></div>
+   <ul class="ops" style="margin-top:10px">${checks.map((c,i) => `<li><span>${S.promo >= 1 ? '✓' : '○'}</span><span class="t">${c}</span></li>`).join('')}</ul>
+   <div class="row" style="margin-top:10px"><button class="btn pri" data-act="promo1" ${!S.exported || S.promo >= 1 || S.promoBusy ? 'disabled' : ''}>${S.promoBusy ? 'Checking…' : 'Promote to staging'}</button><button class="btn" data-act="promo2" ${S.promo !== 1 ? 'disabled' : ''}>Request production approval</button></div></div>`;
+}
+const AUDIT = [
+  [107,'Yes','Issue exists with email-to-issue. No chatbot or URC channel.','downgrade','Partial'],
+  [108,'Yes','Portal and email intake exist. SMS needs a gateway, chatbot absent.','downgrade','Partial'],
+  [110,'Yes','Report builder can group Issues by a category field once the field exists.','confirm','Standard with configuration'],
+  [111,'Yes','Number Cards and Dashboard Charts are standard.','confirm','Standard'],
+  [183,'Yes','Issue has no escalated flag. Needs a custom indicator.','downgrade','Partial'],
+  [192,'Yes','Service Level Agreement supports escalation by priority.','confirm','Standard with configuration'],
+];
+function viewQuality(){
+  const tabs = [['audit','Fit-gap audit'],['tests','Regression'],['bench','Model benchmark'],['wb','Matrix write-back']].map(t => `<button class="${S.qtab === t[0] ? 'on' : ''}" data-act="qtab" data-arg="${t[0]}">${t[1]}</button>`).join('');
+  let body = '';
+  if (S.qtab === 'audit') body = `<p class="small muted" style="margin:0 0 8px">The matrix claims 915 rows are standard. The Auditor probes the live site for each claim. Six pilot rows shown (simulated findings).</p>${S.audited ? '' : '<button class="btn pri" data-act="audit" style="margin-bottom:10px">Run the audit on the 7 standard-fit rows in the pilot</button>'}
+    <div class="scroll"><table><thead><tr><th>ID</th><th>Matrix says</th><th>Finding</th><th>Verdict</th></tr></thead><tbody>${AUDIT.map(r => `<tr><td class="mono">[${r[0]}]</td><td>standard fit</td><td>${S.audited ? esc(r[2]) : '<span class="muted">not probed</span>'}</td><td>${S.audited ? `<span class="chip ${r[3] === 'confirm' ? 'ok' : 'hold'}">${r[4]}</span>` : ''}</td></tr>`).join('')}</tbody></table></div>${S.audited ? '<p class="small muted" style="margin:8px 0 0">3 of 6 claims downgraded. Vendor-claimed fits are often optimistic; this is what finds them before go-live.</p>' : ''}`;
+  else if (S.qtab === 'tests') body = `<p class="small muted" style="margin:0 0 8px">Golden requirements per module run again after every change, so a new change cannot silently break an old one.</p><button class="btn pri sm" data-act="regress" style="margin-bottom:10px">Run regression</button>
+    <table><thead><tr><th>Suite</th><th>Cases</th><th>Result</th></tr></thead><tbody>${[['Supplier registration',5],['Supplier change request',3],['Grievance lifecycle',4],['Provisional demand',5]].map(s => `<tr><td>${s[0]}</td><td>${s[1]}</td><td>${S.regress ? '<span class="chip ok">all pass</span>' : '<span class="muted">not run</span>'}</td></tr>`).join('')}</tbody></table>`;
+  else if (S.qtab === 'bench') body = `<p class="small muted" style="margin:0 0 8px">Choose cheap models with evidence. The real Studio runs a golden set per role; these values are placeholders to show the layout.</p><button class="btn pri sm" data-act="bench" style="margin-bottom:10px">Run benchmark</button>
+    <table><thead><tr><th>Agent</th><th class="num">gpt-4o-mini</th><th class="num">gpt-4o</th><th>Suggested</th></tr></thead><tbody>${[['Customize',88,96],['UI/UX',84,95],['Workflow',71,93],['Reviewer',92,95],['Tester',90,94]].map(r => `<tr><td>${r[0]}</td><td class="num">${S.benchmark ? r[1] + '%' : '–'}</td><td class="num">${S.benchmark ? r[2] + '%' : '–'}</td><td>${S.benchmark ? (r[1] >= 90 ? '<span class="chip ok">cheap model</span>' : '<span class="chip hold">cheap with strong fallback</span>') : ''}</td></tr>`).join('')}</tbody></table>`;
+  else { const ids = PREQ.slice(0,10).map(r => r[0]);
+    body = `<p class="small muted" style="margin:0 0 8px">The Studio writes status, evidence and the change set back into your matrix, so the RFP document stays the source of truth.</p><div class="scroll"><table><thead><tr><th>ID</th><th>Matrix fit</th><th>Studio status</th><th>Evidence</th></tr></thead><tbody>${ids.map(i => `<tr><td class="mono">[${i}]</td><td>${RT[i][2]}</td><td>${schip(S.status[i])}</td><td class="small">${esc(S.notes[i] || '')}</td></tr>`).join('')}</tbody></table></div><div style="margin-top:8px"><button class="btn" data-act="wb">Write back and export</button> <span class="small muted">${S.wroteback ? 'In the product this downloads the updated .xlsx; here it does nothing.' : ''}</span></div>`; }
+  return `<div class="card"><h3>Quality</h3><div class="tabs2">${tabs}</div>${body}</div>`;
+}
+
+/* ============ v3: decision gateway, prompt studio, orchestration ============ */
+const PROVIDERS = {
+  laya:{n:'Laya (open weights, local)',note:'Apache-2.0 weights, run on your own server through ONNX. Case data stays with you.',local:true},
+  kev:{n:'Kev (open weights, local)',note:'Open-weight sibling. Runs locally. Accuracy on ERP wording is unmeasured.',local:true},
+  jev:{n:'Hosted Jev (TypeSafe AI)',note:'Hosted API: case data leaves your network on every call. One published model version and rate limits without an SLA (as of Sep 2026).',local:false},
+  llm:{n:'Small LLM as classifier (fallback)',note:'Works anywhere. Slower and costs tokens. Use it if no decision model passes calibration on your data.',local:true},
+};
+const MODES = {
+  kernel:{short:'built-in kernel only',n:'Built-in kernel only',rec:false,pro:'Fewest moving parts. Fastest to build and test.',con:'Prompts and agent logic can only be changed in code and config. No visual canvas.'},
+  'kernel+lf':{short:'kernel + Langflow agent flows',n:'Kernel + Langflow agent flows',rec:true,pro:'The kernel stays authoritative. Each agent is a flow you can open, edit and test visually.',con:'One more service to run, secure and version. Flow output is always re-validated by the kernel.'},
+  lforch:{short:'Langflow as orchestrator',n:'Langflow as the orchestrator',rec:false,pro:'One tool for everything.',con:'Weak fit: approvals that wait for hours, dependency graph over ERP state, cross-flow budgets and idempotent retries are the kernel\'s job. Gates become editable on a canvas.'},
+};
+const CLASSES = ['configure','customize','ui_ux','workflow_permissions','report','external_system','needs_clarification','out_of_scope','needs_model_not_config'];
+const AGCLS = {configure:'configure',customize:'customize',uiux:'ui_ux',flow:'workflow_permissions',report:'report',builder:'customize'};
+const OVR = {1:.48,109:.52,10:.71,184:.66,209:.93,12:.97,26:.96,201:.98,107:.95,108:.94,199:.78,203:.74,210:.81};
+let DEC = {};
+function buildDec(){
+  const defs = nodeDefs('issue',true); DEC = {};
+  const rnd = id => { const x = Math.sin(id * 12.9898) * 43758.5453; return x - Math.floor(x); };
+  PREQ.forEach(r => { const id = r[0], nd = defs.find(n => n.reqs.includes(id));
+    let cls = nd ? (nd.blocked ? (id === 209 ? 'needs_model_not_config' : 'external_system') : AGCLS[nd.agent]) : ({1:'needs_clarification',109:'needs_clarification',12:'out_of_scope',26:'out_of_scope',201:'external_system'})[id];
+    const recipe = nd ? (nd.recipe ? nd.recipe.split(',')[0].trim().split(' ')[0] : (nd.blocked ? 'none' : 'free-form')) : 'none';
+    const c1 = OVR[id] ?? (0.80 + 0.19 * rnd(id));
+    const c2 = recipe === 'free-form' ? Math.min(c1, 0.55 + 0.25 * rnd(id + 7)) : recipe === 'none' ? 0.99 : Math.min(0.99, c1 + 0.01);
+    const alts = CLASSES.filter(c => c !== cls); DEC[id] = {cls,recipe,c1,c2,ask:id === 1 || id === 109,alts:[alts[id % alts.length],alts[(id + 3) % alts.length]]};
+  });
+}
+function route(id){ const d = DEC[id]; if (d.ask) return 'human'; const m = Math.min(d.c1,d.c2); return m >= S.dec.auto ? 'auto' : m < S.dec.human ? 'human' : 'llm'; }
+function decCounts(){ const c = {auto:0,llm:0,human:0}; PREQ.forEach(r => c[route(r[0])]++); return c; }
+function viaText(a){ return S.mode !== 'kernel' && S.backend[a] === 'langflow' && AG[a].tok ? ' via Langflow flow ' + a + '_v' + promptLive(a) : ''; }
+
+const PROMPT0 = {
+  architect:'You are the Solution Architect for an ERPNext v15 customization project.\nSplit each requirement into the smallest work items one skill agent can build.\nPrefer standard ERPNext features and configuration over custom code.\nOrder items so roles exist before permissions and DocTypes before fields that link to them.\nIf a requirement is ambiguous, return a question instead of guessing.\nNever propose changes outside ERPNext (external systems, hardware).',
+  customize:'You write change specs for ERPNext custom fields, property setters, validation scripts and DocTypes.\nUse the prefix custom_ for fieldnames and keep labels in Title Case.\nReuse an existing field or DocType when one fits; check the module pack first.\nOne change per operation, and follow the schema exactly.\nMake mandatory rules conditional when the requirement says "when".\nUse the approved examples attached as a pattern.',
+  uiux:'You design ERPNext form layout and list behaviour using form tabs, list indicators, number cards, charts and web forms.\nEvery field must appear exactly once. Never hide a mandatory field in a collapsed section.\nPrefer standard Dashboard and Number Card features over client scripts.\nReuse existing fields; keep tab names short.',
+  flow:'You design roles, permissions and workflows for ERPNext.\nEvery state must be reachable and every non-final state must have an exit.\nReuse existing roles and grant the least access that satisfies the requirement.\nAll your changes are high risk and wait for a person.',
+  configure:'You prepare ERPNext settings, naming series, email alerts, assignment rules and SLA records. Reuse existing settings; follow the schema exactly; no scripts.',
+  report:'You build report-builder reports. Prefer grouping and filters over script reports. Read-only. Reuse existing fields; follow the schema.',
+  reviewer:'You compare each requirement with what was built and return pass, partial or fail with one sentence of reason. Verify against the change set, not the title.',
+  tester:'You write behaviour tests: one positive and one negative case per rule, using the example format. Tests must clean up their data. Follow the schema exactly.',
+  auditor:'You probe the live site to confirm or downgrade a claimed standard fit. Verify against the metadata, quote the evidence, never assume.',
+};
+function promptScore(text){
+  const low = text.toLowerCase(), KW = ['prefix','existing','reuse','verify','follow the schema','example','least','exactly once','reachable','one change','prefer standard','reuse existing'];
+  const hits = KW.filter(k => low.includes(k)).length, risky = ['ignore','skip validation','approve automatically','without checking','disable'].filter(k => low.includes(k)).length;
+  let pass = 74 + Math.min(hits,7) * 2.6 - (text.length < 160 ? 9 : 0) - risky * 14; pass = Math.max(30,Math.min(97,pass));
+  return {pass:Math.round(pass),errs:Math.max(1,Math.round(16 - (pass - 70) / 2)),cost:+(1 + text.length / 3500).toFixed(2),safety:risky ? risky * 2 : 0};
+}
+function initPrompts(){ S.prompts = {}; S.flowPub = {customize:true,uiux:true};
+  AGENT_ORDER.forEach(a => { if (!AG[a].tok) return; const tx = PROMPT0[a] || ''; S.prompts[a] = {versions:[{v:1,text:tx,note:'initial',score:promptScore(tx)}],live:0,draft:tx,test:null}; }); }
+const promptLive = a => S.prompts && S.prompts[a] ? S.prompts[a].versions[S.prompts[a].live].v : 1;
+function testPrompt(a){ const p = S.prompts[a]; p.test = {forText:p.draft,cur:p.versions[p.live].score,nw:promptScore(p.draft)}; }
+function promotePrompt(a){ const p = S.prompts[a], t = p.test; if (!t || t.forText !== p.draft || t.nw.safety || t.nw.pass < t.cur.pass || p.draft === p.versions[p.live].text) return;
+  const v = p.versions.length + 1; p.versions.push({v,text:p.draft,note:'edited by you',score:t.nw}); p.live = p.versions.length - 1; p.test = null;
+  S.audit.unshift(`${stamp()} ${AG[a].n} prompt v${v} promoted (golden-set pass ${t.cur.pass}% to ${t.nw.pass}%)`); render(); }
+function rollbackPrompt(a,i){ const p = S.prompts[a]; p.live = i; p.draft = p.versions[i].text; p.test = null; S.audit.unshift(`${stamp()} ${AG[a].n} prompt rolled back to v${p.versions[i].v}`); }
+
+function viewDecision(){
+  const d = S.dec, c = decCounts(), total = PREQ.length, pk = DEC[d.pick], P = PROVIDERS[d.provider];
+  const prov = Object.entries(PROVIDERS).map(([k,p]) => `<label class="card col opt ${d.provider === k ? 'on' : ''}" style="min-width:230px"><input type="radio" name="prov" value="${k}" ${d.provider === k ? 'checked' : ''}> <b>${p.n}</b><div style="margin:4px 0"><span class="chip ${p.local ? 'ok' : 'hold'}">${p.local ? 'data stays with you' : 'data leaves your network'}</span></div><div class="small muted">${p.note}</div></label>`).join('');
+  const top3 = (top,alts,p) => [[top,p],[alts[0],(1 - p) * 0.65],[alts[1],(1 - p) * 0.35]];
+  const recs = RECIPES.map(r => r[0]).filter(x => x !== pk.recipe), rsel = pk.recipe === 'none' ? [['none',pk.c2],['custom_field',(1 - pk.c2) * 0.6],['free-form',(1 - pk.c2) * 0.4]] : top3(pk.recipe,[recs[pk.c1 > 0.9 ? 1 : 2],'free-form'],pk.c2);
+  const qrow = (q,rows) => `<tr><td><b>${q}</b></td><td>${rows.map(r => `<div class="row ctr" style="gap:8px;margin-bottom:2px"><span class="mono" style="min-width:170px">${r[0]}</span><div class="bar" style="width:120px"><div class="s-decision" style="width:${Math.round(r[1] * 100)}%"></div></div><span class="small">${Math.round(r[1] * 100)}%</span></div>`).join('')}</td></tr>`;
+  const rt = route(d.pick);
+  const cat = [['requirement_class','9 options','Which lane and skill agent','top probability decides'],['recipe_choice','16 recipes + free-form','Which recipe fits, or none','free-form goes to the LLM'],['needs_question','yes / no','Is the requirement ambiguous','yes goes to you'],['is_destructive','yes / no','Would this remove or overwrite data','yes always goes to you'],['touches_existing_data','yes / no','Does it change records that exist','yes raises the risk level'],['module_route','6 module packs','Which knowledge pack to load','below auto goes to the Architect'],['coverage_precheck','pass / partial / fail','Cheap first pass before the Reviewer LLM','partial goes to the Reviewer']].map(r => `<tr><td class="mono">${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td class="small muted">${r[3]}</td></tr>`).join('');
+  return `<div class="card"><h3>Decision gateway (System 1): a fast model that chooses, a deterministic gateway that decides what happens</h3>
+   <div class="cv"><div class="bx">Requirement or work item</div><span class="ar">→</span><div class="bx"><span class="tg rule">Rules</span><br>regex, known external systems</div><span class="ar">→</span><div class="bx" style="border-color:var(--decision)"><span class="tg decision">Decision model</span><br>typed question → options with probabilities</div><span class="ar">→</span>
+   <div class="bx" style="min-width:210px"><span class="tg rule">Gateway thresholds</span><br>≥ ${d.auto.toFixed(2)}: Engine path (recipe, block)<br>${d.human.toFixed(2)} to ${d.auto.toFixed(2)}: Architect LLM<br>&lt; ${d.human.toFixed(2)}: you</div></div>
+   <p class="small muted" style="margin:8px 0 0">The decision model interprets; it never authorizes. Policy, approvals and writes stay with the Engine. Its answers are a choice and a probability, not an explanation, so reasons still come from an LLM step.</p></div>
+  <div class="card"><h3>Provider</h3><div class="row">${prov}</div><p class="small muted" style="margin:8px 0 0">Which one passes depends on calibration against your own labelled rows. Out-of-domain accuracy of the open models is lower than the hosted one in published numbers, so the fallback is kept.</p></div>
+  <div class="row"><div class="card col"><h3>Thresholds and what they route (${total} pilot requirements)</h3>
+   <label class="field">Auto at or above ${d.auto.toFixed(2)}<input type="range" min="0.5" max="0.99" step="0.01" value="${d.auto}" data-thr="auto" aria-label="auto threshold"></label>
+   <label class="field" style="margin-top:6px">Send to you below ${d.human.toFixed(2)}<input type="range" min="0.2" max="0.9" step="0.01" value="${d.human}" data-thr="human" aria-label="human threshold"></label>
+   <div class="bar big" style="margin-top:10px"><div class="s-rule" style="width:${c.auto / total * 100}%"></div><div class="s-model" style="width:${c.llm / total * 100}%"></div><div class="seg-needs_input" style="width:${c.human / total * 100}%"></div></div>
+   <div class="legend" style="margin-top:6px"><span><i class="s-rule"></i>Engine path ${c.auto}</span><span><i class="s-model"></i>Architect LLM ${c.llm}</span><span><i class="seg-needs_input"></i>you ${c.human}</span></div>
+   <p class="small muted" style="margin:8px 0 0">Raise the threshold and more goes to the LLM (higher cost, fewer mistakes). Lower it and more is automatic (cheaper, riskier). Thresholds must be retuned when the model version changes.</p>
+   <div style="margin-top:8px"><label class="small"><input type="checkbox" id="decon2" ${S.decisionOn ? 'checked' : ''} ${S.running ? 'disabled' : ''}> Use the decision gateway in runs</label></div></div>
+  <div class="card col"><h3>Try it on a requirement</h3><select class="input" data-pick="1" aria-label="requirement">${PREQ.map(r => `<option value="${r[0]}" ${r[0] === d.pick ? 'selected' : ''}>[${r[0]}] ${esc(r[3].slice(0,56))}…</option>`).join('')}</select>
+   <div class="scroll" style="margin-top:8px"><table><tbody>${qrow('requirement_class',top3(pk.cls,pk.alts,pk.c1))}${qrow('recipe_choice',rsel)}${qrow('needs_question',[[pk.ask ? 'yes' : 'no',pk.ask ? 0.91 : 0.96],[pk.ask ? 'no' : 'yes',pk.ask ? 0.09 : 0.04]])}${qrow('is_destructive',[['no',0.97],['yes',0.03]])}</tbody></table></div>
+   <div class="alert ${rt === 'auto' ? 'ok' : 'hold'}" style="margin-top:8px">Routed to: <b>${rt === 'auto' ? 'the Engine path' : rt === 'llm' ? 'the Architect LLM' : 'you'}</b> · about 0.3 s (scripted)</div></div></div>
+  <div class="row"><div class="card col"><h3>Question catalog</h3><div class="scroll"><table><thead><tr><th>Question</th><th>Options</th><th>Used for</th><th>Routing</th></tr></thead><tbody>${cat}</tbody></table></div></div>
+  <div class="card col"><h3>Calibration and learning</h3><p class="small muted" style="margin:0 0 8px">Before trusting a provider, check that "90% sure" is right about 90% of the time on your own labelled data. The 1,544 matrix rows give a starting set; every answer or approval you give adds labels.</p>
+   <button class="btn pri sm" data-act="calib" style="margin-bottom:8px">Run calibration (illustrative)</button>
+   <table><thead><tr><th>Stated confidence</th><th class="num">Observed accuracy</th></tr></thead><tbody>${[['≥ 0.95','98%'],['0.90 to 0.95','93%'],['0.80 to 0.90','84%'],['< 0.80','61%']].map(r => `<tr><td>${r[0]}</td><td class="num">${d.calibrated ? r[1] : '–'}</td></tr>`).join('')}</tbody></table>
+   <p class="small muted" style="margin:8px 0 0">Labels from this session: ${S.labels}. Placeholder numbers; a real run measures them. A model that fails calibration is replaced by the fallback.</p></div></div>`;
+}
+function viewPrompts(){
+  const a = S.promptAgent, p = S.prompts[a], A = AG[a], live = p.versions[p.live], t = p.test;
+  const list = AGENT_ORDER.filter(x => AG[x].tok).map(x => `<button class="btn sm ${x === a ? 'pri' : ''}" data-act="pagent" data-arg="${x}">${AG[x].n.replace(' agent','')} v${promptLive(x)}</button>`).join('');
+  const can = t && t.forText === p.draft && !t.nw.safety && t.nw.pass >= t.cur.pass && p.draft !== live.text;
+  const cmp = t && t.forText === p.draft ? `<table style="margin-top:8px"><thead><tr><th>40 golden requirements</th><th class="num">Live v${live.v}</th><th class="num">Your draft</th></tr></thead><tbody>
+    <tr><td>Specs the Engine accepts</td><td class="num">${t.cur.pass}%</td><td class="num">${t.nw.pass}%</td></tr><tr><td>Validator errors per 100 specs</td><td class="num">${t.cur.errs}</td><td class="num">${t.nw.errs}</td></tr>
+    <tr><td>Relative cost per item</td><td class="num">${t.cur.cost}×</td><td class="num">${t.nw.cost}×</td></tr><tr><td>Safety failures</td><td class="num">${t.cur.safety}</td><td class="num">${t.nw.safety}</td></tr></tbody></table>
+    ${t.nw.safety ? '<div class="alert bad" style="margin-top:8px">The draft tries to weaken a locked rule (skip checks, auto-approve, ignore). Rejected: those rules live outside prompts and cannot be edited here.</div>' : can ? '<div class="alert ok" style="margin-top:8px">Better or equal, no safety failures. Safe to promote.</div>' : '<div class="alert hold" style="margin-top:8px">Not better than the live version, so promotion is blocked.</div>'}` : '<p class="small muted" style="margin:8px 0 0">Test the draft before it can go live. Scores are simulated here.</p>';
+  return `<div class="card"><h3>Prompt studio</h3><div class="row" style="gap:6px">${list}</div></div>
+  <div class="row"><div class="card col" style="flex:2 1 460px"><div class="row ctr"><h3 style="margin:0">${A.n} · live v${live.v}</h3><span class="chip ${p.draft === live.text ? '' : 'hold'}">${p.draft === live.text ? 'no unsaved edits' : 'draft differs from live'}</span></div>
+    <div class="small muted" style="margin:8px 0 4px">1 · Locked contract (not editable)</div><pre>Output: one JSON object matching the typed schema\nAllowed operations: ${A.emits.join(', ')}\nLimits: ${A.no}\nEvery output is validated by the Engine before any change.\nOutside prompts: output schema, risk levels, policy gate.</pre>
+    <div class="small muted" style="margin:10px 0 4px">2 · Your instructions (editable)</div><textarea class="input" rows="10" data-ptxt="${a}" aria-label="${A.n} instructions">${esc(p.draft)}</textarea>
+    <div class="small muted" style="margin:10px 0 4px">3 · Project knowledge attached automatically</div><div class="row" style="gap:6px"><span class="chip">module pack for the work item</span><span class="chip">naming conventions</span><span class="chip">12 approved examples</span><span class="chip">site metadata (read only)</span></div>
+    <div class="row" style="margin-top:12px"><button class="btn pri sm" data-act="ptest">Test on golden set</button><button class="btn sm" data-act="ppromote" ${can ? '' : 'disabled'}>Promote as v${p.versions.length + 1}</button><button class="btn sm" data-act="preset" ${p.draft === live.text ? 'disabled' : ''}>Discard edits</button></div>${cmp}</div>
+   <div class="card col"><h3>Versions</h3><ul class="ops">${p.versions.map((v,i) => `<li><span class="chip ${i === p.live ? 'ok' : ''}">v${v.v}${i === p.live ? ' live' : ''}</span><span class="t">${esc(v.note)} · pass ${v.score.pass}%${i !== p.live ? ` <button class="btn sm" data-act="prollback" data-arg="${i}">Roll back</button>` : ''}</span></li>`).join('')}</ul>
+    <h3 style="margin-top:12px">Audit log</h3><div class="small mono">${S.audit.length ? S.audit.map(x => `<div>${esc(x)}</div>`).join('') : '<span class="muted">No prompt changes yet.</span>'}</div></div></div>`;
+}
+function viewOrch(){
+  const a = S.flowAgent, A = AG[a], r = S.roles[a], lf = S.mode !== 'kernel';
+  const modes = Object.entries(MODES).map(([k,m]) => `<label class="card col opt ${S.mode === k ? 'on' : ''}" style="min-width:250px"><input type="radio" name="mode" value="${k}" ${S.mode === k ? 'checked' : ''}> <b>${m.n}</b> ${m.rec ? '<span class="chip ok">recommended</span>' : ''}<div class="small" style="margin-top:4px">${m.pro}</div><div class="small muted" style="margin-top:4px">Trade-off: ${m.con}</div></label>`).join('');
+  const opt = sel => Object.entries(S.prices).map(([k,m]) => `<option value="${k}" ${sel === k ? 'selected' : ''}>${esc(m.name)}</option>`).join('');
+  const adapters = AGENT_ORDER.filter(x => AG[x].tok).map(x => `<tr><td>${AG[x].n}</td><td><select class="input" style="width:auto" data-backend="${x}" ${S.mode === 'kernel' ? 'disabled' : ''}><option value="builtin" ${S.backend[x] !== 'langflow' ? 'selected' : ''}>built-in call</option><option value="langflow" ${S.backend[x] === 'langflow' ? 'selected' : ''}>Langflow flow ${x}_v${promptLive(x)}</option></select></td><td class="small muted">${S.backend[x] === 'langflow' && lf ? 'published' : 'direct'}</td></tr>`).join('');
+  const box = (h,b,c) => `<div class="bx" style="${c ? 'border-color:' + c : ''}"><b>${h}</b><br><span class="muted">${b}</span></div>`;
+  const gate = [['Output matches the typed schema (re-checked by the kernel)',true],['Golden-set pass is not below the live version',!!(S.prompts[a].test && S.prompts[a].test.nw.pass >= S.prompts[a].test.cur.pass) || S.flowPub[a]],['No code, HTTP or file components in the flow',true],['No ERPNext credentials inside Langflow (it only calls Studio tools)',true],['Admin approval recorded',!!S.flowPub[a]]];
+  return `<div class="card"><h3>Orchestration mode</h3><div class="row">${modes}</div></div>
+  <div class="row"><div class="card col"><h3>The kernel always does</h3><ul class="ops">${['Task graph and dependency order','Parallelism and per-agent concurrency','Risk gates and approvals that wait for people','Retries, repair, escalation to a stronger model','Budgets and stop','Snapshots, undo, audit log','Calling the Engine to validate, apply, verify'].map(x => `<li><span class="chip rule">kernel</span><span class="t">${x}</span></li>`).join('')}</ul></div>
+   <div class="card col"><h3>Langflow flows do (agent steps only)</h3><ul class="ops">${['Prompt assembly from the Studio prompt registry','Retrieve the module pack and examples','Call the chosen model','Parse the answer into the strict schema','Optional read-only tools served by the Studio (site metadata)','Visual editing and a playground for each agent'].map(x => `<li><span class="chip model">flow</span><span class="t">${x}</span></li>`).join('')}</ul><p class="small muted" style="margin:8px 0 0">A flow can change how an agent reasons. It cannot change what is allowed to happen: the kernel validates every output.</p></div></div>
+  <div class="card"><div class="row ctr"><h3 style="margin:0">Flow lab · ${A.n}</h3><span class="sp"></span>${AGENT_ORDER.filter(x => AG[x].tok).map(x => `<button class="btn sm ${x === a ? 'pri' : ''}" data-act="fagent" data-arg="${x}">${AG[x].n.replace(' agent','')}</button>`).join('')}</div>
+   <div class="cv" style="margin-top:10px">${box('Typed input','work item, requirement text, depends-on')}<span class="ar">→</span>${box('Retriever','module pack and approved examples')}<span class="ar">→</span>${box('Prompt','v' + promptLive(a) + ' from the registry (read only here)','var(--accent)')}<span class="ar">→</span>
+    <div class="bx" style="border-color:#D99A1E"><b>Model</b><br><select class="input" data-role="${a}" data-k="primary" aria-label="flow model">${opt(r.primary)}</select></div><span class="ar">→</span>${box('Strict schema parser','invalid output is rejected and retried')}<span class="ar">→</span>${box('Typed output','handed to the kernel','var(--rule)')}</div>
+   <div class="row" style="margin-top:12px"><div class="col"><div class="small muted" style="margin-bottom:4px">Components allowed in Studio flows</div><div class="row" style="gap:4px">${['Prompt (registry)','Model','Retriever','Schema parser','Read-only site tool'].map(x => `<span class="chip ok">${x}</span>`).join('')}</div>
+     <div class="small muted" style="margin:8px 0 4px">Blocked</div><div class="row" style="gap:4px">${['Python code','Custom HTTP request','File write','Shell'].map(x => `<span class="chip bad">${x}</span>`).join('')}</div></div>
+    <div class="col"><div class="small muted" style="margin-bottom:4px">Publish gate</div><ul class="ops">${gate.map(g => `<li><span>${g[1] ? '✓' : '○'}</span><span class="t">${g[0]}</span></li>`).join('')}</ul>
+     <div class="row" style="margin-top:8px"><button class="btn sm" data-act="noop">Open in Langflow</button><button class="btn pri sm" data-act="fpub" ${S.flowPub[a] ? 'disabled' : ''}>${S.flowPub[a] ? 'Published' : 'Request publish approval'}</button></div></div></div></div>
+  <div class="card"><h3>Which agents run through Langflow</h3><div class="scroll"><table><thead><tr><th>Agent</th><th>Backend</th><th>State</th></tr></thead><tbody>${adapters}</tbody></table></div><p class="small muted" style="margin:8px 0 0">The pilot starts with Customize and UI/UX in Langflow and the rest built in. Both use the same input and output contract, so any agent can move either way.</p></div>
+  <div class="card"><h3>Running Langflow safely</h3><ul class="ops">${['Separate container on an internal network. Never exposed to the internet.','Login required. Version pinned and upgraded deliberately. Langflow had a critical unauthenticated code-execution flaw in 2025 (CVE-2025-3248), so it is treated as an untrusted runtime.','Holds no ERPNext keys. It can only call Studio tools that return read-only metadata.','Every flow output is re-validated by the kernel and the Engine.'].map(x => `<li><span>•</span><span class="t">${x}</span></li>`).join('')}</ul></div>`;
+}
+
+/* ============ chrome ============ */
+const TABS = [['over','Overview','Project'],['reqs','Requirements','Project'],['builder','App Builder','Build'],['work','Workspace','Build'],['run','Runs · task graph','Build'],['agents','Agents & models','Studio'],['prompts','Prompt studio','Studio'],['orch','Orchestration & flows','Studio'],['dec','Decision layer','Studio'],['det','Deterministic layer','Studio'],['approvals','Approvals','Govern'],['changes','Changes & undo','Govern'],['export','Export & promote','Govern'],['quality','Quality','Govern']];
+const VIEWS = {over:viewOver,reqs:viewReqs,builder:viewBuilder,work:viewWork,run:viewRun,agents:viewAgents,prompts:viewPrompts,orch:viewOrch,dec:viewDecision,det:viewDet,approvals:viewApprovals,changes:viewChanges,export:viewExport,quality:viewQuality};
+function tourState(){
+  const held = S.nodes.filter(n => n.st === 'held').length;
+  if (!S.loaded) return {n:1,h:'Load your requirements',p:'The Studio reads the matrix with no model. Your pilot picks 47 rows across three modules: Supplier Relationship, Supply Chain demand and a full Grievance case-management app.',b:'Upload the fitment matrix',a:'load'};
+  if (!S.bp) return {n:2,h:'Design the case-management app first',p:'The App Builder checks what ERPNext already provides, then recommends extending the standard Issue instead of writing a new DocType.',b:'Generate blueprint',a:'bp'};
+  if (!S.profile) return {n:3,h:'Pick models per agent',p:'Ten agents, each with its own model. Balanced puts a strong model on the Architect only and cheap ones elsewhere.',b:'Use the Balanced profile',a:'profile',arg:'balanced'};
+  if (!S.visitedDecision) return {n:4,h:'Add the decision gateway',p:'A fast decision model picks the lane and recipe with a confidence. Confident answers skip the LLM, doubtful ones go to the Architect or to you.',b:'Open the decision layer',a:'tab',arg:'dec'};
+  if (!S.visitedPrompts) return {n:5,h:'Edit an agent prompt safely',p:'Change the instructions, test them on a golden set, and promote only if they are no worse. Locked rules cannot be edited.',b:'Open the prompt studio',a:'tab',arg:'prompts'};
+  if (!S.visitedOrch) return {n:6,h:'Choose how orchestration and Langflow fit',p:'Recommended: our kernel stays in charge, and agent steps run as Langflow flows you can edit visually.',b:'Open orchestration',a:'tab',arg:'orch'};
+  if (!S.runNo && !S.running) return {n:7,h:'Start the pilot run',p:'The Architect splits the work into 22 items. Watch the task graph: lanes run in parallel and each item is tagged rule, recipe, saved pattern, decision model or LLM.',b:'Start run',a:'run'};
+  if (S.running && !held) return {n:7,h:'The run is working',p:'Open Runs and click any work item to see its typed hand-off. The log shows the decision gateway and Langflow steps.',b:'Working…',d:1};
+  if (held) return {n:8,h:'High-risk items are waiting for you',p:held + ' work item(s) grant permissions or change workflows. Review the impact and approve.',b:'Review and approve',a:'tab',arg:'approvals'};
+  if (!S.chat.some(m => m.you)) return {n:9,h:'Now change something by chatting',p:'Ask for a form layout change. The Engine checks it against the live site and shows before and after.',b:'Open the workspace',a:'tab',arg:'work'};
+  if (!S.visitedDet) return {n:10,h:'See what made it cheap and reliable',p:'Rules, recipes and validators did most of the work. Try a recipe yourself: no model involved.',b:'Open the deterministic layer',a:'tab',arg:'det'};
+  if (!S.exported) return {n:10,h:'The run is still finishing',p:'The export happens when all work items are done.',b:'Open runs',a:'tab',arg:'run'};
+  if (!S.audited) return {n:11,h:'Audit the matrix\'s "standard" claims',p:'The Auditor probes the live site and downgrades claims that do not hold.',b:'Open quality',a:'quality'};
+  if (S.runNo < 2) return {n:12,h:'Save what was learned and run again',p:'Verified LLM-built changes become saved patterns. A second run shows the LLM share fall.',b:'Save patterns and run again',a:'again'};
+  return {n:13,h:'Done: compare the two runs',p:'Overview shows run history. Try changes and undo, the export, or start over.',b:'Start over',a:'reset'};
+}
+function render(){
+  const t = totals(), ts = tourState();
+  $('#meter').innerHTML = `Spend <b>${money(t.c)}</b> · ${t.calls} model calls · <b>${Math.round(t.share * 100)}%</b> without an LLM`;
+  $('#tour').innerHTML = `<div class="txt"><div class="step">Step ${ts.n} of 13</div><h2>${esc(ts.h)}</h2><p>${esc(ts.p)}</p></div><button class="btn pri" id="tourbtn" ${ts.d ? 'disabled' : ''}>${esc(ts.b)}</button>`;
+  $('#tourbtn').onclick = () => act(ts.a,ts.arg);
+  const pend = S.nodes.filter(n => n.st === 'held').length + S.questions.filter(q => S.status[q.id] === 'needs_input').length;
+  let last = '';
+  $('#nav').innerHTML = TABS.map(([k,l,g]) => { const h = g !== last ? `<div class="grp">${g}</div>` : ''; last = g; return h + `<button class="tab" role="tab" aria-selected="${S.tab === k}" data-tab="${k}">${l}${k === 'approvals' && pend ? `<span class="n">${pend}</span>` : ''}</button>`; }).join('');
+  const keep = document.activeElement && document.activeElement.dataset ? (document.activeElement.dataset.ans || document.activeElement.dataset.play) : null;
+  $('#main').innerHTML = VIEWS[S.tab]();
+  if (S.tab === 'run'){ const l = $('#log'); if (l) l.scrollTop = l.scrollHeight; }
+  if (keep){ const el = document.querySelector(`[data-ans="${keep}"],[data-play="${keep}"]`); if (el && el.setSelectionRange){ el.focus(); try { el.setSelectionRange(el.value.length,el.value.length); } catch (e) {} } }
+}
+function act(a,arg){
+  if (a === 'load'){ S.loaded = true; S.tab = 'builder'; }
+  else if (a === 'bp'){ S.bp = true; S.tab = 'builder'; }
+  else if (a === 'profile'){ setProfile(arg); }
+  else if (a === 'run') return startRun();
+  else if (a === 'tab'){ S.tab = arg; if (arg === 'det') S.visitedDet = true; if (arg === 'dec') S.visitedDecision = true; if (arg === 'prompts') S.visitedPrompts = true; if (arg === 'orch') S.visitedOrch = true; }
+  else if (a === 'quality'){ S.tab = 'quality'; }
+  else if (a === 'approve') return approve(arg);
+  else if (a === 'approveall') return approveAll();
+  else if (a === 'answer'){ const id = +arg, v = (S.answers[id] || '').trim(); if (!v) return; mark([id],'backlog','Answered: ' + v + ' (queued for the next run)'); say('you',`Answered [${id}]: ${v}`); S.labels++; }
+  else if (a === 'undo'){ S.confirmUndo = arg; }
+  else if (a === 'undo0'){ S.confirmUndo = null; }
+  else if (a === 'undo2') return undoSet(arg);
+  else if (a === 'recipe'){ S.play.recipe = arg; if (arg === 'mandatory_if'){ S.play.field = 'tax_id'; S.play.when = 'supplier_type'; } }
+  else if (a === 'savepat'){ S.patterns = PATTERN_IDS.map(id => S.byId[id].title); }
+  else if (a === 'again'){ S.patternsOn = true; if (!S.patterns.length) S.patterns = PATTERN_IDS.map(id => S.byId[id].title); startRun(); return; }
+  else if (a === 'ask') return ask(arg);
+  else if (a === 'wview'){ S.ws.view = arg; }
+  else if (a === 'wba'){ S.ws.ba = arg; }
+  else if (a === 'wtab'){ S.ws.tab = arg; }
+  else if (a === 'p3keep'){ S.ws.p3 = null; S.chat.push({who:'engine',html:'Kept. Nothing changed.'}); }
+  else if (a === 'p3go'){ S.ws.p3 = 'removed'; S.chat.push({who:'engine',html:'Snapshot taken. Field removed and the server script rewritten without it. Requirement 17 is now unmet and is back in the backlog. Undo is available.'}); mark([17],'backlog','Field removed by you'); }
+  else if (a === 'promo1'){ S.promoBusy = true; render(); setTimeout(() => { S.promoBusy = false; S.promo = 1; render(); }, 1200 * (S.fast ? 0.15 : 1)); return; }
+  else if (a === 'promo2'){ S.promo = 2; }
+  else if (a === 'qtab'){ S.qtab = arg; }
+  else if (a === 'audit'){ S.audited = true; }
+  else if (a === 'regress'){ S.regress = true; }
+  else if (a === 'bench'){ S.benchmark = true; }
+  else if (a === 'wb'){ S.wroteback = true; }
+  else if (a === 'calib'){ S.dec.calibrated = true; }
+  else if (a === 'pagent'){ S.promptAgent = arg; }
+  else if (a === 'ptest'){ testPrompt(S.promptAgent); }
+  else if (a === 'ppromote') return promotePrompt(S.promptAgent);
+  else if (a === 'preset'){ const p = S.prompts[S.promptAgent]; p.draft = p.versions[p.live].text; p.test = null; }
+  else if (a === 'prollback'){ rollbackPrompt(S.promptAgent,+arg); }
+  else if (a === 'fagent'){ S.flowAgent = arg; }
+  else if (a === 'fpub'){ S.flowPub[S.flowAgent] = true; S.backend[S.flowAgent] = 'langflow'; S.audit.unshift(stamp() + ' flow ' + S.flowAgent + '_v' + promptLive(S.flowAgent) + ' published'); }
+  else if (a === 'noop'){}
+  else if (a === 'reset'){ init(); }
+  render();
+}
+document.addEventListener('click', e => {
+  const nd = e.target.closest('[data-node]'); if (nd){ S.sel = nd.dataset.node; render(); return; }
+  const tb = e.target.closest('[data-tab]'); if (tb){ S.tab = tb.dataset.tab; if (S.tab === 'det') S.visitedDet = true; if (S.tab === 'dec') S.visitedDecision = true; if (S.tab === 'prompts') S.visitedPrompts = true; if (S.tab === 'orch') S.visitedOrch = true; render(); return; }
+  const b = e.target.closest('[data-act]'); if (b) act(b.dataset.act,b.dataset.arg);
+});
+document.addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && e.target.dataset && e.target.dataset.node){ e.preventDefault(); S.sel = e.target.dataset.node; render(); } });
+document.addEventListener('change', e => {
+  const t = e.target;
+  if (t.id === 'policy'){ S.policy = t.value; render(); }
+  else if (t.id === 'par'){ S.par = +t.value; render(); }
+  else if (t.id === 'inject'){ S.inject = t.checked; }
+  else if (t.id === 'fast'){ S.fast = t.checked; }
+  else if (t.id === 'decon' || t.id === 'decon2'){ if (S.running) return render(); S.decisionOn = t.checked; resetRun(); render(); }
+  else if (t.name === 'prov'){ S.dec.provider = t.value; render(); }
+  else if (t.name === 'mode'){ S.mode = t.value; render(); }
+  else if (t.dataset.backend){ S.backend[t.dataset.backend] = t.value; render(); }
+  else if (t.dataset.pick){ S.dec.pick = +t.value; render(); }
+  else if (t.dataset.thr){ const v = parseFloat(t.value); S.dec[t.dataset.thr] = v; if (S.dec.human > S.dec.auto - 0.05) S.dec.human = Math.max(0.2, S.dec.auto - 0.05); render(); }
+  else if (t.name === 'fnd'){ S.foundation = t.value; S.bp = false; resetRun(); render(); }
+  else if (t.dataset.role){ const r = S.roles[t.dataset.role]; r[t.dataset.k] = t.value || null; S.profile = S.profile || 'balanced'; render(); }
+  else if (t.dataset.price){ const v = parseFloat(t.value); if (!isNaN(v) && v >= 0) S.prices[t.dataset.price][t.dataset.pk] = v; render(); }
+  else if (t.dataset.play){ S.play[t.dataset.play] = t.value; render(); }
+});
+document.addEventListener('input', e => { const t = e.target; if (t.dataset && t.dataset.ans) S.answers[t.dataset.ans] = t.value; if (t.dataset && t.dataset.ptxt){ S.prompts[t.dataset.ptxt].draft = t.value; } if (t.dataset && t.dataset.thr){ const v = parseFloat(t.value); S.dec[t.dataset.thr] = v; if (S.dec.human > S.dec.auto - 0.05) S.dec.human = Math.max(0.2, S.dec.auto - 0.05); } });
+init(); render();
+</script>
