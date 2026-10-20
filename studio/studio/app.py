@@ -1,10 +1,9 @@
-"""Studio HTTP service: login, settings (model access), servers, and the UI."""
+"""Studio HTTP service: login, model settings, the ERPNext dev site connection, and the UI."""
 
 import hmac
 import os
-import secrets
+import threading
 import time
-import uuid
 from pathlib import Path
 
 import httpx
@@ -12,6 +11,8 @@ from fastapi import Depends, FastAPI, HTTPException, Request, Response
 from fastapi.responses import HTMLResponse, RedirectResponse
 from pydantic import BaseModel
 
+from .erp import HttpErp
+from .prepare import STEPS, prepare
 from .vault import Vault
 
 VERSION = "0.2.0"
@@ -25,6 +26,13 @@ def create_app(data_dir: str | None = None) -> FastAPI:
     admin_pw = os.environ.get("STUDIO_ADMIN_PASSWORD", "")
     app = FastAPI(title="ERPNext Studio", version=VERSION)
     app.state.vault = vault
+    # First start: take the ERPNext address and password from the compose file so the user does not retype them.
+    if os.environ.get("ERP_ADMIN_PASSWORD") and not vault.load().get("erp", {}).get("admin_password"):
+        d = vault.load()
+        d["erp"] = {**d.get("erp", {}), "url": os.environ.get("ERP_URL", "http://backend:8000").rstrip("/"),
+                    "site": os.environ.get("ERP_SITE", "erp.local"),
+                    "admin_password": vault.enc(os.environ["ERP_ADMIN_PASSWORD"])}
+        vault.save(d)
     fails: dict[str, list[float]] = {}
 
     def page(name: str) -> HTMLResponse:
@@ -107,48 +115,90 @@ def create_app(data_dir: str | None = None) -> FastAPI:
         except Exception as e:  # network or parse errors are reported, never raised
             return {"ok": False, "error": str(e)[:200]}
 
-    # ---- servers (ERPNext targets)
-    class ServerIn(BaseModel):
-        name: str
-        host: str
-        ssh_port: int = 22
-        ssh_user: str = "root"
-        ssh_password: str = ""
-        ssh_private_key: str = ""
-        role: str = "development"
+    # ---- the ERPNext development site
+    class ErpIn(BaseModel):
+        url: str = "http://backend:8000"
+        site: str = "erp.local"
+        admin_password: str = ""  # blank = keep stored
+        company: str = "Demo Company"
+        country: str = "India"
+        currency: str = "INR"
+        timezone: str = "Asia/Kolkata"
 
-    def server_public(s: dict) -> dict:
-        return {k: v for k, v in s.items() if k not in ("ssh_password", "ssh_private_key")} | {
-            "has_password": bool(s.get("ssh_password")), "has_key": bool(s.get("ssh_private_key"))}
+    progress: dict = {"steps": [], "running": False}
 
-    @app.get("/api/servers")
-    def list_servers(_: str = Depends(authed)) -> list:
-        return [server_public(s) for s in vault.load()["servers"]]
+    def erp_public(doc: dict) -> dict:
+        e = doc.get("erp", {})
+        return {"url": e.get("url", "http://backend:8000"), "site": e.get("site", "erp.local"),
+                "company": e.get("company", "Demo Company"), "country": e.get("country", "India"),
+                "currency": e.get("currency", "INR"), "timezone": e.get("timezone", "Asia/Kolkata"),
+                "password_set": bool(e.get("admin_password")), "ready": bool(e.get("api_key")),
+                "running": progress["running"], "steps": progress["steps"], "step_names": STEPS}
 
-    @app.post("/api/servers")
-    def add_server(body: ServerIn, _: str = Depends(authed)) -> dict:
+    @app.get("/api/erp")
+    def get_erp(_: str = Depends(authed)) -> dict:
+        return erp_public(vault.load())
+
+    @app.put("/api/erp")
+    def put_erp(body: ErpIn, _: str = Depends(authed)) -> dict:
         doc = vault.load()
-        s = body.model_dump()
-        s["id"] = uuid.uuid4().hex[:8]
-        s["status"] = "not installed"
-        for f in ("ssh_password", "ssh_private_key"):
-            s[f] = vault.enc(s[f]) if s[f] else ""
-        doc["servers"].append(s)
+        e = doc.setdefault("erp", {})
+        changed = (body.url.rstrip("/"), body.site) != (e.get("url"), e.get("site"))
+        e.update(url=body.url.rstrip("/"), site=body.site, company=body.company, country=body.country,
+                 currency=body.currency, timezone=body.timezone)
+        if body.admin_password:
+            e["admin_password"] = vault.enc(body.admin_password)
+        if changed:
+            e.pop("api_key", None)
+            e.pop("api_secret", None)
         vault.save(doc)
-        return server_public(s)
+        return erp_public(doc)
 
-    @app.delete("/api/servers/{sid}")
-    def del_server(sid: str, _: str = Depends(authed)) -> dict:
-        doc = vault.load()
-        doc["servers"] = [s for s in doc["servers"] if s["id"] != sid]
-        vault.save(doc)
+    def _run_prepare() -> None:
+        def step(key: str, status: str, note: str) -> None:
+            for s in progress["steps"]:
+                if s["key"] == key:
+                    s.update(status=status, note=note)
+                    return
+            progress["steps"].append({"key": key, "status": status, "note": note})
+        try:
+            doc = vault.load()
+            e = doc["erp"]
+            cfg = {**e, "admin_password": vault.dec(e.get("admin_password", ""))}
+            keys = prepare(cfg, step)
+            doc = vault.load()
+            doc["erp"]["api_key"] = keys["api_key"]
+            doc["erp"]["api_secret"] = vault.enc(keys["api_secret"])
+            vault.save(doc)
+        except Exception:  # the failing step already carries the plain-words reason
+            pass
+        finally:
+            progress["running"] = False
+
+    @app.post("/api/erp/prepare")
+    def start_prepare(_: str = Depends(authed)) -> dict:
+        e = vault.load().get("erp", {})
+        if not e.get("admin_password"):
+            raise HTTPException(400, "Save the Administrator password first")
+        if progress["running"]:
+            raise HTTPException(409, "already running")
+        progress.update(running=True, steps=[])
+        threading.Thread(target=_run_prepare, daemon=True).start()
         return {"ok": True}
+
+    def erp_client() -> HttpErp:
+        e = vault.load().get("erp", {})
+        if not e.get("api_key"):
+            raise HTTPException(409, "ERPNext is not prepared yet")
+        return HttpErp(e["url"], e["api_key"], vault.dec(e["api_secret"]), host_header=e["site"])
+
+    app.state.erp_client = erp_client
 
     @app.get("/api/status")
     def status(_: str = Depends(authed)) -> dict:
         doc = vault.load()
         return {"version": VERSION, "llm": llm_public(doc)["key_set"] and bool(doc["llm"].get("models")),
-                "servers": len(doc["servers"])}
+                "erp": bool(doc.get("erp", {}).get("api_key"))}
 
     # ---- pages
     def gated(name: str):

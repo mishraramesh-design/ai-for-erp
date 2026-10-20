@@ -1,0 +1,159 @@
+# ERPNext Studio + a development ERPNext (v15), one server, one compose file.
+# Paste into Hostinger Docker Manager. Change only the three passwords near the top.
+#
+#   Studio UI      http://<server-ip>:18100
+#   ERPNext (dev)  http://<server-ip>:18080     login: Administrator / <ERP_ADMIN_PASSWORD below>
+#
+# Development only: this ERPNext has developer mode on and is the place the Studio builds.
+# Production is a separate deployment that pulls the release image (erp-<tag>); the Studio never touches it.
+
+# The three passwords are defined once, here. Change these three lines and nothing else.
+x-erp-admin-password: &erp_pw "CHANGE-ME-erp-admin"      # CHANGE: ERPNext 'Administrator' password
+x-db-root-password: &db_pw "CHANGE-ME-db-root"           # CHANGE: MariaDB root password (any strong string)
+x-studio-login-password: &studio_pw "CHANGE-ME-studio"   # CHANGE: password for the Studio web UI
+
+x-secrets: &secrets
+  ERP_ADMIN_PASSWORD: *erp_pw
+  DB_ROOT_PASSWORD: *db_pw
+  SITE_NAME: "erp.local"                         # internal site name; leave as is
+
+x-erp: &erp
+  image: mishramesh/ai-for-erp:erp-latest
+  volumes:
+    - sites:/home/frappe/frappe-bench/sites
+    - logs:/home/frappe/frappe-bench/logs
+  restart: unless-stopped
+  depends_on:
+    configurator:
+      condition: service_completed_successfully
+
+name: ai-for-erp
+services:
+  studio:
+    image: mishramesh/ai-for-erp:studio-latest
+    environment:
+      STUDIO_DATA_DIR: /data
+      STUDIO_ADMIN_PASSWORD: *studio_pw
+      ERP_URL: "http://backend:8000"
+      ERP_SITE: "erp.local"
+      ERP_ADMIN_PASSWORD: *erp_pw
+    ports:
+      - "18100:8100"
+    volumes:
+      - studio-data:/data
+    restart: unless-stopped
+
+  db:
+    image: mariadb:10.6
+    command: >
+      --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+      --skip-character-set-client-handshake --skip-innodb-read-only-compressed
+    environment:
+      MYSQL_ROOT_PASSWORD: *db_pw
+    healthcheck:
+      test: mysqladmin ping -h localhost --password=$$MYSQL_ROOT_PASSWORD
+      interval: 5s
+      timeout: 5s
+      retries: 30
+    volumes:
+      - db-data:/var/lib/mysql
+    restart: unless-stopped
+
+  redis-cache:
+    image: redis:6.2-alpine
+    restart: unless-stopped
+
+  redis-queue:
+    image: redis:6.2-alpine
+    volumes:
+      - redis-queue-data:/data
+    restart: unless-stopped
+
+  configurator:
+    <<: *erp
+    restart: "no"
+    depends_on:
+      db: {condition: service_healthy}
+    entrypoint: ["bash", "-c"]
+    command:
+      - |
+        printf '%s\n' frappe erpnext studio_bridge csd_customizations > sites/apps.txt
+        bench set-config -g db_host db
+        bench set-config -gp db_port 3306
+        bench set-config -g redis_cache "redis://redis-cache:6379"
+        bench set-config -g redis_queue "redis://redis-queue:6379"
+        bench set-config -g redis_socketio "redis://redis-queue:6379"
+        bench set-config -gp socketio_port 9000
+
+  create-site:
+    <<: *erp
+    restart: "no"
+    environment: *secrets
+    depends_on:
+      configurator: {condition: service_completed_successfully}
+    entrypoint: ["bash", "-c"]
+    command:
+      - |
+        wait-for-it -t 180 db:3306
+        wait-for-it -t 180 redis-cache:6379
+        wait-for-it -t 180 redis-queue:6379
+        if [ ! -d "sites/$$SITE_NAME" ]; then
+          bench new-site "$$SITE_NAME" --mariadb-user-host-login-scope='%' \
+            --admin-password "$$ERP_ADMIN_PASSWORD" --db-root-password "$$DB_ROOT_PASSWORD" \
+            --install-app erpnext --install-app studio_bridge --install-app csd_customizations --set-default
+        else
+          for a in studio_bridge csd_customizations; do
+            bench --site "$$SITE_NAME" list-apps | grep -q "^$$a " || bench --site "$$SITE_NAME" install-app $$a
+          done
+          bench --site "$$SITE_NAME" migrate
+        fi
+        bench --site "$$SITE_NAME" set-config developer_mode 1
+        bench --site "$$SITE_NAME" set-config server_script_enabled true
+        bench --site "$$SITE_NAME" set-config allow_embedding true
+
+  backend:
+    <<: *erp
+    depends_on:
+      create-site: {condition: service_completed_successfully}
+
+  websocket:
+    <<: *erp
+    command: ["node", "/home/frappe/frappe-bench/apps/frappe/socketio.js"]
+    depends_on:
+      create-site: {condition: service_completed_successfully}
+
+  queue:
+    <<: *erp
+    command: ["bench", "worker", "--queue", "short,default,long"]
+    depends_on:
+      create-site: {condition: service_completed_successfully}
+
+  scheduler:
+    <<: *erp
+    command: ["bench", "schedule"]
+    depends_on:
+      create-site: {condition: service_completed_successfully}
+
+  frontend:
+    <<: *erp
+    command: ["nginx-entrypoint.sh"]
+    environment:
+      BACKEND: backend:8000
+      SOCKETIO: websocket:9000
+      FRAPPE_SITE_NAME_HEADER: erp.local
+      UPSTREAM_REAL_IP_ADDRESS: 127.0.0.1
+      UPSTREAM_REAL_IP_HEADER: X-Forwarded-For
+      UPSTREAM_REAL_IP_RECURSIVE: "off"
+      PROXY_READ_TIMEOUT: "300"
+      CLIENT_MAX_BODY_SIZE: 50m
+    ports:
+      - "18080:8080"
+    depends_on:
+      backend: {condition: service_started}
+
+volumes:
+  studio-data:
+  db-data:
+  redis-queue-data:
+  sites:
+  logs:

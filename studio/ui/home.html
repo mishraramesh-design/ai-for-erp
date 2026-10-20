@@ -27,7 +27,7 @@ table{width:100%;border-collapse:collapse}td,th{text-align:left;padding:8px 6px;
 <header><div class="brand">◆ ERPNext Studio</div><span class="chip" id="ver"></span><div class="sp"></div><button id="out">Sign out</button></header>
 <div class="app"><nav>
 <a data-t="overview">Overview</a><a href="/workbench">Workbench <span class="chip">preview</span></a>
-<small>Setup</small><a data-t="models">Models</a><a data-t="servers">Servers</a></nav>
+<small>Setup</small><a data-t="models">Models</a><a data-t="erp">ERPNext</a></nav>
 <main id="m"></main></div>
 <script>
 const $=s=>document.querySelector(s),api=async(p,o)=>{const r=await fetch(p,o&&{method:o.method,headers:{'Content-Type':'application/json'},body:JSON.stringify(o.body)});if(r.status===401)location.href='/login';return r.json()};
@@ -37,8 +37,8 @@ V.overview=async()=>{const s=await api('/api/status');$('#ver').textContent='v'+
  const step=(ok,t,d,go)=>`<div class="card"><span class="tag ${ok?'ok':'hold'}">${ok?'done':'to do'}</span> <b>${t}</b><div class="muted">${d}</div>${ok?'':`<div class="row"><button class="p" onclick="go('${go}')">Set up</button></div>`}</div>`;
  return `<h2>Welcome</h2><p class="sub">Three steps take you from this screen to a working ERPNext development site.</p>
  ${step(s.llm,'1 · Connect a model','Add your API key and choose a model for each agent role.','models')}
- ${step(s.servers>0,'2 · Add your server','The Studio installs a development ERPNext there over SSH.','servers')}
- <div class="card"><span class="tag hold">coming next</span> <b>3 · Install ERPNext and start building</b><div class="muted">One-click install, then requirements, plans and approvals. The <a href="/workbench">Workbench preview</a> shows how this will look, using scripted data.</div></div>`};
+ ${step(s.erp,'2 · Connect ERPNext','The Studio prepares the development site next to it with one click.','erp')}
+ <div class="card"><span class="tag hold">coming next</span> <b>3 · Build from requirements</b><div class="muted">Requirements, plans and approvals. The <a href="/workbench">Workbench preview</a> shows how this will look, using scripted data.</div></div>`};
 V.models=async()=>{const l=await api('/api/settings/llm');
  const roles=l.roles.map(r=>`<div><label>${r}</label><input data-r="${r}" value="${esc(l.models[r]||'')}" placeholder="model name"></div>`).join('');
  return `<h2>Models</h2><p class="sub">Use a strong model for planning and a cheaper one for routine steps. Leave a role blank to skip it.</p>
@@ -47,26 +47,32 @@ V.models=async()=>{const l=await api('/api/settings/llm');
  <label>Monthly budget, USD (0 = no limit)</label><input id="bd" type="number" min="0" value="${l.monthly_budget_usd}"></div>
  <div class="card"><b>Model per role</b><div class="grid">${roles}</div></div>
  <div class="row"><button class="p" id="sv">Save</button><button id="ts">Test connection</button><span id="msg"></span></div>`};
-V.servers=async()=>{const s=await api('/api/servers');
- const rows=s.map(x=>`<tr><td><b>${esc(x.name)}</b><div class="muted">${esc(x.role)}</div></td><td>${esc(x.ssh_user)}@${esc(x.host)}:${x.ssh_port}</td><td>${esc(x.status)}</td><td><button data-del="${x.id}">Remove</button></td></tr>`).join('');
- return `<h2>Servers</h2><p class="sub">Where the Studio installs and manages ERPNext. Credentials are stored encrypted.</p>
- <div class="card">${s.length?`<table><tr><th>Name</th><th>SSH</th><th>Status</th><th></th></tr>${rows}</table>`:'<span class="muted">No servers yet.</span>'}</div>
- <div class="card"><b>Add server</b><div class="grid">
- <div><label>Name</label><input id="sn" value="Hostinger dev"></div><div><label>Host or IP</label><input id="sh"></div>
- <div><label>SSH port</label><input id="sp" type="number" value="22"></div><div><label>SSH user</label><input id="su" value="root"></div></div>
- <label>SSH password (or paste a private key below)</label><input id="spw" type="password" autocomplete="off">
- <label>SSH private key (optional)</label><textarea id="sk" rows="3" autocomplete="off"></textarea>
- <div class="row"><button class="p" id="add">Add server</button><span id="msg"></span></div></div>`};
+V.erp=async()=>{const e=await api('/api/erp');
+ const rows=(e.steps||[]).map(x=>`<tr><td>${x.status==='ok'?'<span class="ok">✔</span>':x.status==='fail'?'<span class="bad">✖</span>':'<span class="muted">…</span>'}</td><td>${esc((e.step_names.find(n=>n[0]===x.key)||[0,x.key])[1])}</td><td class="${x.status==='fail'?'bad':'muted'}">${esc(x.note)}</td></tr>`).join('');
+ return `<h2>ERPNext</h2><p class="sub">The development ERPNext that runs next to the Studio. ${e.ready?'<span class="tag ok">ready</span>':'<span class="tag hold">not prepared</span>'}</p>
+ <div class="card"><div class="grid">
+ <div><label>ERPNext address (inside Docker)</label><input id="eu" value="${esc(e.url)}"></div>
+ <div><label>Site name</label><input id="es" value="${esc(e.site)}"></div></div>
+ <label>Administrator password ${e.password_set?'<span class="ok">· saved (leave blank to keep)</span>':''}</label><input id="ep" type="password" autocomplete="off" placeholder="from your compose file"></div>
+ <div class="card"><b>First-time company setup</b><span class="muted"> (used only if the site has no company yet)</span><div class="grid">
+ <div><label>Company name</label><input id="ec" value="${esc(e.company)}"></div><div><label>Country</label><input id="eo" value="${esc(e.country)}"></div>
+ <div><label>Currency</label><input id="ey" value="${esc(e.currency)}"></div><div><label>Time zone</label><input id="ez" value="${esc(e.timezone)}"></div></div></div>
+ <div class="row"><button class="p" id="prep" ${e.running?'disabled':''}>${e.ready?'Prepare again':'Prepare site'}</button><span id="msg" class="muted">${e.running?'Working… the setup wizard takes about 30 seconds':''}</span></div>
+ ${rows?`<div class="card" style="margin-top:14px"><table>${rows}</table></div>`:''}`};
+V.erp.after=()=>{
+ $('#prep').onclick=async()=>{const body={url:$('#eu').value,site:$('#es').value,admin_password:$('#ep').value,company:$('#ec').value,country:$('#eo').value,currency:$('#ey').value,timezone:$('#ez').value};
+  await api('/api/erp',{method:'PUT',body});const r=await fetch('/api/erp/prepare',{method:'POST'});
+  if(!r.ok){$('#msg').innerHTML='<span class="bad">'+esc((await r.json()).detail)+'</span>';return}
+  poll()};
+ async function poll(){const e=await api('/api/erp');if(location.hash!=='#erp')return;const keep={eu:$('#eu').value,es:$('#es').value,ec:$('#ec').value,eo:$('#eo').value,ey:$('#ey').value,ez:$('#ez').value};
+  $('#m').innerHTML=await V.erp();V.erp.after();for(const k in keep)$('#'+k).value=keep[k];if(e.running)setTimeout(poll,1500)}
+ api('/api/erp').then(e=>{if(e.running)setTimeout(poll,1500)})};
 V.models.after=()=>{
  $('#sv').onclick=save;$('#ts').onclick=async()=>{await save(true);$('#msg').textContent='Testing…';const r=await api('/api/settings/llm/test',{method:'POST',body:{}});
   $('#msg').innerHTML=r.ok?`<span class="ok">Connected · ${esc(r.model)} replied "${esc(r.reply)}"</span>`:`<span class="bad">${esc(r.error)}</span>`};
  async function save(q){const models={};document.querySelectorAll('[data-r]').forEach(i=>models[i.dataset.r]=i.value.trim());
   await api('/api/settings/llm',{method:'PUT',body:{base_url:$('#bu').value,api_key:$('#ak').value,models,monthly_budget_usd:+$('#bd').value||0}});
   if(q!==true)$('#msg').innerHTML='<span class="ok">Saved</span>';}};
-V.servers.after=()=>{
- $('#add').onclick=async()=>{if(!$('#sh').value.trim()){$('#msg').innerHTML='<span class="bad">Host is required</span>';return}
-  await api('/api/servers',{method:'POST',body:{name:$('#sn').value,host:$('#sh').value.trim(),ssh_port:+$('#sp').value||22,ssh_user:$('#su').value,ssh_password:$('#spw').value,ssh_private_key:$('#sk').value}});go('servers')};
- document.querySelectorAll('[data-del]').forEach(b=>b.onclick=async()=>{await fetch('/api/servers/'+b.dataset.del,{method:'DELETE'});go('servers')})};
 V.overview.after=()=>{};
 async function go(t){t=V[t]?t:'overview';history.replaceState(0,'','#'+t);
  document.querySelectorAll('nav a[data-t]').forEach(a=>a.classList.toggle('on',a.dataset.t===t));

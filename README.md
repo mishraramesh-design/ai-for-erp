@@ -23,17 +23,13 @@ Pilot build in progress. See `docs/ROADMAP.md` for what is done and what is next
 
 1. In GitHub: Settings, Secrets and variables, Actions: `DOCKERHUB_USERNAME` and `DOCKERHUB_TOKEN` (a Docker Hub access token with read and write). Already set.
 2. Merge to `main`. CI pushes two tags to `<dockerhub-user>/ai-for-erp`: `studio-<sha>` and `erp-<sha>` (plus `studio-latest`, `erp-latest`).
-3. On the server (needs Docker with the compose plugin):
-   ```bash
-   mkdir -p ~/studio && cd ~/studio
-   curl -fsSLO https://raw.githubusercontent.com/mishraramesh-design/ai-for-erp/main/deploy/studio.compose.yml
-   curl -fsSLO https://raw.githubusercontent.com/mishraramesh-design/ai-for-erp/main/deploy/install-studio.sh
-   chmod +x install-studio.sh && ./install-studio.sh
-   ```
-   (The repository is private: clone it instead, or copy `deploy/` to the server.) The script asks for the Docker Hub namespace and your OpenAI key (hidden input), and prints the Studio URL.
-4. Open the Studio, create a project, enter the target server IP and SSH access, and press Deploy.
+3. On the server (Hostinger Docker Manager, or any Docker host): create a project from `deploy/pilot.compose.yml`.
+   Change the three passwords near the top. One compose runs the Studio and a development ERPNext (db, redis, backend,
+   websocket, worker, scheduler, nginx). The first start creates the site with developer mode on.
+4. Open `http://<server>:18100`, sign in, add your model key under Models, then ERPNext, Prepare site.
+   ERPNext itself is at `http://<server>:18080`.
 
-Secrets never go into git or into chat. The OpenAI key lives only in `.env` on the server.
+Secrets never go into git or into chat. Model keys are entered in the Studio and stored encrypted in its data volume.
 
 ## Tests
 

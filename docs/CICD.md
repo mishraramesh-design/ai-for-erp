@@ -8,7 +8,7 @@ server       -> docker compose pull && up -d       (pull-based; GitHub never con
 
 ## Secrets
 GitHub repository secrets: `DOCKERHUB_USERNAME`, `DOCKERHUB_TOKEN` (access token, read and write).
-The OpenAI key is never in CI. It is entered on the server by `deploy/install-studio.sh`.
+The OpenAI key is never in CI. It is entered in the Studio (Models) and stored encrypted on the server.
 
 ## Images (one Docker Hub repository, two tags)
 - `studio-*`: the Studio service and UI. It also carries the ERPNext compose template and app sources the provisioner ships to the target server.

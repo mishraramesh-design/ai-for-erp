@@ -1,20 +1,14 @@
-"""Provisioning, run once after install:  bench --site <site> execute studio_bridge.setup.provision
+"""Service-user provisioning (development sites only).
 
-Creates the dedicated service user the agent service signs in as (so every change shows 'Studio Agent' as its author
-in the audit trail) and the 'Studio User' role. Secrets come from the environment, never from source.
+The Studio signs in as a dedicated service user so every change shows 'Studio Agent' in the audit trail.
+`ensure_service_user()` creates it (idempotent) and issues a fresh API key and secret.
 """
-import os
-
 import frappe
 
 SERVICE_USER = "studio.agent@example.com"
 
 
-def provision():
-    key = os.environ.get("STUDIO_SVC_KEY")
-    secret = os.environ.get("STUDIO_SVC_SECRET")
-    if not key or not secret:
-        raise SystemExit("STUDIO_SVC_KEY and STUDIO_SVC_SECRET must be set")
+def ensure_service_user() -> tuple[str, str]:
     if not frappe.db.exists("Role", "Studio User"):
         frappe.get_doc({"doctype": "Role", "role_name": "Studio User", "desk_access": 1}).insert(ignore_permissions=True)
     if frappe.db.exists("User", SERVICE_USER):
@@ -23,15 +17,15 @@ def provision():
         user = frappe.get_doc({"doctype": "User", "email": SERVICE_USER, "first_name": "Studio Agent",
                                "send_welcome_email": 0, "user_type": "System User", "enabled": 1})
         user.insert(ignore_permissions=True)
-    # Development site only: the service user holds every assignable role so it can test the behaviour it builds
-    # (insert test records, read new tables). Roles the Studio creates later are granted to it by the applier.
+    # The service user holds every assignable role so it can test the behaviour it builds (insert test records,
+    # read new tables). Roles the Studio creates later are granted to it by the applier.
     auto = {"Guest", "All", "Administrator", "Desk User"}
     have = {r.role for r in user.roles}
     for role in frappe.get_all("Role", pluck="name"):
         if role not in auto and role not in have:
             user.append("roles", {"role": role})
-    user.api_key = key
-    user.api_secret = secret
     user.save(ignore_permissions=True)
+    from frappe.core.doctype.user.user import generate_keys
+    secret = generate_keys(SERVICE_USER)["api_secret"]
     frappe.db.commit()
-    print(f"Service user ready: {SERVICE_USER}")
+    return frappe.db.get_value("User", SERVICE_USER, "api_key"), secret

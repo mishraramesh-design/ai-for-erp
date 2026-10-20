@@ -40,10 +40,10 @@ class Vault:
         except InvalidToken:
             return ""
 
-    # --- settings document {"llm": {...}, "servers": [...]}
+    # --- settings document {"llm": {...}, "erp": {...}}
     def load(self) -> dict:
         if not self.path.exists():
-            return {"llm": {}, "servers": []}
+            return {"llm": {}}
         return json.loads(self.path.read_text())
 
     def save(self, doc: dict) -> None:

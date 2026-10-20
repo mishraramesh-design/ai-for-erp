@@ -37,17 +37,53 @@ def test_llm_key_encrypted_and_never_returned(client, tmp_path):
     assert client.get("/api/status").json()["llm"] is True
 
 
-def test_servers_credentials_hidden(client, tmp_path):
+def test_erp_password_encrypted_and_prepare_stores_keys(client, tmp_path, monkeypatch):
+    import time
+    from studio import app as appmod
     login(client)
-    s = client.post("/api/servers", json={"name": "d", "host": "1.2.3.4", "ssh_password": "hunter2"}).json()
-    assert s["has_password"] and "ssh_password" not in s
-    assert "hunter2" not in (tmp_path / "settings.json").read_text()
-    assert len(client.get("/api/servers").json()) == 1
-    client.delete(f"/api/servers/{s['id']}")
-    assert client.get("/api/servers").json() == []
+    r = client.put("/api/erp", json={"admin_password": "adm-secret", "site": "erp.local"}).json()
+    assert r["password_set"] and not r["ready"] and "adm-secret" not in str(r)
+    assert "adm-secret" not in (tmp_path / "settings.json").read_text()
+
+    seen = {}
+
+    def fake_prepare(cfg, step):
+        seen["pw"] = cfg["admin_password"]
+        step("reach", "ok", "x")
+        step("login", "ok", "")
+        return {"api_key": "K1", "api_secret": "S1-secret"}
+
+    monkeypatch.setattr(appmod, "prepare", fake_prepare)
+    assert client.post("/api/erp/prepare").status_code == 200
+    for _ in range(50):
+        e = client.get("/api/erp").json()
+        if not e["running"]:
+            break
+        time.sleep(0.05)
+    assert seen["pw"] == "adm-secret" and e["ready"] and [x["key"] for x in e["steps"]] == ["reach", "login"]
+    assert "S1-secret" not in (tmp_path / "settings.json").read_text()
+    assert client.get("/api/status").json()["erp"] is True
+    # changing the target clears the stored keys
+    assert client.put("/api/erp", json={"url": "http://other:8000"}).json()["ready"] is False
+
+
+def test_prepare_needs_password(client):
+    login(client)
+    assert client.post("/api/erp/prepare").status_code == 400
 
 
 def test_pages_after_login(client):
     login(client)
     for p in ("/", "/workbench"):
         assert client.get(p).status_code == 200
+
+
+def test_erp_defaults_seeded_from_environment(tmp_path, monkeypatch):
+    monkeypatch.setenv("STUDIO_ADMIN_PASSWORD", "pw123")
+    monkeypatch.setenv("ERP_ADMIN_PASSWORD", "from-compose")
+    monkeypatch.setenv("ERP_SITE", "erp.local")
+    c = TestClient(create_app(str(tmp_path)))
+    login(c)
+    e = c.get("/api/erp").json()
+    assert e["password_set"] and e["url"] == "http://backend:8000" and e["site"] == "erp.local"
+    assert "from-compose" not in (tmp_path / "settings.json").read_text()
