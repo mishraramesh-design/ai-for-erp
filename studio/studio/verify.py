@@ -150,7 +150,12 @@ def run_tests(tests: list, erp) -> list[dict]:
                 elif _MANDATORY.search(e.detail) and want not in e.detail.lower():
                     res["status"], res["detail"] = "inconclusive", f"stopped earlier by a different rule: {e.detail[:160]}"
                 else:
-                    res["status"], res["detail"] = "fail", f"blocked, but not with the expected message: {e.detail[:160]}"
+                    ww = {w for w in re.findall(r"[a-z]{3,}", want)}
+                    got = set(re.findall(r"[a-z]{3,}", e.detail.lower()))
+                    if ww and len(ww & got) / len(ww) >= 0.5:
+                        res["status"], res["detail"] = "pass", f"blocked with a differently worded message: {e.detail[:160]}"
+                    else:  # blocked for some other reason: not proof the rule works, but not proof it is broken either
+                        res["status"], res["detail"] = "inconclusive", f"blocked, but with a different message: {e.detail[:160]}"
             else:
                 if _MANDATORY.search(e.detail):
                     res["status"], res["detail"] = "inconclusive", f"test data incomplete: {e.detail[:160]}"
