@@ -570,7 +570,9 @@ class Kernel:
             try:
                 spec = agents.tester(self._reqs(g, d), cs, d.snap, d.llm_for("tester", run.id))
                 with self._write_lock:
-                    tests = run_tests(spec, d.erp)
+                    own = {getattr(o, "fieldname", None) for o in cs.ops if getattr(o, "fieldname", None)}
+                    own |= {f.fieldname for o in cs.ops for f in (getattr(o, "fields", None) or [])}
+                    tests = run_tests(spec, d.erp, own_fields=own)
             except LlmError as e:
                 self._log(run, t.id, "warn", f"Tester unavailable: {e}", tier="model")
         failed_tests = [x for x in tests if x["status"] == "fail"]

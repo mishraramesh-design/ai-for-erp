@@ -4,7 +4,10 @@ No model is involved. Behavioural tests written by the tester agent are executed
 """
 from __future__ import annotations
 
+from typing import Optional
+
 import re
+import time
 from dataclasses import asdict, dataclass
 
 from .applier import PM
@@ -121,10 +124,53 @@ def verify_changeset(cs, erp) -> list[Check]:
     return out
 
 
-_MANDATORY = re.compile(r"mandatory|required|MandatoryError|is not set|cannot be empty", re.I)
+_MANDATORY = re.compile(r"mandatory|required|MandatoryError|is not set|cannot be empty|value missing", re.I)
 
 
-def run_tests(tests: list, erp) -> list[dict]:
+_LAYOUT = {"Section Break", "Column Break", "Tab Break", "HTML", "Button", "Heading", "Image", "Fold", "Table",
+           "Table MultiSelect", "Attach", "Attach Image", "Signature", "Geolocation", "Read Only"}
+
+
+def autofill(erp, doctype: str, vals: dict, own_fields: set, made: list) -> dict:
+    """Fill mandatory fields that OTHER changes made mandatory, so one change's tests are not blocked by another's rules.
+
+    Fields this change set itself defines are never filled: a test may leave them empty on purpose."""
+    try:
+        meta = erp.get_meta(doctype) or {}
+    except Exception:  # noqa: BLE001
+        return vals
+    out = dict(vals)
+    for f in meta.get("fields", []):
+        fn, ft = f.get("fieldname"), f.get("fieldtype")
+        if not fn or not f.get("reqd") or fn in out or fn in own_fields or ft in _LAYOUT or f.get("default") not in (None, ""):
+            continue
+        if ft in ("Data", "Small Text", "Text", "Long Text", "Text Editor", "Code", "Phone"):
+            out[fn] = "Studio test"
+        elif ft in ("Int", "Float", "Currency", "Percent", "Rating"):
+            out[fn] = 1
+        elif ft == "Date":
+            out[fn] = time.strftime("%Y-%m-%d")
+        elif ft == "Datetime":
+            out[fn] = time.strftime("%Y-%m-%d %H:%M:%S")
+        elif ft == "Select":
+            opts = [o for o in (f.get("options") or "").split("\n") if o.strip()]
+            if opts:
+                out[fn] = opts[0]
+        elif ft == "Link" and f.get("options"):
+            try:
+                rows = erp.list_docs(f["options"], fields=["name"], limit=1)
+                if not rows and f["options"] == "Contact":
+                    d = erp.insert("Contact", {"doctype": "Contact", "first_name": "Studio Test"})
+                    made.append(("Contact", d.get("name")))
+                    rows = [{"name": d.get("name")}]
+                if rows:
+                    out[fn] = rows[0]["name"]
+            except Exception:  # noqa: BLE001
+                pass
+    return out
+
+
+def run_tests(tests: list, erp, own_fields: Optional[set] = None) -> list[dict]:
     """Behavioural tests from the tester agent. Each inserts a throwaway document and removes it again."""
     results = []
     for t in tests[:12]:
@@ -135,8 +181,9 @@ def run_tests(tests: list, erp) -> list[dict]:
             res["detail"] = "malformed test"
             results.append(res)
             continue
-        created = None
+        created, made = None, []
         try:
+            vals = autofill(erp, dt, vals, own_fields or set(), made)
             created = erp.insert(dt, {"doctype": dt, **vals})
             if kind == "insert_expect_ok":
                 res["status"], res["detail"] = "pass", "document saved as expected"
@@ -167,5 +214,10 @@ def run_tests(tests: list, erp) -> list[dict]:
                     erp.delete(dt, created["name"])
                 except Exception:  # noqa: BLE001
                     res["detail"] += " (cleanup failed)"
+            for mdt, mname in made:
+                try:
+                    erp.delete(mdt, mname)
+                except Exception:  # noqa: BLE001
+                    pass
         results.append(res)
     return results

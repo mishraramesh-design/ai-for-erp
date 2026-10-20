@@ -77,3 +77,26 @@ def test_splice_keeps_the_rest_of_hooks():
     out = splice_hooks(HOOKS, f"{BLOCK_START}\nfixtures = [1]\n{BLOCK_END}")
     assert out.startswith('app_name = "csd_customizations"') and "fixtures = [1]" in out and out.count(BLOCK_START) == 1
     assert "GENERATED" in splice_hooks("x = 1\n", f"{BLOCK_START}\n{BLOCK_END}")
+
+
+def test_autofill_fills_other_changes_mandatory_fields_but_not_own():
+    from studio.verify import autofill
+
+    class E:
+        def get_meta(self, dt):
+            return {"fields": [
+                {"fieldname": "supplier_name", "fieldtype": "Data", "reqd": 1},
+                {"fieldname": "primary_contact", "fieldtype": "Link", "options": "Contact", "reqd": 1},
+                {"fieldname": "custom_risk", "fieldtype": "Select", "options": "Low\nHigh", "reqd": 1},
+                {"fieldname": "kind", "fieldtype": "Select", "options": "\nA\nB", "reqd": 1}]}
+
+        def list_docs(self, dt, fields=None, filters=None, limit=0):
+            return []
+
+        def insert(self, dt, data):
+            return {"name": "C-1"}
+
+    made = []
+    out = autofill(E(), "Supplier", {"supplier_name": "X"}, {"custom_risk"}, made)
+    assert out["supplier_name"] == "X" and out["primary_contact"] == "C-1" and out["kind"] == "A"
+    assert "custom_risk" not in out and made == [("Contact", "C-1")]
