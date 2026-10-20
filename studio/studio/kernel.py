@@ -43,6 +43,7 @@ class Policy:
     use_tester: bool = True
     auto_low: bool = True
     auto_medium: bool = True      # high risk (permissions, workflows) is ALWAYS held for a person
+    analyze_only: bool = False    # classify and stop: no plan, no change (cheap survey of a whole module)
 
     @classmethod
     def from_dict(cls, d: Optional[dict]) -> "Policy":
@@ -201,7 +202,8 @@ class Kernel:
                                    "approach": {}, "cs_id": "", "attempt": 0, "closed": False, "outcome": ""}
                 run.tasks.append(Task(f"{gid}.triage", "triage", gid))
                 run.tasks.append(Task(f"{gid}.analyze", "analyze", gid, deps=[f"{gid}.triage"]))
-                run.tasks.extend(self._chain(gid, 0, [f"{gid}.analyze"]))
+                if not pol.analyze_only:
+                    run.tasks.extend(self._chain(gid, 0, [f"{gid}.analyze"]))
         self._runs[run.id] = run
         self._log(run, "-", "info", f"Run started: {len(reqs)} requirement(s) in {n} group(s).")
         self._launch(run)
@@ -463,7 +465,13 @@ class Kernel:
             else:
                 keep.append(r)
                 g["approach"][str(r.id)] = a["approach"]
+                if run.policy.analyze_only:
+                    d.reqs.mark([r.id], "backlog", note=f"Analysed ({a['class']}): {a['approach'] or a['reason']}"[:300])
         g["ids"] = [r.id for r in keep]
+        if run.policy.analyze_only:
+            self._log(run, t.id, "ok", "Analyst: " + ", ".join(f"{v} {k}" for k, v in sorted(counts.items())) + " (analysis only, nothing built)", tier="model")
+            self._close(run, t.group, "analysed")
+            return Outcome("done", f"{len(keep)} to build", {"classes": counts})
         self._log(run, t.id, "ok", "Analyst: " + ", ".join(f"{v} {k}" for k, v in sorted(counts.items())), tier="model")
         if not keep:
             self._close(run, t.group, "nothing to build")
