@@ -3,6 +3,9 @@
 The Studio signs in as a dedicated service user so every change shows 'Studio Agent' in the audit trail.
 `ensure_service_user()` creates it (idempotent) and issues a fresh API key and secret.
 """
+import json
+import os
+
 import frappe
 
 SERVICE_USER = "studio.agent@example.com"
@@ -29,3 +32,21 @@ def ensure_service_user() -> tuple[str, str]:
     secret = generate_keys(SERVICE_USER)["api_secret"]
     frappe.db.commit()
     return frappe.db.get_value("User", SERVICE_USER, "api_key"), secret
+
+
+def ensure_server_scripts() -> bool:
+    """Frappe v15 reads `server_script_enabled` only from common_site_config.json. Turn it on (development sites only).
+
+    Returns True when the file had to be changed."""
+    path = os.path.join(frappe.local.sites_path, "common_site_config.json")
+    try:
+        with open(path) as f:
+            cfg = json.load(f)
+    except (OSError, ValueError):
+        cfg = {}
+    if cfg.get("server_script_enabled") is True:
+        return False
+    cfg["server_script_enabled"] = True
+    with open(path, "w") as f:
+        json.dump(cfg, f, indent=1)
+    return True

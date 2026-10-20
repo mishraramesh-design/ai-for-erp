@@ -87,7 +87,7 @@ def prepare(cfg: dict, step: Step, client: httpx.Client | None = None, wait_s: i
         step("service", "fail", note)
         raise RuntimeError("service user failed")
     svc = r.json()["message"]
-    step("service", "ok", svc["user"])
+    step("service", "ok", svc["user"] + (" · Server Scripts switched on" if svc.get("server_scripts_enabled_now") else ""))
 
     step("verify", "run", "")
     try:
