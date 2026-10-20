@@ -36,6 +36,7 @@ Rules:
  - Use ONLY DocTypes, fields and roles that appear in the context below, or ones you create in the same ops list (create_role before use).
  - Prefer the smallest change. Prefer configuration (set_property, set_setting, custom field) over scripts; prefer standard ERPNext features over new DocTypes.
  - Never invent a field of a standard DocType; if you need it, add a custom field.
+ - If a requirement says a value must be recorded/captured/mandatory, set reqd=true on that field. A conditional rule (mandatory only when X) needs BOTH mandatory_depends_on AND a server validation, because the API does not enforce mandatory_depends_on.
  - Workflows: the first state must have doc_status 0; submitted states doc_status 1; only for submittable DocTypes use 1/2.
  - If a requirement needs something the ops cannot express (integrations, reports, print formats, dashboards, mobile, external systems, data migration, UI beyond forms), do NOT fake it: put its id in not_covered with a one-line reason.
  - If a decision is genuinely ambiguous, state your assumption in "assumptions" (do not block); only use "questions" if you cannot proceed.
