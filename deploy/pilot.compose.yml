@@ -108,7 +108,7 @@ services:
           bench --site "$$SITE_NAME" migrate
         fi
         bench --site "$$SITE_NAME" set-config developer_mode 1
-        bench --site "$$SITE_NAME" set-config server_script_enabled true
+        bench set-config -g server_script_enabled true
         bench --site "$$SITE_NAME" set-config allow_embedding true
 
   backend:
