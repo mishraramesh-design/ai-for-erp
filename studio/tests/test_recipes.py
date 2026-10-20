@@ -96,3 +96,9 @@ def test_normalize_ops_repairs_common_model_slips():
     prop = LlmProposal.model_validate({"ops": normalize_ops(raw)})
     assert [o.op for o in prop.ops] == ["create_role", "create_notification", "create_notification"]
     assert prop.ops[1].value_changed == "disabled" and prop.ops[2].days == 3
+
+
+def test_administrator_role_cannot_be_granted():
+    ops = [{"op": "create_doctype", "name": "Zed Doc", "fields": [{"fieldname": "title", "label": "Title", "fieldtype": "Data"}],
+            "permissions": [{"role": "Administrator", "read": True}]}]
+    assert "perm_system_role" in codes(ops)

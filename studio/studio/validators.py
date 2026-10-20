@@ -292,6 +292,8 @@ def validate(cs: ChangeSet, snap) -> list:
             if not op.is_child_table and not op.permissions:
                 add("error", "no_permissions", f'"{op.name}" has no role permissions; nobody could open it.', i)
             for p in op.permissions:
+                if p.role in ("Administrator", "Guest", "All"):
+                    add("error", "perm_system_role", f'Role "{p.role}" cannot be granted on a custom DocType; use System Manager, a business role, or a role you create.', i)
                 if not ctx.role_exists(p.role):
                     add("error", "role_missing", f'Role "{p.role}" does not exist.' + _close(p.role, snap.roles()), i)
             ctx.planned_doctypes[op.name] = {"child": op.is_child_table, "fields": seen | {"name"},
@@ -399,6 +401,8 @@ def validate(cs: ChangeSet, snap) -> list:
             if not snap.has_doctype(op.doctype):
                 add("error", "doctype_missing", f'DocType "{op.doctype}" does not exist.' + _close(op.doctype, snap.doctypes()), i)
                 continue
+            if op.role == "Administrator":
+                add("error", "perm_system_role", 'Role "Administrator" cannot be granted permissions; use System Manager or a business role.', i)
             if not ctx.role_exists(op.role):
                 add("error", "role_missing", f'Role "{op.role}" does not exist.' + _close(op.role, snap.roles()), i)
             if not 0 <= op.permlevel <= 9:
