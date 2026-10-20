@@ -147,7 +147,10 @@ def _run(llm, system: str, user: str, snap, source: str, message: str, created_b
         if not has_errors(issues):
             break
         prompt = (f"{user}\n\nYOUR PREVIOUS ANSWER FAILED VALIDATION. Fix these errors and return the full corrected JSON:\n"
-                  f"{_issues_text(issues)}\nPREVIOUS OPS:\n{json.dumps(raw.get('ops'), ensure_ascii=False)[:6000]}")
+                  f"{_issues_text(issues)}\nHOW TO FIX: a missing role -> add a create_role op BEFORE it is used (or use an existing role named in the error); "
+                  "an unknown field -> add an add_custom_field op first or use a field that exists; imports/regex in a server script -> remove them; "
+                  "keep everything else in the plan unchanged.\n"
+                  f"PREVIOUS OPS:\n{json.dumps(raw.get('ops'), ensure_ascii=False)[:24000]}")
     if cs is None:
         res.reply = res.reply or "I could not produce a valid change."
         return res
