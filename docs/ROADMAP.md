@@ -7,6 +7,14 @@
 - [ ] Recipe library: notification, number card, dashboard chart, report, web form, SLA and more (9 ops exist today)
 - [x] One-server compose (Studio + dev ERPNext) and Prepare site (wizard, service user) over ERPNext's own API; no SSH or Docker socket
 - [ ] Agents, model router, decision gateway, prompt registry, Langflow adapter
-- [ ] Exporter: customization app and pull request
+- [x] Exporter: ledger to csd_customizations fixtures, studio_apply, manifest, traceability; zip download; GitHub pull request; drift check (round trip proven on a real ERPNext)
 - [x] Studio shell: login, Models, ERPNext, Workbench preview (scripted)
 - [ ] Studio Workbench wired to the kernel
+
+## After the first demo
+- [ ] Pluggable delivery (publisher setting): zip (done), GitHub (done), GitLab / Bitbucket / Azure DevOps merge requests,
+      generic git push over HTTPS or SSH deploy key to any remote, write to a mounted folder or share. Kernel and export content unchanged.
+- [ ] Recipe library: notification, report, number card, dashboard chart, print format, web form, SLA, scheduled job
+- [ ] Decision gateway, prompt registry with golden-set gate, Langflow adapter
+- [ ] Workbench wired to the kernel; reviewer scope control; stronger tester
+- [ ] Cost and speed: smaller context, parallel steps; production hardening and operator guide
