@@ -21,3 +21,9 @@ def test_cannot_make_an_autofilled_field_mandatory():
     cs = ChangeSet(ops=[{"op": "set_property", "doctype": "Supplier", "fieldname": "supplier_primary_contact", "property": "reqd", "value": True}])
     codes = [getattr(i, "code", None) or i.get("code") for i in validate(cs, snap)]
     assert "reqd_autofilled" in codes
+
+
+def test_top_level_return_is_rejected_but_return_in_def_is_fine():
+    from studio.validators import check_python
+    assert any(c == "py_top_return" for _, c, _ in check_python("if doc.a:\n    return\nfrappe.throw('x')", None, False))
+    assert not any(c == "py_top_return" for _, c, _ in check_python("def ok(v):\n    return v\nif ok(doc.a):\n    frappe.throw('x')", None, False))

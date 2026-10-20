@@ -158,6 +158,19 @@ def check_python(script: str, doc_fields: Optional[set], doc_ok: bool) -> list:
     except SyntaxError as e:
         return [("error", "python_syntax", f"Python syntax error at line {e.lineno}: {e.msg}")]
     call_funcs = {id(n.func) for n in ast.walk(tree) if isinstance(n, ast.Call)}
+
+    def top_level_return(node, in_func=False) -> bool:
+        for ch in ast.iter_child_nodes(node):
+            if isinstance(ch, ast.Return) and not in_func:
+                return True
+            if isinstance(ch, (ast.Lambda,)):
+                continue
+            if top_level_return(ch, in_func or isinstance(ch, (ast.FunctionDef, ast.AsyncFunctionDef))):
+                return True
+        return False
+
+    if top_level_return(tree):
+        found.append(("error", "py_top_return", "`return` is not allowed outside a function in a Server Script; use if/else, or put the logic in a def."))
     for n in ast.walk(tree):
         if isinstance(n, (ast.Import, ast.ImportFrom)):
             found.append(("error", "py_import", "Imports are not allowed in Server Scripts; use the `frappe` object."))
