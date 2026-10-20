@@ -1,0 +1,15 @@
+# The Studio on your server. One container, one published port, one named volume.
+name: studio
+services:
+  studio:
+    image: ${DOCKERHUB_NAMESPACE}/ai-for-erp:${STUDIO_TAG:-studio-latest}
+    env_file: .env
+    environment:
+      STUDIO_DATA_DIR: /data
+    ports:
+      - "${STUDIO_PORT:-18100}:8100"
+    volumes:
+      - studio-data:/data
+    restart: unless-stopped
+volumes:
+  studio-data:

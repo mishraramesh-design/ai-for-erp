@@ -1,0 +1,10 @@
+[project]
+name = "studio_bridge"
+version = "0.2.0"
+description = "Provisioning helpers for the ERPNext Studio (development sites only)"
+requires-python = ">=3.10"
+dependencies = []
+
+[build-system]
+requires = ["flit_core >=3.4,<4"]
+build-backend = "flit_core.buildapi"

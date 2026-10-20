@@ -1,0 +1,14 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+.env
+*.env
+.venv/
+node_modules/
+# RFP source material and generated outputs never go into git
+*.xlsx
+*.xls
+*.docx
+requirements-private/
+data/
+deploy-report.txt
