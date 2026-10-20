@@ -313,6 +313,11 @@ def validate(cs: ChangeSet, snap) -> list:
                 continue
             if op.fieldname and op.fieldname not in ctx.fields(op.doctype):
                 add("error", "field_missing", f'{op.doctype} has no field "{op.fieldname}".' + _close(op.fieldname, ctx.fields(op.doctype)), i)
+            if op.property == "reqd" and op.fieldname and _norm_check_value(op.value) == "1":
+                mf = next((f for f in ((snap.meta(op.doctype) or {}).get("fields") or []) if f.get("fieldname") == op.fieldname), None)
+                if mf and (mf.get("read_only") or mf.get("fieldname", "").endswith("_primary_contact") or mf.get("fieldname") in ("primary_address", "naming_series")):
+                    add("error", "reqd_autofilled", f'"{op.fieldname}" is filled in by ERPNext itself (read-only), so making it mandatory would stop '
+                        f'anyone creating a {op.doctype}. Add your own custom field for this requirement instead.', i)
             if PROPERTY_TYPES[op.property] == "Check" and _norm_check_value(op.value) is None:
                 add("error", "property_value", f"{op.property} must be true/false (1/0).", i)
             if not op.fieldname and op.property not in ("label", "description"):
