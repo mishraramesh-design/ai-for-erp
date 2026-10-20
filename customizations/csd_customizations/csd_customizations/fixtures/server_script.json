@@ -1,0 +1,20 @@
+[
+ {
+  "disabled": 0,
+  "doctype": "Server Script",
+  "doctype_event": "Before Save",
+  "name": "Supplier - validate_risk_review_date_when_high",
+  "reference_doctype": "Supplier",
+  "script": "HIGH = 'High'\n\nif doc.get('custom_risk_rating') == HIGH and not doc.get('custom_risk_review_date'):\n    frappe.throw('Risk Review Date is required when Vendor Risk Rating is High.')\n",
+  "script_type": "DocType Event"
+ },
+ {
+  "disabled": 0,
+  "doctype": "Server Script",
+  "doctype_event": "Before Save",
+  "name": "Supplier - Validate UPI ID when method is UPI",
+  "reference_doctype": "Supplier",
+  "script": "UPI_METHOD = 'UPI'\n\nupi_needed = doc.get('custom_preferred_payment_method') == UPI_METHOD\nupi = doc.get('custom_upi_id')\n\nif upi_needed and (not upi or not upi.strip()):\n    frappe.throw('UPI ID is required when Preferred Payment Method is UPI.')\n",
+  "script_type": "DocType Event"
+ }
+]
