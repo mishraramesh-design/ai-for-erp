@@ -228,6 +228,21 @@ def create_app(data_dir: str | None = None) -> FastAPI:
         return {"version": VERSION, "llm": router.enabled("developer"), "requirements": len(reqs.all()),
                 "erp": bool(doc.get("erp", {}).get("api_key"))}
 
+    @app.get("/api/overview")
+    def overview(_: str = Depends(authed)) -> dict:
+        st = reqs.stats()
+        sets = ledger.list(limit=5000)
+        applied = [c for c in sets if c.status == "applied"]
+        verified = [r for r in reqs.all() if r.status == "verified"]
+        runs = kernel.store.list_ids()
+        return {"totals": st["totals"], "modules": st["modules"][:12],
+                "change_sets": {"total": len(sets), "applied": len(applied),
+                                "undone": sum(1 for c in sets if c.status == "undone")},
+                "usage": usage.summary()["total"], "by_role": usage.summary()["by_role"],
+                "verified": [{"id": r.id, "text": r.text[:160], "module": r.module, "evidence": len(r.evidence)} for r in verified[-8:]],
+                "decisions": {"auto": sum(1 for c in applied if c.risk() != "high"), "human": sum(1 for c in applied if c.risk() == "high")},
+                "runs": len(runs)}
+
     # ---- requirements
     @app.get("/api/requirements/stats")
     def req_stats(_: str = Depends(authed)) -> dict:

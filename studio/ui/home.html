@@ -54,6 +54,19 @@ const tag=(s,c)=>`<span class="tag ${c??STAT[s]??''}">${esc(String(s).replace('_
 
 /* ---------------------------------------------------------------- overview */
 V.overview=async()=>{const s=await api('/api/status');$('#ver').textContent='v'+s.version;
+ if(s.llm&&s.erp&&s.requirements>0){const o=await api('/api/overview');const t=o.totals||{},u=o.usage||{},n=k=>(t[k]||0).toLocaleString();
+  const tile=(v,l,c)=>`<div class="card" style="flex:1;min-width:130px;text-align:center"><div style="font-size:28px;font-weight:700;${c?'color:var(--'+c+')':''}">${v}</div><div class="muted">${l}</div></div>`;
+  const mods=(o.modules||[]).filter(m=>m.gap).map(m=>{const done=m.verified+m.built+m.standard,pc=Math.round(100*done/m.gap);return `<tr><td>${esc(m.module)}${m.poc?' <span class="chip">PoC</span>':''}</td><td style="width:42%"><div style="background:var(--surface2);border-radius:6px;height:10px"><div style="width:${pc}%;background:var(--accent);height:10px;border-radius:6px"></div></div></td><td class="muted">${done}/${m.gap} gaps</td></tr>`}).join('');
+  const ver=(o.verified||[]).map(r=>`<tr><td>${r.id}</td><td>${esc(r.text)}</td><td>${tag('verified')} <span class="muted">${r.evidence} checks</span></td></tr>`).join('');
+  const roles=Object.entries(o.by_role||{}).map(([k,v])=>`<tr><td>${esc(k)}</td><td>${v.calls} calls</td><td class="muted">${(v.tokens_in+v.tokens_out).toLocaleString()} tokens</td></tr>`).join('');
+  return `<h2>Overview</h2><p class="sub">Where the programme stands, from your real requirement register and change history.</p>
+  <div class="row" style="flex-wrap:wrap;align-items:stretch">${tile(n('total'),'requirements')}${tile(n('gap'),'gaps to close')}${tile(n('verified'),'verified','ok')}${tile(n('built'),'built, to check')}${tile(n('standard'),'already standard')}${tile(n('needs_input'),'need your input','hold')}</div>
+  <div class="card"><b>Progress by module</b><table>${mods||'<tr><td class="muted">no gaps yet</td></tr>'}</table></div>
+  <div class="row" style="align-items:stretch;flex-wrap:wrap">
+  <div class="card" style="flex:1;min-width:260px"><b>Changes on the development site</b><div style="margin-top:6px"><span class="chip">${o.change_sets.applied} applied</span> <span class="chip">${o.change_sets.undone} undone</span> <span class="chip">${o.runs} runs</span></div><div class="muted" style="margin-top:6px">${o.decisions.auto} applied automatically by policy, ${o.decisions.human} approved by a person.</div>
+  <div class="row"><button class="p" onclick="go('export')">Export to your app</button></div></div>
+  <div class="card" style="flex:1;min-width:260px"><b>Model usage</b><div class="muted" style="margin-top:6px">${(u.calls||0)} calls · ${((u.tokens_in||0)+(u.tokens_out||0)).toLocaleString()} tokens${u.cost?` · $${u.cost}`:''}</div><table>${roles}</table></div></div>
+  <div class="card"><b>Recently verified</b><table>${ver||'<tr><td class="muted">nothing verified yet</td></tr>'}</table></div>`}
  const step=(ok,t,d,go)=>`<div class="card"><span class="tag ${ok?'ok':'hold'}">${ok?'done':'to do'}</span> <b>${t}</b><div class="muted">${d}</div>${ok?'':`<div class="row"><button class="p" onclick="go('${go}')">Set up</button></div>`}</div>`;
  return `<h2>Welcome</h2><p class="sub">From requirements to a verified change on your development ERPNext, with approvals where it matters.</p>
  ${step(s.llm,'1 · Connect a model','Add your API key, a cheap model and a stronger one.','models')}
