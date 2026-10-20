@@ -193,7 +193,9 @@ V.run.after=(id)=>{
 
 /* ---------------------------------------------------------------- export */
 let XP={pr:null,drift:null,msg:''};
-V.export=async()=>{const [e,g]=await Promise.all([api('/api/export'),api('/api/github')]);
+V.export=async()=>{const [e,g,bt]=await Promise.all([api('/api/export'),api('/api/github'),api('/api/requirements/built')]);
+ const bl=(bt.items||[]);
+ const so=bl.length?`<div class="card"><b>${bl.length} requirement(s) are built but not yet signed off</b> <span class="muted">· applied and read back from the site; a person confirms they do what the requirement asks. Only signed-off work is exported.</span><ul>${bl.slice(0,30).map(r=>`<li>${r.id} · ${esc(r.text)}${r.notes?` <span class="muted">· ${esc(r.notes)}</span>`:''}</li>`).join('')}</ul><div class="row"><button class="p" id="sgn">Sign off all ${bl.length}</button></div></div>`:'';
  const cnt=Object.entries(e.counts||{}).map(([k,v])=>`<span class="chip">${esc(k)} ${v}</span>`).join(' ')||'<span class="muted">nothing yet</span>';
  const items=(e.items||[]).map(i=>`<div class="card"><b>${esc(i.title||i.id)}</b> ${tag(i.risk,i.risk==='high'?'bad':i.risk==='medium'?'hold':'ok')} <span class="muted">requirements ${esc((i.requirements||[]).join(', '))}</span><ul>${(i.lines||[]).map(l=>`<li>${esc(l)}</li>`).join('')}</ul></div>`).join('');
  const sk=(e.skipped||[]).map(x=>`<li>${esc(x.title||x.id)} <span class="muted">· ${esc(x.reason)}</span></li>`).join('');
@@ -205,12 +207,13 @@ V.export=async()=>{const [e,g]=await Promise.all([api('/api/export'),api('/api/g
   <div class="card"><b>What will ship</b> <span class="muted">${(e.change_sets||[]).length} verified change set(s)</span><div style="margin-top:8px">${cnt}</div>
    ${sk?`<div class="muted" style="margin-top:8px">Left out:<ul>${sk}</ul></div>`:''}
    <div class="row"><button class="p" id="xpub" ${(e.change_sets||[]).length&&g.token_set&&g.repo?'':'disabled'}>Publish pull request</button><a class="btn" href="/api/export/bundle">Download zip</a><button id="xdr">Check drift</button><span id="xmsg" class="muted">${esc(XP.msg)}</span></div></div>
-  ${pr}${dr}${items}
+  ${so}${pr}${dr}${items}
   <div class="card"><b>GitHub</b><span class="muted"> · a fine-grained token with Contents and Pull requests (write) on this one repository</span><div class="grid">
    <div><label>Repository</label><input id="gr" placeholder="owner/name" value="${esc(g.repo)}"></div><div><label>Base branch</label><input id="gb" value="${esc(g.base||'main')}"></div>
    <div><label>Token ${g.token_set?'(saved, leave empty to keep)':''}</label><input id="gt" type="password" autocomplete="off"></div></div>
    <div class="row"><button id="gs">Save</button><button id="gtst">Test connection</button><span id="gmsg" class="muted"></span></div></div>`};
 V.export.after=()=>{const m=t=>$('#xmsg').textContent=t;
+ const sg=$('#sgn');if(sg)sg.onclick=async()=>{sg.disabled=true;await api('/api/requirements/signoff',{method:'POST',body:{}});go('export')};
  $('#gs').onclick=async()=>{const r=await api('/api/github',{method:'PUT',body:{repo:$('#gr').value,base:$('#gb').value,token:$('#gt').value}});$('#gmsg').textContent=r.detail||'Saved';go('export')};
  $('#gtst').onclick=async()=>{const r=await api('/api/github/test',{method:'POST',body:{}});$('#gmsg').innerHTML=r.detail?`<span class="bad">${esc(r.detail)}</span>`:`<span class="ok">Connected to ${esc(r.repo)}${r.can_push?'':' (no push access!)'}</span>`};
  $('#xdr').onclick=async()=>{m('Checking…');const r=await api('/api/export/drift');if(r.detail){m(r.detail);return}XP.drift=r;go('export')};

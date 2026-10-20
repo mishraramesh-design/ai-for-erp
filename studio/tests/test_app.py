@@ -130,3 +130,24 @@ def test_export_endpoints_and_token_never_returned(client, tmp_path):
     assert any(n.endswith("studio_manifest.json") for n in z.namelist())
     assert client.post("/api/export/publish", json={}).status_code == 409  # nothing verified yet
     assert client.get("/api/export").status_code == 200
+
+
+def test_signoff_turns_built_into_verified(tmp_path, monkeypatch):
+    monkeypatch.setenv("STUDIO_ADMIN_PASSWORD", "pw123")
+    app = create_app(str(tmp_path))
+    c = TestClient(app)
+    login(c)
+    c.post("/api/requirements/import", files={"file": ("fr.txt", b"1. Record the date of every supplier site visit.\n2. Block POs above the limit.", "text/plain")},
+           data={"module": "SRM"})
+    ids = [i["id"] for i in c.get("/api/requirements?module=SRM").json()["items"]]
+    # reach into the store the app uses: mark one as built
+    from studio.requirements import RequirementStore
+    store = RequirementStore(tmp_path / "requirements.json") if (tmp_path / "requirements.json").exists() else None
+    assert store is not None
+    store.mark([ids[0]], "built", "cs1")
+    c2 = TestClient(create_app(str(tmp_path)))
+    login(c2)
+    assert [r["id"] for r in c2.get("/api/requirements/built").json()["items"]] == [ids[0]]
+    assert c2.post("/api/requirements/signoff", json={}).json()["signed_off"] == [ids[0]]
+    assert c2.get("/api/requirements/built").json()["items"] == []
+    assert c2.get(f"/api/requirements?ids={ids[0]}").json()["items"][0]["status"] == "verified"

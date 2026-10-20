@@ -258,6 +258,22 @@ def create_app(data_dir: str | None = None) -> FastAPI:
             return {"total": len(items), "items": [r.model_dump(mode="json") for r in items if r]}
         return reqs.query(module=module, gap_only=gap, status=status, q=q, limit=min(limit, 200), offset=offset)
 
+    class SignoffIn(BaseModel):
+        ids: list[int] = []
+        module: str = ""
+
+    @app.get("/api/requirements/built")
+    def req_built(module: str = "", _: str = Depends(authed)) -> dict:
+        items = [r for r in reqs.all() if r.status == "built" and (not module or r.module == module)]
+        return {"items": [{"id": r.id, "text": r.text[:160], "module": r.module, "notes": r.notes[:200]} for r in items]}
+
+    @app.post("/api/requirements/signoff")
+    def req_signoff(body: SignoffIn, user: str = Depends(authed)) -> dict:
+        """A person confirms that a built requirement works as intended: it becomes verified and may be exported."""
+        want = [r for r in reqs.all() if r.status == "built" and (r.id in body.ids if body.ids else (not body.module or r.module == body.module))]
+        reqs.mark([r.id for r in want], "verified", by=f"signed off by {user}", note="Signed off by a person after review.")
+        return {"signed_off": [r.id for r in want]}
+
     @app.post("/api/requirements/import")
     async def req_import(file: UploadFile = File(...), module: str = Form(""), _: str = Depends(authed)) -> dict:
         data = await file.read()
