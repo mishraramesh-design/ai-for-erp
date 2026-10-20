@@ -23,9 +23,12 @@ def provision():
         user = frappe.get_doc({"doctype": "User", "email": SERVICE_USER, "first_name": "Studio Agent",
                                "send_welcome_email": 0, "user_type": "System User", "enabled": 1})
         user.insert(ignore_permissions=True)
+    # Development site only: the service user holds every assignable role so it can test the behaviour it builds
+    # (insert test records, read new tables). Roles the Studio creates later are granted to it by the applier.
+    auto = {"Guest", "All", "Administrator", "Desk User"}
     have = {r.role for r in user.roles}
-    for role in ("System Manager",):  # the applier creates DocTypes, fields, scripts and workflows
-        if role not in have:
+    for role in frappe.get_all("Role", pluck="name"):
+        if role not in auto and role not in have:
             user.append("roles", {"role": role})
     user.api_key = key
     user.api_secret = secret

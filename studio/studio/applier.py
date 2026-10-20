@@ -73,6 +73,7 @@ class Applier:
             else:
                 doc = self.erp.insert("Role", {"doctype": "Role", "role_name": op.role_name, "desk_access": 1})
                 step["created"].append(["Role", doc.get("name") or op.role_name])
+                self._grant_to_self(op.role_name, step)
         elif t == "add_permission":
             self.erp.call_method(f"{PM}.add", {"parent": op.doctype, "role": op.role, "permlevel": op.permlevel})
             for r in RIGHTS:
@@ -97,6 +98,22 @@ class Applier:
         else:  # pragma: no cover - the discriminated union makes this unreachable
             raise ValueError(f"unknown operation {t}")
         return step
+
+    def _grant_to_self(self, role: str, step: dict) -> None:
+        """Give a newly created role to the service user so the Studio can read and test what it builds.
+        Undo restores the user's previous roles before the role is deleted."""
+        try:
+            me = self.erp.call_method("frappe.auth.get_logged_user", {})
+            user = self.erp.get_doc("User", me) if me else None
+            if not user:
+                return
+            before = [{"role": r["role"]} for r in user.get("roles", [])]
+            if role in {r["role"] for r in before}:
+                return
+            self.erp.update("User", me, {"roles": before + [{"role": role}]})
+            step["updated"].append(["User", me, {"roles": before}])
+        except Exception as e:  # noqa: BLE001 - not fatal: the change itself succeeded
+            step["note"] = f"role created, but could not be granted to the Studio user ({e})"
 
     def _set_property(self, op, step: dict) -> None:
         filters = [["doc_type", "=", op.doctype], ["property", "=", op.property]]
