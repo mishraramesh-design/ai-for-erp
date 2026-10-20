@@ -160,6 +160,9 @@ def check_python(script: str, doc_fields: Optional[set], doc_ok: bool) -> list:
             found.append(("error", "py_import", "Imports are not allowed in Server Scripts; use the `frappe` object."))
         elif isinstance(n, ast.Name) and n.id in FORBIDDEN_PY_NAMES:
             found.append(("error", "py_forbidden_name", f"`{n.id}` is not allowed in Server Scripts (restricted Python: no getattr/setattr/import/exec; read fields as doc.fieldname or doc.get('fieldname'))."))
+        elif (isinstance(n, ast.Name) and n.id.startswith("_")) or (isinstance(n, (ast.FunctionDef, ast.arg)) and (n.name if isinstance(n, ast.FunctionDef) else n.arg).startswith("_")):
+            nm = n.id if isinstance(n, ast.Name) else (n.name if isinstance(n, ast.FunctionDef) else n.arg)
+            found.append(("error", "py_underscore_name", f"Name `{nm}` starts with an underscore, which the Server Script sandbox rejects; rename it without the leading underscore."))
         elif isinstance(n, ast.Attribute) and n.attr.startswith("_"):
             found.append(("error", "py_underscore_attr", f"Attribute `{n.attr}` starts with an underscore, which the sandbox blocks."))
         elif isinstance(n, ast.While):
