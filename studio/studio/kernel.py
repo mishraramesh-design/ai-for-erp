@@ -175,7 +175,14 @@ class Kernel:
     def start(self, project: str, ids: list, policy: Optional[dict] = None, guidance: str = "", title: str = "") -> Run:
         deps = self.deps_factory()
         pol = Policy.from_dict(policy)
-        reqs = [r for r in (deps.reqs.get(i) for i in ids) if r and r.status in ("backlog", "blocked", "needs_input")]
+        def stale_plan(r) -> bool:  # planned by a cancelled/abandoned run, never applied
+            if r.status != "planned":
+                return False
+            if any(x.status in ("queued", "running", "waiting_approval") and r.id in sum((g["ids"] for g in x.groups.values()), [])
+                   for x in self._runs.values()):
+                return False
+            return not any((deps.ledger.get(c) is not None and deps.ledger.get(c).status in ("applied", "applying")) for c in r.change_sets)
+        reqs = [r for r in (deps.reqs.get(i) for i in ids) if r and (r.status in ("backlog", "blocked", "needs_input") or stale_plan(r))]
         if not reqs:
             raise ValueError("None of these requirements is waiting to be built (they may already be planned, built or verified).")
         run = Run(uuid.uuid4().hex[:12], project, title or f"Build {len(reqs)} requirement(s)", pol)
