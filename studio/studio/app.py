@@ -5,6 +5,7 @@ import os
 import threading
 import time
 from pathlib import Path
+from typing import Optional
 
 import httpx
 from fastapi import Depends, FastAPI, HTTPException, Request, Response
@@ -311,7 +312,7 @@ def create_app(data_dir: str | None = None) -> FastAPI:
     app.state.kernel = kernel
 
     class RunIn(BaseModel):
-        ids: list[int] = []
+        ids: Optional[list[int]] = None
         module: str = ""
         branch: str = ""
         process: str = ""
@@ -323,6 +324,8 @@ def create_app(data_dir: str | None = None) -> FastAPI:
     def start_run(body: RunIn, _: str = Depends(authed)) -> dict:
         if not router.enabled("developer"):
             raise HTTPException(409, "Connect a model first (Models screen).")
+        if body.ids is not None and not body.ids:
+            raise HTTPException(400, "No requirements selected.")
         ids = body.ids or [r.id for r in reqs.batch(module=body.module, branch=body.branch, process=body.process,
                                                     limit=min(body.limit, 60))]
         try:

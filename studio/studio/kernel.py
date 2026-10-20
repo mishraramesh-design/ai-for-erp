@@ -489,6 +489,11 @@ class Kernel:
         cs = res.changeset
         if not cs or not cs.ops:
             reasons = {n.get("id"): n.get("reason", "") for n in (cs.not_covered if cs else [])}
+            if res.error and not cs:  # the model was unreachable or unusable: not the requirement's fault, keep it open
+                d.reqs.mark(g["ids"], "backlog", note=f"Model error, retry: {res.error}"[:300])
+                self._log(run, t.id, "warn", res.reply, tier="model")
+                self._close(run, t.group, "model error")
+                return Outcome("failed", f"model error: {res.error}"[:200], {})
             d.reqs.mark(g["ids"], "needs_input", note=(res.reply or "The model proposed nothing buildable.")[:300])
             self._log(run, t.id, "warn", res.reply or "No buildable operations.", tier="model")
             self._close(run, t.group, "nothing to build")
