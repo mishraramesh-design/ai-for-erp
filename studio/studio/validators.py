@@ -264,7 +264,13 @@ def validate(cs: ChangeSet, snap) -> list:
             if not DOCTYPE_RE.match(op.name) or op.name != op.name.strip():
                 add("error", "doctype_name", f'Invalid DocType name "{op.name}".', i)
             if ctx.doctype_exists(op.name):
-                add("error", "doctype_exists", f'DocType "{op.name}" already exists.', i)
+                live = snap.erp.get_doc("DocType", op.name) if op.name not in ctx.planned_doctypes else None
+                if op.rebuild and live and live.get("custom"):
+                    add("warning", "doctype_rebuild", f'Custom DocType "{op.name}" exists and will be rebuilt from this definition (undo restores it).', i)
+                elif op.rebuild:
+                    add("error", "doctype_rebuild", f'"{op.name}" is not an existing custom DocType, so it cannot be rebuilt.', i)
+                else:
+                    add("error", "doctype_exists", f'DocType "{op.name}" already exists. To rebuild a broken custom DocType set rebuild=true.', i)
             if op.module not in snap.modules() and op.module != "Custom":
                 add("error", "module_missing", f'Module "{op.module}" does not exist. Use "Custom" or an existing module.', i)
             if not op.fields:

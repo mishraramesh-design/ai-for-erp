@@ -83,8 +83,15 @@ class Applier:
                                                           "permlevel": op.permlevel, "ptype": r, "value": 1})
             step["perm"] = [op.doctype, op.role, op.permlevel]
         elif t == "create_doctype":
-            doc = self.erp.insert("DocType", doctype_payload(op))
-            step["created"].append(["DocType", doc.get("name") or op.name])
+            existing = self.erp.get_doc("DocType", op.name) if op.rebuild else None
+            if existing:
+                payload = doctype_payload(op)
+                step["updated"].append(["DocType", op.name, {k: existing.get(k) for k in ("fields", "permissions", "autoname", "istable", "is_submittable", "track_changes") if k in existing}])
+                self.erp.update("DocType", op.name, {k: v for k, v in payload.items() if k not in ("doctype", "name")})
+                step["note"] = "rebuilt existing DocType"
+            else:
+                doc = self.erp.insert("DocType", doctype_payload(op))
+                step["created"].append(["DocType", doc.get("name") or op.name])
         elif t == "create_workflow":
             for s in op.states:  # Workflow links need master records for every state and action
                 if not self.erp.get_doc("Workflow State", s.state):

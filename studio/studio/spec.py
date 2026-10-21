@@ -176,6 +176,7 @@ class CreateDocType(_Op):
     name_field: Optional[str] = None
     title_field: Optional[str] = None
     track_changes: bool = True
+    rebuild: bool = False  # rebuild an existing custom DocType of this name (also recreates a missing database table)
     fields: list[DocFieldSpec]
     permissions: list[PermSpec] = Field(default_factory=list)
 
