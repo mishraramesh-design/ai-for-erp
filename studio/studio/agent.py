@@ -82,12 +82,19 @@ def build_context(message: str, ctx: dict, snap, extra_doctypes: Optional[list] 
     for n in sorted(names, key=len, reverse=True):
         if len(n) > 4 and n.lower() in lower and n not in want:
             want.append(n)
-        if len(want) >= 4:
+        if len(want) >= 6:
             break
     for n in extra_doctypes or []:
         if n in names and n not in want and len(want) < 7:
             want.append(n)
     parts = ["DOCTYPE FIELDS (fieldname:type→link target):"] + [_fields_line(snap, n) for n in want]
+    facts = []
+    for n in want:
+        f = snap.site_facts(n) if hasattr(snap, "site_facts") else []
+        if f:
+            facts.append(f"{n} -> " + "; ".join(f))
+    if facts:
+        parts.append("ALREADY BUILT ON THESE DOCTYPES (reuse it; never add or create it again):\n" + "\n".join(facts))
     parts.append("CUSTOM DOCTYPES ALREADY CREATED: " + (", ".join(snap.custom_doctypes()[:60]) or "none"))
     parts.append("ROLES: " + ", ".join(sorted(snap.roles())[:150]))
     parts.append("MODULES: " + ", ".join(sorted(snap.modules())[:60]))
@@ -185,7 +192,7 @@ def plan_batch(reqs: list, snap, llm, guidance: str = "", created_by: str = "", 
     system = ("You are the ERPNext v15 solution engineer closing fit-gap items from an RFP. For each requirement below, decide what ERPNext "
               "configuration or customization (using ONLY the ops) would satisfy it, and combine them into one coherent change set. "
               "Be honest: list in not_covered anything the ops cannot do.\n" + SPEC_HELP)
-    mods = " ".join(r.text for r in reqs)
+    mods = " ".join(r.text for r in reqs) + " " + (guidance or "")
     user = (build_context(mods, {}, snap) + "\n\nREQUIREMENTS (the number in brackets is the id to use in covered / not_covered):\n"
             + "\n".join(_req_block(r, (hints or {}).get(r.id, "")) for r in reqs)
             + (f"\n\nPROJECT GUIDANCE FROM THE ARCHITECT:\n{guidance}" if guidance else "")

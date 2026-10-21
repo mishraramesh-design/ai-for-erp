@@ -18,3 +18,19 @@
 - [ ] Decision gateway, prompt registry with golden-set gate, Langflow adapter
 - [ ] Workbench wired to the kernel; reviewer scope control; stronger tester
 - [ ] Cost and speed: smaller context, parallel steps; production hardening and operator guide
+
+## Architecture: more deterministic strength, two modes per agent (decided 2026-10-21)
+Lesson from the SRM pilot: most failures were the model guessing about the live site, not weak models. The code takes more of the job.
+
+Done:
+- [x] Site-facts digest in every plan prompt (custom fields, workflow, scripts, notifications, reports, web forms already on the doctypes in play)
+- [x] Pre-flight health check: a plan on a doctype whose table is missing is refused; `create_doctype rebuild=true` repairs it
+- [x] Cost guards: output-token cap per run, stop on the same error twice (split first), repairs stay bounded
+- [x] Op library now 17: web form (login-only Supplier Portal pages) and DocType rebuild added
+
+Next:
+- [ ] Post-flight health sweep: after apply, read every touched doctype/workspace card and fail (and undo) on any broken one
+- [ ] Reusable, tested building blocks (declaration form, approval workflow, expiry alert, portal page) filled in by the model instead of written from scratch
+- [ ] Engine-written behavioural tests for server scripts and workflows (so items reach "verified", not just "built")
+- [ ] Two modes per agent. Build mode: change the dev site, test, export. Guide mode: a documenter agent turns the SAME tested change set into a step-by-step manual (screen, field, value, how to check), and the steps are replayed on a clean test site before the person gets them; both modes share one plan so they cannot drift apart
+- [ ] Documenter agent role and a Guide export per requirement (docx/markdown) in the traceability pack

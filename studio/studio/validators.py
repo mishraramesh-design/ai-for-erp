@@ -251,6 +251,14 @@ def validate(cs: ChangeSet, snap) -> list:
     def add(level, code, msg, i):
         issues.append(Issue(level, code, msg, i))
 
+    rebuilt = {o.name for o in cs.ops if o.op == "create_doctype" and getattr(o, "rebuild", False)}
+    broken_seen: set = set()
+    for i, op in enumerate(cs.ops):
+        dt0 = getattr(op, "doctype", None)
+        if dt0 and dt0 not in broken_seen and dt0 not in rebuilt and snap.has_doctype(dt0) and not snap.table_ok(dt0):
+            broken_seen.add(dt0)
+            add("error", "doctype_broken", f'The database table of "{dt0}" is missing, so nothing can be built on it. '
+                f'Rebuild it first with create_doctype (same name, rebuild=true) or leave it out of this plan.', i)
     for i, op in enumerate(cs.ops):
         t = op.op
         if t == "create_role":

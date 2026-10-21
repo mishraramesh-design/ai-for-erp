@@ -138,3 +138,26 @@ def test_web_form_validation_and_name():
     assert "web_title" in codes([{**base, "title": "Bad/Title!"}])
     assert "field_missing" in codes([{**base, "fields": [{"fieldname": "nope", "fieldtype": "Data"}]}])
     assert "web_column" in codes([{**base, "list_columns": ["supplier_group"]}])
+
+
+def test_broken_table_blocks_plans_unless_rebuilt():
+    from studio.erp import ErpError
+    erp = FakeErp()
+    real = erp.list_docs
+
+    def broken(doctype, fields=None, filters=None, limit=0):
+        if doctype == "Supplier":
+            raise ErpError(500, "Table 'tabSupplier' doesn't exist")
+        return real(doctype, fields, filters, limit)
+    erp.list_docs = broken
+    snap = Snapshot(erp, ttl=0)
+    ops = [{"op": "add_custom_field", "doctype": "Supplier", "fieldname": "custom_x", "label": "X", "fieldtype": "Data"}]
+    assert "doctype_broken" in [i.code for i in validate(ChangeSet(ops=ops), snap) if i.level == "error"]
+
+
+def test_site_facts_listed_in_planner_context():
+    from studio.agent import build_context
+    erp = FakeErp()
+    erp.docs[("Custom Field", "Supplier-custom_a")] = {"name": "Supplier-custom_a", "dt": "Supplier", "fieldname": "custom_a"}
+    ctx = build_context("update Supplier records", {}, Snapshot(erp, ttl=0))
+    assert "ALREADY BUILT" in ctx and "custom_a" in ctx

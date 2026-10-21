@@ -335,6 +335,7 @@ def create_app(data_dir: str | None = None) -> FastAPI:
         return Deps(reqs=reqs, ledger=ledger, erp=erp_cache["erp"], snap=erp_cache["snap"], applier=erp_cache["applier"],
                     llm_for=lambda role, run_id: router.for_role(role, project="default", run_id=run_id),
                     llm_calls=lambda rid: usage.summary(run_id=rid)["total"]["calls"],
+                    llm_tokens_out=lambda rid: usage.summary(run_id=rid)["total"].get("tokens_out", 0),
                     roles_enabled=router.enabled)
 
     kernel = Kernel(RunStore(Path(data) / "runs"), build_deps)

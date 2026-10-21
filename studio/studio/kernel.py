@@ -37,6 +37,7 @@ class Policy:
     batch_size: int = 8
     max_repairs: int = 2          # extra plan attempts after the first
     max_llm_calls: int = 80       # per run
+    max_tokens_out: int = 300000  # per run: output tokens (hidden thinking is billed as output); the real cost driver
     workers: int = 3
     use_analyst: bool = True
     use_reviewer: bool = True
@@ -161,6 +162,7 @@ class Deps:
     llm_for: Callable        # (role, run_id) -> object with complete_json / escalated / configured
     llm_calls: Callable      # (run_id) -> int
     roles_enabled: Callable  # (role) -> bool
+    llm_tokens_out: Optional[Callable] = None  # (run_id) -> int
 
 
 class Kernel:
@@ -420,6 +422,8 @@ class Kernel:
             return Outcome("skipped", "cancelled")
         if t.kind in ("analyze", "plan", "review") and deps.llm_calls(run.id) >= run.policy.max_llm_calls:
             raise LlmBudgetExceeded(f"this run's limit of {run.policy.max_llm_calls} model calls is used up")
+        if t.kind in ("analyze", "plan", "review") and deps.llm_tokens_out and deps.llm_tokens_out(run.id) >= run.policy.max_tokens_out:
+            raise LlmBudgetExceeded(f"this run's limit of {run.policy.max_tokens_out} output tokens is used up (cost guard)")
         return getattr(self, f"_x_{t.kind}")(run, t, g, deps)
 
     def _reqs(self, g: dict, deps: Deps) -> list:
@@ -640,7 +644,8 @@ class Kernel:
     def _repair(self, run: Run, t: Task, g: dict, feedback: str, why: str) -> Outcome:
         d = self._make_deps()
         ids = list(g["ids"])
-        if t.attempt >= run.policy.max_repairs and len(ids) > 1 and not g.get("split"):
+        same = bool(feedback) and g.get("feedback", "")[:300] == feedback[:300]
+        if (t.attempt >= run.policy.max_repairs or same) and len(ids) > 1 and not g.get("split"):
             # divide and conquer: one stubborn requirement must not sink its neighbours
             spawn = []
             for rid in ids:
@@ -659,6 +664,11 @@ class Kernel:
             self._close(run, t.group, "blocked", skip_after=t)
             self._log(run, t.id, "err", f"Giving up after {t.attempt + 1} attempt(s): {why}.")
             return Outcome("failed", f"{why}; out of retries")
+        if same:  # the same error twice: another try would only repeat it
+            d.reqs.mark(ids, "blocked", note=f"{why}; stuck on the same error twice: {feedback[:240]}")
+            self._close(run, t.group, "blocked", skip_after=t)
+            self._log(run, t.id, "err", f"Stopping: the same error came back ({why}). Not spending more model calls on it.")
+            return Outcome("failed", f"{why}; same error twice")
         g["feedback"] = feedback
         nxt = t.attempt + 1
         for x in run.tasks:

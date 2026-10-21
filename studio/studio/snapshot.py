@@ -20,6 +20,7 @@ class Snapshot:
         self._doctypes: Optional[dict] = None
         self._doctypes_at = 0.0
         self._metas: dict = {}
+        self._tables: dict = {}
         self._roles: Optional[set] = None
         self._roles_at = 0.0
         self._modules: Optional[set] = None
@@ -103,6 +104,41 @@ class Snapshot:
 
     def custom_doctypes(self) -> list[str]:
         return sorted(n for n, r in self.doctypes().items() if r.get("custom"))
+
+    def table_ok(self, doctype: str) -> bool:
+        """False when the DocType record exists but reading its rows fails on the server (e.g. its table is missing)."""
+        with self._lock:
+            hit = self._tables.get(doctype)
+            if hit and not self._stale(hit[0]):
+                return hit[1]
+        ok = True
+        try:
+            self.erp.list_docs(doctype, fields=["name"], limit=1)
+        except Exception as e:  # noqa: BLE001 - only a server error means a broken table; permissions or 404 do not
+            ok = getattr(e, "status", 0) < 500
+        with self._lock:
+            self._tables[doctype] = (time.time(), ok)
+        return ok
+
+    def site_facts(self, doctype: str) -> list[str]:
+        """What is ALREADY built on a DocType (custom fields, workflow, scripts, notifications, reports, web forms)."""
+        out: list[str] = []
+
+        def rows(dt, fields, filters):
+            try:
+                return self.erp.list_docs(dt, fields=fields, filters=filters, limit=40)
+            except Exception:  # noqa: BLE001 - facts are a hint, never a reason to fail
+                return []
+        cf = [r["fieldname"] for r in rows("Custom Field", ["fieldname"], [["dt", "=", doctype]]) if r.get("fieldname")]
+        if cf:
+            out.append("custom fields: " + ", ".join(cf))
+        for label, dt, field, fl in (("workflow", "Workflow", "name", "document_type"), ("server scripts", "Server Script", "name", "reference_doctype"),
+                                     ("notifications", "Notification", "name", "document_type"), ("reports", "Report", "name", "ref_doctype"),
+                                     ("web forms", "Web Form", "name", "doc_type")):
+            names = [r["name"] for r in rows(dt, ["name"], [[fl, "=", doctype]])]
+            if names:
+                out.append(f"{label}: " + ", ".join(names))
+        return out
 
     def doc_exists(self, doctype: str, name: str) -> bool:
         return self.erp.get_doc(doctype, name) is not None
