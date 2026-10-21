@@ -151,3 +151,22 @@ def test_signoff_turns_built_into_verified(tmp_path, monkeypatch):
     assert c2.post("/api/requirements/signoff", json={}).json()["signed_off"] == [ids[0]]
     assert c2.get("/api/requirements/built").json()["items"] == []
     assert c2.get(f"/api/requirements?ids={ids[0]}").json()["items"][0]["status"] == "verified"
+
+
+def test_link_attaches_applied_change_set(tmp_path, monkeypatch):
+    monkeypatch.setenv("STUDIO_ADMIN_PASSWORD", "pw123")
+    c = TestClient(create_app(str(tmp_path)))
+    login(c)
+    c.post("/api/requirements/import", files={"file": ("fr.txt", b"1. Record the date of every supplier site visit.", "text/plain")}, data={"module": "SRM"})
+    rid = c.get("/api/requirements?module=SRM").json()["items"][0]["id"]
+    assert c.post("/api/requirements/link", json={"ids": [rid], "change_set_id": "nope"}).status_code == 400
+    from studio.ledger import Ledger
+    from studio.spec import ChangeSet
+    cs = ChangeSet(title="t", ops=[{"op": "add_custom_field", "doctype": "Supplier", "fieldname": "custom_x", "label": "X", "fieldtype": "Data"}], session_id="s")
+    cs.status = "applied"
+    Ledger(tmp_path / "ledger").save(cs)
+    c2 = TestClient(create_app(str(tmp_path)))
+    login(c2)
+    r = c2.post("/api/requirements/link", json={"ids": [rid], "change_set_id": cs.id})
+    assert r.status_code == 200 and r.json()["linked"] == [rid]
+    assert c2.get(f"/api/requirements?ids={rid}").json()["items"][0]["status"] == "built"

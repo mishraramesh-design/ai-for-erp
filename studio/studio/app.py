@@ -287,6 +287,25 @@ def create_app(data_dir: str | None = None) -> FastAPI:
                     done.append(r.id)
         return {"recredited": sorted(set(done))}
 
+    class LinkIn(BaseModel):
+        ids: list[int]
+        change_set_id: str
+        note: str = ""
+
+    @app.post("/api/requirements/link")
+    def req_link(body: LinkIn, _: str = Depends(authed)) -> dict:
+        """Attach an applied change set to requirements it satisfies (repairs a missing link); they become 'built', never 'verified'."""
+        cs = ledger.get(body.change_set_id)
+        if not cs or cs.status not in ("applied", "verified"):
+            raise HTTPException(400, "That change set is not applied.")
+        known = [r.id for r in reqs.all() if r.id in body.ids]
+        if not known:
+            raise HTTPException(400, "None of those requirements exist.")
+        reqs.mark(known, "built", cs.id, by="linked by a person", note=body.note or f"Linked to applied change set {cs.id}; a person decides if it is enough.")
+        cs.requirement_ids = sorted(set(cs.requirement_ids) | set(known))
+        ledger.save(cs)
+        return {"linked": known, "change_set": cs.id}
+
     @app.post("/api/requirements/import")
     async def req_import(file: UploadFile = File(...), module: str = Form(""), _: str = Depends(authed)) -> dict:
         data = await file.read()
