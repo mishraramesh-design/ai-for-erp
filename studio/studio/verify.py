@@ -219,6 +219,8 @@ def run_tests(tests: list, erp, own_fields: Optional[set] = None, own_terms: Opt
             else:
                 if _MANDATORY.search(e.detail):
                     res["status"], res["detail"] = "inconclusive", f"test data incomplete: {e.detail[:160]}"
+                elif re.search(r"could not find|does not exist", e.detail, re.I):  # a made-up Link value is a bad test, not a bad change
+                    res["status"], res["detail"] = "inconclusive", f"test data refers to a record that does not exist: {e.detail[:160]}"
                 elif own_terms and not _mentions(e.detail, own_terms):
                     res["status"], res["detail"] = "inconclusive", f"blocked by a rule that is not part of this change: {e.detail[:160]}"
                 else:
