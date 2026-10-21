@@ -642,6 +642,8 @@ class Kernel:
 
     # -- repair: bounded retry with the failure as feedback; the last attempt escalates the model
     def _repair(self, run: Run, t: Task, g: dict, feedback: str, why: str) -> Outcome:
+        if run.id in self._cancel:  # a cancelled run must not touch requirement statuses after the fact
+            return Outcome("skipped", "cancelled")
         d = self._make_deps()
         ids = list(g["ids"])
         same = bool(feedback) and g.get("feedback", "")[:300] == feedback[:300]

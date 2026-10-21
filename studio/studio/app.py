@@ -282,8 +282,8 @@ def create_app(data_dir: str | None = None) -> FastAPI:
             if cs.status not in ("applied", "verified"):
                 continue
             for r in reqs.all():
-                if r.id in cs.requirement_ids and r.status == "needs_input":
-                    reqs.mark([r.id], "built", cs.id, by="recredit", note=f"Partly covered; still open: {r.notes[:240] if hasattr(r, 'notes') else ''}")
+                if r.id in cs.requirement_ids and r.status in ("needs_input", "backlog", "planned", "blocked") and r.id not in done:
+                    reqs.mark([r.id], "built", cs.id, by="recredit", note=f"Applied change set {cs.id}; a person decides if it is enough. Earlier note: {(r.notes or '')[:200]}")
                     done.append(r.id)
         return {"recredited": sorted(set(done))}
 
