@@ -1,0 +1,46 @@
+[
+ {
+  "charts": [],
+  "content": "[{\"id\": \"b01\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>SRM Home</b></span>\", \"col\": 12}}, {\"id\": \"b02\", \"type\": \"custom_block\", \"data\": {\"custom_block_name\": \"demo-pilot banner\", \"col\": 12}}, {\"id\": \"b03\", \"type\": \"custom_block\", \"data\": {\"custom_block_name\": \"SRM Tiles\", \"col\": 12}}, {\"id\": \"b04\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"SRM - Suppliers (Count)\", \"col\": 4}}, {\"id\": \"b05\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"SRM - Supplier Change Requests (Count)\", \"col\": 4}}, {\"id\": \"b06\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"SRM - Supplier Quotations (Count)\", \"col\": 4}}, {\"id\": \"b07\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"SRM - Purchase Orders (Count)\", \"col\": 4}}, {\"id\": \"b08\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"SRM - Supplier C-Forms (Count)\", \"col\": 4}}, {\"id\": \"b09\", \"type\": \"spacer\", \"data\": {\"col\": 12}}]",
+  "custom_blocks": [
+   {
+    "custom_block_name": "demo-pilot banner",
+    "label": "demo-pilot banner"
+   },
+   {
+    "custom_block_name": "SRM Tiles",
+    "label": "SRM Tiles"
+   }
+  ],
+  "doctype": "Workspace",
+  "label": "SRM Home",
+  "module": "Buying",
+  "name": "SRM Home",
+  "number_cards": [
+   {
+    "label": "SRM - Suppliers (Count)",
+    "number_card_name": "SRM - Suppliers (Count)"
+   },
+   {
+    "label": "SRM - Supplier Change Requests (Count)",
+    "number_card_name": "SRM - Supplier Change Requests (Count)"
+   },
+   {
+    "label": "SRM - Supplier Quotations (Count)",
+    "number_card_name": "SRM - Supplier Quotations (Count)"
+   },
+   {
+    "label": "SRM - Purchase Orders (Count)",
+    "number_card_name": "SRM - Purchase Orders (Count)"
+   },
+   {
+    "label": "SRM - Supplier C-Forms (Count)",
+    "number_card_name": "SRM - Supplier C-Forms (Count)"
+   }
+  ],
+  "public": 1,
+  "roles": [],
+  "shortcuts": [],
+  "title": "SRM Home"
+ }
+]

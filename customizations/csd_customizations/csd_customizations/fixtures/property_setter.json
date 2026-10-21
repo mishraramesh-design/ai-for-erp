@@ -1,0 +1,172 @@
+[
+ {
+  "doc_type": "Supplier",
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "custom_risk_review_date",
+  "name": "Supplier-custom_risk_review_date-mandatory_depends_on",
+  "property": "mandatory_depends_on",
+  "property_type": "Code",
+  "value": "eval:doc.custom_risk_rating=='High'"
+ },
+ {
+  "doc_type": "Supplier",
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "custom_upi_id",
+  "name": "Supplier-custom_upi_id-mandatory_depends_on",
+  "property": "mandatory_depends_on",
+  "property_type": "Code",
+  "value": "eval:doc.custom_preferred_payment_method=='UPI'"
+ },
+ {
+  "doc_type": "Supplier",
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "supplier_group",
+  "name": "Supplier-supplier_group-in_standard_filter",
+  "property": "in_standard_filter",
+  "property_type": "Check",
+  "value": "1"
+ },
+ {
+  "doc_type": "Supplier",
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "supplier_group",
+  "name": "Supplier-supplier_group-in_list_view",
+  "property": "in_list_view",
+  "property_type": "Check",
+  "value": "1"
+ },
+ {
+  "doc_type": "Supplier",
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "naming_series",
+  "name": "Supplier-naming_series-options",
+  "property": "options",
+  "property_type": "Text",
+  "value": "SUP-.YYYY.-.#####\nSUP-.#####"
+ },
+ {
+  "doc_type": "Supplier",
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "naming_series",
+  "name": "Supplier-naming_series-default",
+  "property": "default",
+  "property_type": "Text",
+  "value": "SUP-.YYYY.-.#####"
+ },
+ {
+  "doc_type": "Supplier Product Registration Item",
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "item",
+  "name": "Supplier Product Registration Item-item-reqd",
+  "property": "reqd",
+  "property_type": "Check",
+  "value": "0"
+ },
+ {
+  "doc_type": "Supplier CPS",
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "custom_scheme_type",
+  "name": "Supplier CPS-custom_scheme_type-reqd",
+  "property": "reqd",
+  "property_type": "Check",
+  "value": "0"
+ },
+ {
+  "doc_type": "Supplier CPS",
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "custom_scheme_type",
+  "name": "Supplier CPS-custom_scheme_type-hidden",
+  "property": "hidden",
+  "property_type": "Check",
+  "value": "1"
+ },
+ {
+  "doc_type": "Supplier CPS",
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "custom_scheme_mechanics",
+  "name": "Supplier CPS-custom_scheme_mechanics-reqd",
+  "property": "reqd",
+  "property_type": "Check",
+  "value": "0"
+ },
+ {
+  "doc_type": "Supplier CPS",
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "custom_scheme_mechanics",
+  "name": "Supplier CPS-custom_scheme_mechanics-hidden",
+  "property": "hidden",
+  "property_type": "Check",
+  "value": "1"
+ },
+ {
+  "doc_type": "Supplier CPS",
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "custom_start_date",
+  "name": "Supplier CPS-custom_start_date-reqd",
+  "property": "reqd",
+  "property_type": "Check",
+  "value": "0"
+ },
+ {
+  "doc_type": "Supplier CPS",
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "custom_start_date",
+  "name": "Supplier CPS-custom_start_date-hidden",
+  "property": "hidden",
+  "property_type": "Check",
+  "value": "1"
+ },
+ {
+  "doc_type": "Supplier CPS",
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "custom_end_date",
+  "name": "Supplier CPS-custom_end_date-reqd",
+  "property": "reqd",
+  "property_type": "Check",
+  "value": "0"
+ },
+ {
+  "doc_type": "Supplier CPS",
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "custom_end_date",
+  "name": "Supplier CPS-custom_end_date-hidden",
+  "property": "hidden",
+  "property_type": "Check",
+  "value": "1"
+ },
+ {
+  "doc_type": "Supplier CPS",
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "valid_from",
+  "name": "Supplier CPS-valid_from-reqd",
+  "property": "reqd",
+  "property_type": "Check",
+  "value": "1"
+ },
+ {
+  "doc_type": "Supplier CPS",
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "valid_to",
+  "name": "Supplier CPS-valid_to-reqd",
+  "property": "reqd",
+  "property_type": "Check",
+  "value": "1"
+ }
+]

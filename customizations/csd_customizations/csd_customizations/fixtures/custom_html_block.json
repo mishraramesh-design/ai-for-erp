@@ -1,0 +1,23 @@
+[
+ {
+  "doctype": "Custom HTML Block",
+  "html": "<div class=\"srm-banner\">\n  <div class=\"srm-inner\">\n    <div class=\"srm-topbar\"></div>\n    <div class=\"srm-text\">\n      <h1>demo-pilot</h1>\n      <p class=\"srm-sub\">Supplier Relationship Management</p>\n    </div>\n  </div>\n</div>",
+  "name": "demo-pilot banner",
+  "private": 0,
+  "style": ".srm-banner{box-sizing:border-box;background:#FFFFFF;color:#000000;font-family:-apple-system,BlinkMacSystemFont,\"Segoe UI\",Roboto,\"Helvetica Neue\",Arial,\"Noto Sans\",sans-serif;margin:0;padding:18px;border:1px solid #F2F2F2}.srm-banner .srm-inner{max-width:1200px;margin:0 auto}.srm-banner .srm-topbar{height:6px;background:#FFE600;width:100%;border-radius:2px}.srm-banner .srm-text{padding:12px 0 0 0}.srm-banner h1{margin:0;font-size:28px;font-weight:700;color:#000}.srm-banner .srm-sub{margin:4px 0 0 0;font-size:14px;color:#747480}.srm-banner{border-color:#F2F2F2}.srm-banner .srm-text small{color:#C4C4CD}"
+ },
+ {
+  "doctype": "Custom HTML Block",
+  "html": "<div style=\"padding:12px 0\"><h2 style=\"margin:0 0 6px 0\">Supplier Relationship Management (SRM)</h2><div style=\"color:#6b6b6b\">Quick access to supplier lists and SRM actions</div></div>",
+  "name": "SRM Home Header",
+  "private": 0,
+  "style": ""
+ },
+ {
+  "doctype": "Custom HTML Block",
+  "html": "<div class=\"srm-tiles\">\n  <a href=\"/app/supplier\">\n    <div>Suppliers</div>\n    <div class=\"caption\">Supplier list</div>\n  </a>\n  <a href=\"/app/supplier-change-request\">\n    <div>Supplier Change Requests</div>\n    <div class=\"caption\">Change requests</div>\n  </a>\n  <a href=\"/app/supplier-quotation\">\n    <div>Supplier Quotations</div>\n    <div class=\"caption\">Quotations</div>\n  </a>\n  <a href=\"/app/purchase-order\">\n    <div>Purchase Orders</div>\n    <div class=\"caption\">Purchase Orders</div>\n  </a>\n  <a href=\"/app/supplier-c-form\">\n    <div>Supplier C-Forms</div>\n    <div class=\"caption\">C-Forms</div>\n  </a>\n  <a href=\"/app/supplier-document\">\n    <div>Supplier Documents</div>\n    <div class=\"caption\">Documents</div>\n  </a>\n</div>",
+  "name": "SRM Tiles",
+  "private": 0,
+  "style": ".srm-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px} .srm-tiles a{display:block;background:#000;color:#FFE600 !important;border-radius:10px;padding:18px;text-decoration:none;font-weight:700;font-size:16px} .srm-tiles .caption{color:#BDBDBD;font-size:12px;margin-top:6px;font-weight:400}"
+ }
+]

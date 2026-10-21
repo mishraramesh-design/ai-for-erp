@@ -1,0 +1,40 @@
+[
+ {
+  "channel": "Email",
+  "condition": "doc.workflow_state == 'Submitted'",
+  "doctype": "Notification",
+  "document_type": "Supplier C-Form",
+  "enabled": 1,
+  "event": "Value Change",
+  "message": "<p>A C-Form has been submitted by {{ doc.supplier }}.</p><p>C-Form No: {{ doc.custom_c_form_number }}</p><p>Document: {{ doc.name }}</p>",
+  "message_type": "HTML",
+  "name": "C-Form Submitted - Notify Purchase Manager",
+  "recipients": [
+   {
+    "receiver_by_role": "Purchase Manager"
+   }
+  ],
+  "subject": "C-Form submitted for Supplier {{ doc.supplier }}",
+  "value_changed": "workflow_state"
+ },
+ {
+  "channel": "System Notification",
+  "condition": "doc.workflow_state == 'Pending Approval'",
+  "doctype": "Notification",
+  "document_type": "Branch Price Revision",
+  "enabled": 1,
+  "event": "Value Change",
+  "message": "Branch Price Revision {{ doc.name }} has moved to Pending Approval.",
+  "message_type": "HTML",
+  "name": "Branch Price Revision Pending Approval - Notify Purchase Manager",
+  "notification_title": "Branch Price Revision Pending Approval: {{ doc.name }}",
+  "notification_type": "Alert",
+  "recipients": [
+   {
+    "receiver_by_role": "Purchase Manager"
+   }
+  ],
+  "subject": "Branch Price Revision Pending Approval: {{ doc.name }}",
+  "value_changed": "workflow_state"
+ }
+]

@@ -1,0 +1,74 @@
+[
+ {
+  "disabled": 0,
+  "doctype": "Server Script",
+  "doctype_event": "Before Save",
+  "name": "Supplier - validate_risk_review_date_when_high",
+  "reference_doctype": "Supplier",
+  "script": "HIGH = 'High'\n\nif doc.get('custom_risk_rating') == HIGH and not doc.get('custom_risk_review_date'):\n    frappe.throw('Risk Review Date is required when Vendor Risk Rating is High.')\n",
+  "script_type": "DocType Event"
+ },
+ {
+  "disabled": 0,
+  "doctype": "Server Script",
+  "doctype_event": "Before Save",
+  "name": "Supplier - Validate UPI ID when method is UPI",
+  "reference_doctype": "Supplier",
+  "script": "UPI_METHOD = 'UPI'\n\nupi_needed = doc.get('custom_preferred_payment_method') == UPI_METHOD\nupi = doc.get('custom_upi_id')\n\nif upi_needed and (not upi or not upi.strip()):\n    frappe.throw('UPI ID is required when Preferred Payment Method is UPI.')\n",
+  "script_type": "DocType Event"
+ },
+ {
+  "disabled": 0,
+  "doctype": "Server Script",
+  "doctype_event": "Before Save",
+  "name": "supplier_onboarding_validation",
+  "reference_doctype": "Supplier",
+  "script": "MIN_YEARS = 2\nMIN_MONTHS = 3\n\nstate = doc.get('workflow_state') or ''\nif state in ('Under Review', 'Approved'):\n    est = doc.get('custom_establishment_date')\n    if not est:\n        frappe.throw('Establishment Date is required before review/approval.')\n    today = frappe.utils.getdate(frappe.utils.today())\n    years = (today - frappe.utils.getdate(est)).days / 365.0\n    if years < MIN_YEARS:\n        frappe.throw('Supplier must be in existence for at least {0} years.'.format(MIN_YEARS))\n\n    months = frappe.utils.cint(doc.get('custom_product_availability_months') or 0)\n    if months < MIN_MONTHS:\n        frappe.throw('Product must be available in the civil market for at least {0} months.'.format(MIN_MONTHS))\n\n    if doc.get('custom_is_sole_marketer') != 'Yes':\n        frappe.throw('Supplier must be the sole marketer (set Is Sole Marketer to \"Yes\").')",
+  "script_type": "DocType Event"
+ },
+ {
+  "disabled": 0,
+  "doctype": "Server Script",
+  "doctype_event": "Before Save",
+  "name": "Supplier_CSD_Autovalidation",
+  "reference_doctype": "Supplier",
+  "script": "MIN_TAX_ID_LEN = 6\nMIN_BANK_ACCT_NO_LEN = 6\nMIN_IBAN_LEN = 15\nMAX_IBAN_LEN = 34\n\n# Basic email check\nemail = doc.get('email_id')\nif email:\n    ok = frappe.utils.validate_email_address(email, False)\n    if not ok:\n        frappe.throw('Email ID is not valid.')\n\n# Basic website URL check\nwebsite = doc.get('website')\nif website:\n    ok = frappe.utils.validate_url(website, False)\n    if not ok:\n        frappe.throw('Website URL is not valid.')\n\n# Basic phone check (primary mobile if available)\nmobile = doc.get('mobile_no')\nif mobile:\n    ok = frappe.utils.validate_phone_number(mobile, False)\n    if not ok:\n        frappe.throw('Mobile number is not valid.')\n\n# Basic UPI check (very light since no regex allowed)\nupi = doc.get('custom_upi_id')\nif upi:\n    if ' ' in upi or '@' not in upi or len(upi) < 5:\n        frappe.throw('UPI ID seems invalid. It should contain \"@\" and no spaces.')\n\n# Tax ID presence/format (if provided)\ntax_id = doc.get('tax_id')\nif tax_id:\n    if len(tax_id) < MIN_TAX_ID_LEN or not tax_id.replace(' ', '').isalnum():\n        frappe.throw('Tax ID format looks invalid (min length and alphanumeric expected).')\n\n# Default Bank Account validations (if linked)\ndef_bank = doc.get('default_bank_account')\nif def_bank:\n    values = frappe.db.get_value('Bank Account', def_bank, ['iban', 'bank_account_no'])\n    iban_val = None\n    bank_no_val = None\n    if values:\n        if isinstance(values, tuple):\n            iban_val, bank_no_val = values[0], values[1]\n        else:\n            iban_val = values\n    if not (iban_val or bank_no_val):\n        frappe.throw('Default Bank Account must have either IBAN or Bank Account No.')\n    if iban_val:\n        if len(iban_val) < MIN_IBAN_LEN or len(iban_val) > MAX_IBAN_LEN:\n            frappe.throw('IBAN length must be between {0} and {1} characters.'.format(MIN_IBAN_LEN, MAX_IBAN_LEN))\n    if bank_no_val:\n        clean_no = bank_no_val.replace(' ', '')\n        if len(clean_no) < MIN_BANK_ACCT_NO_LEN or not clean_no.isdigit():\n            frappe.throw('Bank Account No must be numeric and at least {0} digits.'.format(MIN_BANK_ACCT_NO_LEN))\n",
+  "script_type": "DocType Event"
+ },
+ {
+  "disabled": 0,
+  "doctype": "Server Script",
+  "doctype_event": "Before Submit",
+  "name": "Supplier C-Form - validate_c_form_fields",
+  "reference_doctype": "Supplier C-Form",
+  "script": "if doc.get('custom_document_type') == 'C-Form':\n    if not doc.get('custom_c_form_number'):\n        frappe.throw('C-Form Number is required for documents marked as C-Form.')\n    if not doc.get('custom_document_file'):\n        frappe.throw('Please attach the C-Form file in Document File for C-Form submissions.')\n    if not doc.get('custom_c_form_received_date'):\n        doc.custom_c_form_received_date = frappe.utils.today()\nelse:\n    pass",
+  "script_type": "DocType Event"
+ },
+ {
+  "disabled": 0,
+  "doctype": "Server Script",
+  "doctype_event": "Before Save",
+  "name": "Supplier CPS - Validate CPS dates and required fields",
+  "reference_doctype": "Supplier CPS",
+  "script": "if not doc.get('valid_from'):\n    frappe.throw('Valid From (valid_from) is mandatory.')\nif not doc.get('valid_to'):\n    frappe.throw('Valid To (valid_to) is mandatory.')\nif doc.get('valid_from') and doc.get('valid_to'):\n    if frappe.utils.getdate(doc.valid_to) < frappe.utils.getdate(doc.valid_from):\n        frappe.throw('Valid To (valid_to) must be the same or after Valid From (valid_from).')\nif not doc.get('scheme_details') or not (doc.scheme_details or '').strip():\n    frappe.throw('Scheme Details (scheme_details) is mandatory.')\nif doc.get('custom_benefit_value') in (None, ''):\n    frappe.throw('Benefit value (custom_benefit_value) is mandatory.')",
+  "script_type": "DocType Event"
+ },
+ {
+  "disabled": 0,
+  "doctype": "Server Script",
+  "doctype_event": "Before Save",
+  "name": "Supplier Product Registration - items validation",
+  "reference_doctype": "Supplier Product Registration",
+  "script": "for row in (doc.items or []):\n    if not (row.generic_code or row.item):\n        frappe.throw('Each product line must have either a Generic Code or an Item.')\n\nSEEN_GENERIC_CODES = []\nfor row in (doc.items or []):\n    code = row.generic_code\n    if code:\n        if code in SEEN_GENERIC_CODES:\n            frappe.throw(\"Duplicate generic code '%s' in a single Supplier Product Registration is not allowed.\" % code)\n        SEEN_GENERIC_CODES.append(code)",
+  "script_type": "DocType Event"
+ },
+ {
+  "disabled": 0,
+  "doctype": "Server Script",
+  "doctype_event": "Before Save",
+  "name": "Supplier Source Declaration - ssd_validate_dates",
+  "reference_doctype": "Supplier Source Declaration",
+  "script": "if doc.get('valid_from') and doc.get('valid_to'):\n    if frappe.utils.getdate(doc.valid_to) < frappe.utils.getdate(doc.valid_from):\n        frappe.throw('\"Valid To\" cannot be earlier than \"Valid From\"')\n",
+  "script_type": "DocType Event"
+ }
+]

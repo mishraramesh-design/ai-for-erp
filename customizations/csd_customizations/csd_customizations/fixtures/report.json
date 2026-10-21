@@ -1,0 +1,32 @@
+[
+ {
+  "doctype": "Report",
+  "is_standard": "No",
+  "json": "{\"filters\": [[\"Supplier C-Form\", \"custom_document_type\", \"=\", \"C-Form\", false], [\"Supplier C-Form\", \"workflow_state\", \"!=\", \"Approved\", false]], \"fields\": [[\"name\", \"Supplier C-Form\"], [\"supplier\", \"Supplier C-Form\"], [\"custom_c_form_number\", \"Supplier C-Form\"], [\"custom_c_form_received_date\", \"Supplier C-Form\"], [\"workflow_state\", \"Supplier C-Form\"]], \"order_by\": \"`tabSupplier C-Form`.`modified` desc\", \"add_totals_row\": 0, \"page_length\": 20, \"column_widths\": {}, \"group_by\": null}",
+  "name": "Pending C-Forms",
+  "ref_doctype": "Supplier C-Form",
+  "report_name": "Pending C-Forms",
+  "report_type": "Report Builder",
+  "roles": []
+ },
+ {
+  "doctype": "Report",
+  "is_standard": "No",
+  "json": "{\"filters\": [], \"fields\": [[\"name\", \"Branch Price Revision\"], [\"workflow_state\", \"Branch Price Revision\"], [\"creation\", \"Branch Price Revision\"]], \"order_by\": \"`tabBranch Price Revision`.`modified` desc\", \"add_totals_row\": 0, \"page_length\": 20, \"column_widths\": {}, \"group_by\": null}",
+  "name": "Branch Price Revision - Workflow Overview",
+  "ref_doctype": "Branch Price Revision",
+  "report_name": "Branch Price Revision - Workflow Overview",
+  "report_type": "Report Builder",
+  "roles": [
+   {
+    "role": "Branch User"
+   },
+   {
+    "role": "Purchase Manager"
+   },
+   {
+    "role": "System Manager"
+   }
+  ]
+ }
+]

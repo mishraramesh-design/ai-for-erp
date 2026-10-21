@@ -1,0 +1,16 @@
+[
+ {
+  "chart_name": "C-Form Status Distribution",
+  "chart_type": "Group By",
+  "doctype": "Dashboard Chart",
+  "document_type": "Supplier C-Form",
+  "filters_json": "[[\"Supplier C-Form\", \"custom_document_type\", \"=\", \"C-Form\", false]]",
+  "group_by_based_on": "workflow_state",
+  "group_by_type": "Count",
+  "is_public": 1,
+  "name": "C-Form Status Distribution",
+  "number_of_groups": 10,
+  "timeseries": 0,
+  "type": "Pie"
+ }
+]
