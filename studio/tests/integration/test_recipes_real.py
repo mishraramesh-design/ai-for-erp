@@ -29,6 +29,9 @@ def test_recipes_round_trip(erp, tmp_path):
         {"op": "create_number_card", "label": names["c"], "doctype": "Supplier", "filters": [{"field": "disabled", "value": 0}]},
         {"op": "create_dashboard_chart", "name": names["ch"], "doctype": "Supplier", "group_by_field": "supplier_group"},
         {"op": "create_html_block", "name": names["h"], "html": "<div class='dp'>demo-pilot</div>", "style": ".dp{background:#FFE600;color:#000;padding:8px}"},
+        {"op": "create_web_form", "title": names["w"] + " form", "route": f"rt-{t}", "doctype": "Supplier", "intro": "<p>Hi</p>",
+         "fields": [{"fieldname": "supplier_name", "fieldtype": "Data", "reqd": True}, {"fieldname": "supplier_group", "fieldtype": "Link"}],
+         "list_columns": ["supplier_name"]},
         {"op": "create_dashboard", "name": names["d"], "charts": [names["ch"]], "cards": [names["c"]]},
         {"op": "create_workspace", "title": names["w"], "html_blocks": [names["h"]], "cards": [names["c"]], "charts": [names["ch"]],
          "shortcuts": [{"label": "Suppliers", "doctype": "Supplier"}]},
@@ -55,7 +58,7 @@ def test_recipes_round_trip(erp, tmp_path):
     original = open(hooks_path).read()
     pairs = [("Notification", names["n"]), ("Report", names["r"]), ("Number Card", names["c"]),
              ("Dashboard Chart", names["ch"]), ("Dashboard", names["d"]),
-             ("Custom HTML Block", names["h"]), ("Workspace", names["w"])]
+             ("Custom HTML Block", names["h"]), ("Workspace", names["w"]), ("Web Form", f"rw-{t}-form".lower())]
     try:
         out = build(ledger, reqs, original, prefix="")
         for rel, text in out.files.items():

@@ -228,6 +228,26 @@ def html_block_payload(op) -> dict:
     return {"doctype": "Custom HTML Block", "name": op.name, "html": op.html, "style": op.style, "private": 0}
 
 
+def web_form_name(title: str) -> str:
+    """Frappe names a web form after its title (lowercase, spaces to hyphens); an explicit name is ignored."""
+    import re
+    return re.sub(r"[\s_-]+", "-", title.strip().lower())
+
+
+def web_form_payload(op) -> dict:
+    fields = [{"fieldname": f.fieldname, "fieldtype": f.fieldtype, "label": f.label or f.fieldname.replace("_", " ").title(),
+               "reqd": 1 if f.reqd else 0, "read_only": 1 if f.read_only else 0, "options": f.options, "default": f.default}
+              for f in op.fields]
+    cols = {f.fieldname: f for f in op.fields}
+    return {"doctype": "Web Form", "name": web_form_name(op.title), "title": op.title, "route": op.route, "doc_type": op.doctype,
+            "module": "Custom", "is_standard": 0, "published": 1, "login_required": 1, "anonymous": 0,
+            "apply_document_permissions": 1, "allow_edit": 1 if op.allow_edit else 0, "allow_multiple": 1 if op.allow_multiple else 0,
+            "show_list": 1 if op.show_list else 0, "introduction_text": op.intro, "button_label": op.button_label,
+            "success_message": op.success_message, "web_form_fields": fields,
+            "list_columns": [{"fieldname": c, "fieldtype": cols[c].fieldtype if c in cols else "Data",
+                              "label": (cols[c].label if c in cols and cols[c].label else c.replace("_", " ").title())} for c in op.list_columns]}
+
+
 def workspace_payload(op) -> dict:
     import json
     blocks: list = []
@@ -263,5 +283,5 @@ def workspace_payload(op) -> dict:
 def record_payload(op) -> dict:
     return {"create_notification": notification_payload, "create_report": report_payload,
             "create_number_card": number_card_payload, "create_dashboard_chart": dashboard_chart_payload,
-            "create_dashboard": dashboard_payload, "create_html_block": html_block_payload,
+            "create_dashboard": dashboard_payload, "create_web_form": web_form_payload, "create_html_block": html_block_payload,
             "create_workspace": workspace_payload}[op.op](op)

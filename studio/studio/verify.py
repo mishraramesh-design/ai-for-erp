@@ -259,6 +259,11 @@ def _record_checks(op, d, add, i) -> None:
     elif t == "create_dashboard_chart":
         add(i, "chart reads the right DocType", d.get("document_type") == op.doctype, f"found {d.get('document_type')}")
         add(i, f"chart type is {op.chart_type}", d.get("chart_type") == op.chart_type, f"found {d.get('chart_type')}")
+    elif t == "create_web_form":
+        add(i, "web form is published and needs login", bool(d.get("published")) and bool(d.get("login_required")) and not d.get("anonymous"))
+        add(i, "web form reads the right DocType", d.get("doc_type") == op.doctype, f"found {d.get('doc_type')}")
+        add(i, "web form fields stored", len(d.get("web_form_fields") or []) == len(op.fields),
+            f"{len(d.get('web_form_fields') or [])} of {len(op.fields)}")
     elif t == "create_html_block":
         add(i, "HTML stored", (d.get("html") or "").strip() == op.html.strip())
     elif t == "create_workspace":

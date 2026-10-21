@@ -285,6 +285,31 @@ class WorkspaceShortcut(_Op):
     view: Literal["List", "New", "Report Builder", "Dashboard"] = "List"
 
 
+class WebFormField(_Op):
+    fieldname: str
+    fieldtype: str
+    label: str = ""
+    reqd: bool = False
+    read_only: bool = False
+    options: str = ""
+    default: str = ""
+
+
+class CreateWebForm(_Op):
+    op: Literal["create_web_form"] = "create_web_form"
+    title: str
+    route: str  # lowercase url slug, also the record name; the page is served at /<route>
+    doctype: str
+    intro: str = ""
+    fields: list[WebFormField]
+    list_columns: list[str] = Field(default_factory=list)
+    allow_edit: bool = True
+    allow_multiple: bool = True
+    show_list: bool = True
+    button_label: str = "Submit"
+    success_message: str = ""
+
+
 class CreateWorkspace(_Op):
     op: Literal["create_workspace"] = "create_workspace"
     title: str
@@ -297,14 +322,14 @@ class CreateWorkspace(_Op):
 
 
 RECORD_OPS = {"create_html_block": "Custom HTML Block", "create_workspace": "Workspace", "create_notification": "Notification", "create_report": "Report", "create_number_card": "Number Card",
-              "create_dashboard_chart": "Dashboard Chart", "create_dashboard": "Dashboard"}
+              "create_dashboard_chart": "Dashboard Chart", "create_dashboard": "Dashboard", "create_web_form": "Web Form"}
 
 
 Op = Annotated[
     Union[
         AddCustomField, SetProperty, AddClientScript, AddServerValidation, SetSetting,
         CreateRole, AddPermission, CreateDocType, CreateWorkflow, CreateNotification, CreateReport,
-        CreateNumberCard, CreateDashboardChart, CreateDashboard, CreateHtmlBlock, CreateWorkspace,
+        CreateNumberCard, CreateDashboardChart, CreateDashboard, CreateHtmlBlock, CreateWorkspace, CreateWebForm,
     ],
     Field(discriminator="op"),
 ]
@@ -315,7 +340,7 @@ RISK = {
     "set_property": 1, "add_client_script": 1, "add_server_validation": 1, "set_setting": 1,
     "add_permission": 2, "create_workflow": 2,
     "create_notification": 1, "create_report": 0, "create_number_card": 0, "create_dashboard_chart": 0, "create_dashboard": 0,
-    "create_html_block": 0, "create_workspace": 0,
+    "create_html_block": 0, "create_workspace": 0, "create_web_form": 2,
 }
 RISK_LEVELS = ("low", "medium", "high")
 
@@ -366,6 +391,8 @@ def describe(op) -> str:
         return f'Create {op.graph.lower()} chart "{op.name}" on {op.doctype}'
     if t == "create_dashboard":
         return f'Create dashboard "{op.name}" with {len(op.charts)} chart(s) and {len(op.cards)} number card(s)'
+    if t == "create_web_form":
+        return f'Create portal web form "{op.title}" (/{op.route}) on {op.doctype} with {len(op.fields)} field(s)'
     if t == "create_html_block":
         return f'Create workspace HTML block "{op.name}"'
     if t == "create_workspace":

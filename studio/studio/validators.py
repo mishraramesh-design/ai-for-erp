@@ -57,7 +57,7 @@ STANDARD_DOC_METHODS = {
 PHASE = {"create_role": 0, "create_doctype": 1, "add_custom_field": 2, "set_property": 3, "add_client_script": 4,
          "add_server_validation": 4, "create_workflow": 5, "set_setting": 5, "add_permission": 6,
          "create_notification": 7, "create_report": 7, "create_number_card": 7, "create_dashboard_chart": 7,
-         "create_dashboard": 8, "create_html_block": 7, "create_workspace": 9}
+         "create_dashboard": 8, "create_html_block": 7, "create_workspace": 9, "create_web_form": 7}
 
 
 @dataclass
@@ -509,13 +509,38 @@ def _check_record(op, ctx, snap, add, i) -> None:
     t = op.op
     label = {"create_notification": "Notification", "create_report": "Report", "create_number_card": "Number Card",
              "create_dashboard_chart": "Dashboard Chart", "create_dashboard": "Dashboard",
-             "create_html_block": "Custom HTML Block", "create_workspace": "Workspace"}[t]
-    name = op.label if t == "create_number_card" else op.title if t == "create_workspace" else op.name
+             "create_html_block": "Custom HTML Block", "create_workspace": "Workspace", "create_web_form": "Web Form"}[t]
+    name = op.label if t == "create_number_card" else op.title if t in ("create_workspace", "create_web_form") else op.name
     if not re.match(r"^[A-Za-z0-9][A-Za-z0-9 _.\-()/&,]{2,120}$", name or ""):
         add("error", "record_name", f'Invalid {label} name "{name}" (3-120 letters, digits, spaces, - _ . ( ) / & ,).', i)
+    if t == "create_web_form":
+        from .compiler import web_form_name
+        if not re.match(r"^[A-Za-z0-9 ]+$", op.title):
+            add("error", "web_title", "A web form title may only use letters, digits and spaces (ERPNext names the page after it).", i)
+        name = web_form_name(op.title)
     if snap.doc_exists(label, name):
         add("warning", "record_exists", f'{label} "{name}" exists and will be overwritten (undo restores it).', i)
     ctx.planned_records.add((label, name))
+    if t == "create_web_form":
+        if not re.match(r"^[a-z0-9][a-z0-9\-]{2,60}$", op.route):
+            add("error", "web_route", f'Route "{op.route}" must be a lowercase slug (letters, digits, hyphens), e.g. "supplier-cps".', i)
+        if not ctx.doctype_exists(op.doctype):
+            add("error", "doctype_missing", f'DocType "{op.doctype}" does not exist.' + _close(op.doctype, snap.doctypes()), i)
+            return
+        known_w = ctx.fields(op.doctype)
+        if not op.fields:
+            add("error", "web_fields", "A web form needs at least one field.", i)
+        for f in op.fields:
+            if f.fieldname not in known_w:
+                add("error", "field_missing", f'Web form field "{f.fieldname}" is not a field of {op.doctype}.' + _close(f.fieldname, known_w), i)
+            elif op.doctype not in ctx.planned_doctypes:
+                ft = _field_type(ctx, op.doctype, f.fieldname)
+                if ft and ft != f.fieldtype:
+                    add("error", "web_fieldtype", f'Field {f.fieldname} is {ft} in {op.doctype}, not {f.fieldtype}.', i)
+        for c in op.list_columns:
+            if c not in {f.fieldname for f in op.fields}:
+                add("error", "web_column", f'List column "{c}" must also be one of the form fields.', i)
+        return
     if t == "create_dashboard":
         for c in op.charts:
             if ("Dashboard Chart", c) not in ctx.planned_records and not snap.doc_exists("Dashboard Chart", c):

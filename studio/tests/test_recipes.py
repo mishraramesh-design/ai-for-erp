@@ -123,3 +123,18 @@ def test_select_default_must_be_one_of_the_options():
     good = [{"op": "set_property", "doctype": "Supplier", "fieldname": "naming_series", "property": "options", "value": "SUP-.YYYY.-\nSUP-.#####"},
             {"op": "set_property", "doctype": "Supplier", "fieldname": "naming_series", "property": "default", "value": "SUP-.YYYY.-"}]
     assert "select_default" not in [i.code for i in validate(ChangeSet(ops=good), snap) if i.level == "error"]
+
+
+def test_web_form_validation_and_name():
+    from studio.compiler import web_form_name, web_form_payload
+    from studio.spec import OpAdapter
+    base = {"op": "create_web_form", "title": "Supplier Risk Form", "route": "supplier-risk", "doctype": "Supplier",
+            "fields": [{"fieldname": "supplier_name", "fieldtype": "Data", "reqd": True}], "list_columns": ["supplier_name"]}
+    assert codes([base]) == []
+    assert web_form_name("Supplier Risk Form") == "supplier-risk-form"
+    p = web_form_payload(OpAdapter.validate_python(base))
+    assert p["login_required"] == 1 and p["anonymous"] == 0 and p["apply_document_permissions"] == 1
+    assert "web_route" in codes([{**base, "route": "Bad Route"}])
+    assert "web_title" in codes([{**base, "title": "Bad/Title!"}])
+    assert "field_missing" in codes([{**base, "fields": [{"fieldname": "nope", "fieldtype": "Data"}]}])
+    assert "web_column" in codes([{**base, "list_columns": ["supplier_group"]}])
