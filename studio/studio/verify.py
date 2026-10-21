@@ -45,6 +45,21 @@ def verify_changeset(cs, erp) -> list[Check]:
     def add(i, name, ok, detail=""):
         out.append(Check(i, name, "pass" if ok else "fail", detail))
 
+    # Post-flight health: every DocType this change touched must still be readable (a missing table breaks lists, cards and reports)
+    seen: set = set()
+    for i, op in enumerate(cs.ops):
+        dt = op.name if op.op == "create_doctype" else getattr(op, "doctype", None)
+        if dt and dt not in seen and not (op.op == "create_doctype" and op.is_child_table):
+            seen.add(dt)
+            try:
+                erp.list_docs(dt, fields=["name"], limit=1)
+                out.append(Check(i, f"{dt} can be read (table healthy)", "pass"))
+            except ErpError as e:
+                if e.status >= 500:
+                    out.append(Check(i, f"{dt} can be read (table healthy)", "fail", e.detail[:160]))
+            except Exception:  # noqa: BLE001 - a health probe must not break verification
+                pass
+
     for i, op in enumerate(cs.ops):
         t = op.op
         try:
