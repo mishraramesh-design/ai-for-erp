@@ -274,6 +274,19 @@ def create_app(data_dir: str | None = None) -> FastAPI:
         reqs.mark([r.id for r in want], "verified", by=f"signed off by {user}", note="Signed off by a person after review.")
         return {"signed_off": [r.id for r in want]}
 
+    @app.post("/api/requirements/recredit")
+    def req_recredit(_: str = Depends(authed)) -> dict:
+        """Requirements parked as needs_input although an applied change set exists for them become built again."""
+        done = []
+        for cs in ledger.list(limit=500):
+            if cs.status not in ("applied", "verified"):
+                continue
+            for r in reqs.all():
+                if r.id in cs.requirement_ids and r.status == "needs_input":
+                    reqs.mark([r.id], "built", cs.id, by="recredit", note=f"Partly covered; still open: {r.notes[:240] if hasattr(r, 'notes') else ''}")
+                    done.append(r.id)
+        return {"recredited": sorted(set(done))}
+
     @app.post("/api/requirements/import")
     async def req_import(file: UploadFile = File(...), module: str = Form(""), _: str = Depends(authed)) -> dict:
         data = await file.read()

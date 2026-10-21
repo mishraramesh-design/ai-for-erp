@@ -623,9 +623,14 @@ class Kernel:
             d.reqs.mark([i], "built", cs.id, evidence=evidence[:60], by=f"run:{run.id}", note=f"Partly covered: {why}")
         for n in cs.not_covered:
             try:
-                d.reqs.mark([int(n["id"])], "needs_input", note=str(n.get("reason", ""))[:300])
+                rid = int(n["id"])
             except (KeyError, TypeError, ValueError):
                 continue
+            why = str(n.get("reason", ""))[:300]
+            if rid in cs.requirement_ids:  # something was applied for it: keep that credit, flag what is still open
+                d.reqs.mark([rid], "built", cs.id, evidence=evidence[:60], by=f"run:{run.id}", note=f"Partly covered; still open: {why}")
+            else:
+                d.reqs.mark([rid], "needs_input", note=why)
         self._log(run, t.id, "ok", f"Verified on the live site: {res['passed']}/{res['checks']} checks, {len(tests)} behavioural test(s)"
                   + (" (some inconclusive: left as built)" if inconclusive else " (a validation rule has no passing behavioural test: left as built)" if untested else "") + ".", tier="engine")
         self._close(run, t.group, status)
