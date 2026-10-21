@@ -118,6 +118,7 @@ class _Ctx:
         self.planned_doctypes: dict = {}  # name -> {"child": bool, "fields": set, "submittable": bool}
         self.planned_fields: dict = {}  # doctype -> set(fieldnames)
         self.planned_roles: set = set()
+        self.select_state: dict = {}
         self.planned_records: set = set()  # (doctype, name) of reports/cards/charts created in this change set
 
     def doctype_exists(self, name: str) -> bool:
@@ -338,6 +339,15 @@ def validate(cs: ChangeSet, snap) -> list:
                         f'anyone creating a {op.doctype}. Add your own custom field for this requirement instead.', i)
             if PROPERTY_TYPES[op.property] == "Check" and _norm_check_value(op.value) is None:
                 add("error", "property_value", f"{op.property} must be true/false (1/0).", i)
+            if op.fieldname and op.property in ("options", "default"):
+                mf = next((f for f in ((snap.meta(op.doctype) or {}).get("fields") or []) if f.get("fieldname") == op.fieldname), None)
+                if mf and mf.get("fieldtype") == "Select":
+                    st = ctx.select_state.setdefault((op.doctype, op.fieldname), {"options": mf.get("options") or "", "default": mf.get("default") or ""})
+                    st[op.property] = str(op.value)
+                    opts = [o.strip() for o in st["options"].split("\n") if o.strip()]
+                    if st["default"] and opts and st["default"] not in opts:
+                        add("error", "select_default", f'The default "{st["default"]}" of {op.fieldname} must be one of its options ({", ".join(opts)}); '
+                            "otherwise ERPNext rejects every later change to this form.", i)
             if not op.fieldname and op.property not in ("label", "description"):
                 add("warning", "doctype_level_property", f"{op.property} is normally a field-level property.", i)
 

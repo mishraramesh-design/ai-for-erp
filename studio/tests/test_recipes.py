@@ -109,3 +109,17 @@ def test_date_defaults_are_normalised_for_frappe():
     assert norm_default("Date", "today") == "Today" and norm_default("Date", "Now") == "Today"
     assert norm_default("Datetime", "today") == "Now" and norm_default("Date", "2026-10-21") == "2026-10-21"
     assert norm_default("Date", "next week") is None and norm_default("Data", "today") == "today"
+
+
+def test_select_default_must_be_one_of_the_options():
+    from tests.fakes import FakeErp
+    erp = FakeErp()
+    snap = Snapshot(erp, ttl=0)
+    orig = snap.meta
+    snap.meta = lambda dt: ({**(orig(dt) or {}), "fields": (orig(dt) or {}).get("fields", []) + [
+        {"fieldname": "naming_series", "fieldtype": "Select", "options": "SUP-.#####", "default": ""}]} if dt == "Supplier" else orig(dt))
+    bad = [{"op": "set_property", "doctype": "Supplier", "fieldname": "naming_series", "property": "default", "value": "SUP-.YYYY.-"}]
+    assert "select_default" in [i.code for i in validate(ChangeSet(ops=bad), snap) if i.level == "error"]
+    good = [{"op": "set_property", "doctype": "Supplier", "fieldname": "naming_series", "property": "options", "value": "SUP-.YYYY.-\nSUP-.#####"},
+            {"op": "set_property", "doctype": "Supplier", "fieldname": "naming_series", "property": "default", "value": "SUP-.YYYY.-"}]
+    assert "select_default" not in [i.code for i in validate(ChangeSet(ops=good), snap) if i.level == "error"]
