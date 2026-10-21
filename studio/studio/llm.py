@@ -57,6 +57,19 @@ def _post(url: str, headers: dict, body: dict, timeout: float, retry_codes=(429,
     raise LlmError(f"LLM request failed: {last}")
 
 
+def reasoning_effort(model: str, base_url: str = "") -> str:
+    """Hidden thinking is billed as output. Keep it low for OpenAI reasoning models (override: STUDIO_REASONING_EFFORT,
+    or 'off'); medium for the full-size model that repairs use."""
+    import os
+    forced = os.environ.get("STUDIO_REASONING_EFFORT", "").strip().lower()
+    if forced:
+        return "" if forced == "off" else forced
+    m = (model or "").lower()
+    if "api.openai.com" not in (base_url or "https://api.openai.com") or not m.startswith(("gpt-5", "o1", "o3", "o4")):
+        return ""
+    return "low" if "mini" in m or "nano" in m else "medium"
+
+
 def call_provider(kind: str, base_url: str, api_key: str, model: str, system: str, user: str,
                   max_tokens: int = 6000, timeout: float = 120.0) -> tuple[dict, dict]:
     """Returns (parsed JSON object, {"in": tokens, "out": tokens})."""
@@ -78,7 +91,16 @@ def call_provider(kind: str, base_url: str, api_key: str, model: str, system: st
     for attempt in range(2):
         body = {"model": model, "response_format": {"type": "json_object"}, "max_completion_tokens": budget,
                 "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}]}
-        r = _post(url, {"Authorization": f"Bearer {api_key}"}, body, max(timeout, 240.0))
+        effort = reasoning_effort(model, base_url)
+        if effort:
+            body["reasoning_effort"] = effort
+        try:
+            r = _post(url, {"Authorization": f"Bearer {api_key}"}, body, max(timeout, 240.0))
+        except LlmError:
+            if not effort:
+                raise
+            body.pop("reasoning_effort")  # a compatible server that does not know the parameter
+            r = _post(url, {"Authorization": f"Bearer {api_key}"}, body, max(timeout, 240.0))
         d = r.json()
         u = d.get("usage") or {}
         choice = d["choices"][0]
