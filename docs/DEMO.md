@@ -1,4 +1,4 @@
-# First demo: run sheet
+# First demo: run sheet (Saturday)
 
 Goal: show that a requirement from the RFP becomes a verified, reviewable change in ERPNext without anyone writing code,
 and that a human stays in control. Show only what is real. About 10 minutes.
@@ -11,6 +11,12 @@ and that a human stays in control. Show only what is real. About 10 minutes.
 4. Export screen: save the GitHub repo and token, press **Test connection**, then **Publish pull request** once and merge it,
    so the demo shows a pull request that already has history. Do not merge during the demo unless the release build is the point.
 5. Leave one run **unstarted**: it is the live moment.
+
+## What is new since the first draft (show these)
+- **SRM Home** (`/app/srm-home`): demo-pilot landing page (yellow band, black tiles, live count cards). Built by Studio, not by hand.
+- **Supplier Portal pages** (web forms, login only): C-Form, CPS declaration, Bank Guarantee view, Source declaration.
+- **Rebuild and health checks**: a broken DocType (missing table) is refused by a plan and repaired through Studio.
+- Be honest about partial items: they show as **built** with the open part named. Only signed-off items are exported.
 
 ## The story
 1. **Overview** (1 min): "This is the programme: 1,544 requirements, 629 gaps, what is verified, what needs a decision."
@@ -32,4 +38,5 @@ and that a human stays in control. Show only what is real. About 10 minutes.
 
 ## Do not show
 - The Workbench as if it were live. It plays scripted data and is labelled so.
-- Requirements that touch integrations, reports, print formats or dashboards: not built yet (roadmap).
+- Integration requirements (12, 19, 25, 413): shown as "needs integration", not built.
+- Supplier Portal pages assume the supplier's login is linked to their Supplier record (User Permission); say so.
