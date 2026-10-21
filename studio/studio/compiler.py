@@ -234,8 +234,17 @@ def web_form_name(title: str) -> str:
     return re.sub(r"[\s_-]+", "-", title.strip().lower())
 
 
+WEB_FORM_TYPES = {"Long Text": "Text", "Code": "Text", "Markdown Editor": "Text Editor", "HTML Editor": "Text Editor", "Read Only": "Data",
+                  "Currency": "Currency", "Percent": "Float"}
+
+
+def web_form_fieldtype(ft: str) -> str:
+    """A web form field cannot be Long Text (and a few other types); the closest allowed type is used."""
+    return WEB_FORM_TYPES.get(ft, ft)
+
+
 def web_form_payload(op) -> dict:
-    fields = [{"fieldname": f.fieldname, "fieldtype": f.fieldtype, "label": f.label or f.fieldname.replace("_", " ").title(),
+    fields = [{"fieldname": f.fieldname, "fieldtype": web_form_fieldtype(f.fieldtype), "label": f.label or f.fieldname.replace("_", " ").title(),
                "reqd": 1 if f.reqd else 0, "read_only": 1 if f.read_only else 0, "options": f.options, "default": f.default}
               for f in op.fields]
     cols = {f.fieldname: f for f in op.fields}

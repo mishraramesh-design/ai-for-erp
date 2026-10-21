@@ -161,3 +161,11 @@ def test_site_facts_listed_in_planner_context():
     erp.docs[("Custom Field", "Supplier-custom_a")] = {"name": "Supplier-custom_a", "dt": "Supplier", "fieldname": "custom_a"}
     ctx = build_context("update Supplier records", {}, Snapshot(erp, ttl=0))
     assert "ALREADY BUILT" in ctx and "custom_a" in ctx
+
+
+def test_web_form_long_text_maps_to_text():
+    from studio.compiler import web_form_payload
+    from studio.spec import OpAdapter
+    op = OpAdapter.validate_python({"op": "create_web_form", "title": "Notes Form", "route": "notes-form", "doctype": "Supplier",
+                                    "fields": [{"fieldname": "supplier_name", "fieldtype": "Long Text"}]})
+    assert web_form_payload(op)["web_form_fields"][0]["fieldtype"] == "Text"

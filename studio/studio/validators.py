@@ -549,7 +549,8 @@ def _check_record(op, ctx, snap, add, i) -> None:
                 add("error", "field_missing", f'Web form field "{f.fieldname}" is not a field of {op.doctype}.' + _close(f.fieldname, known_w), i)
             elif op.doctype not in ctx.planned_doctypes:
                 ft = _field_type(ctx, op.doctype, f.fieldname)
-                if ft and ft != f.fieldtype:
+                from .compiler import web_form_fieldtype
+                if ft and web_form_fieldtype(ft) != web_form_fieldtype(f.fieldtype):
                     add("error", "web_fieldtype", f'Field {f.fieldname} is {ft} in {op.doctype}, not {f.fieldtype}.', i)
         for c in op.list_columns:
             if c not in {f.fieldname for f in op.fields}:

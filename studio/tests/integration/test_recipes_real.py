@@ -30,7 +30,7 @@ def test_recipes_round_trip(erp, tmp_path):
         {"op": "create_dashboard_chart", "name": names["ch"], "doctype": "Supplier", "group_by_field": "supplier_group"},
         {"op": "create_html_block", "name": names["h"], "html": "<div class='dp'>demo-pilot</div>", "style": ".dp{background:#FFE600;color:#000;padding:8px}"},
         {"op": "create_web_form", "title": names["w"] + " form", "route": f"rt-{t}", "doctype": "Supplier", "intro": "<p>Hi</p>",
-         "fields": [{"fieldname": "supplier_name", "fieldtype": "Data", "reqd": True}, {"fieldname": "supplier_group", "fieldtype": "Link"}],
+         "fields": [{"fieldname": "supplier_name", "fieldtype": "Data", "reqd": True}, {"fieldname": "supplier_group", "fieldtype": "Link"}, {"fieldname": "supplier_details", "fieldtype": "Long Text"}],
          "list_columns": ["supplier_name"]},
         {"op": "create_dashboard", "name": names["d"], "charts": [names["ch"]], "cards": [names["c"]]},
         {"op": "create_workspace", "title": names["w"], "html_blocks": [names["h"]], "cards": [names["c"]], "charts": [names["ch"]],
