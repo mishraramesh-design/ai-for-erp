@@ -1,0 +1,88 @@
+[
+ {
+  "color": "red",
+  "doctype": "Number Card",
+  "document_type": "Supplier C-Form",
+  "filters_json": "[[\"Supplier C-Form\", \"custom_document_type\", \"=\", \"C-Form\", false], [\"Supplier C-Form\", \"workflow_state\", \"!=\", \"Approved\", false]]",
+  "function": "Count",
+  "is_public": 1,
+  "label": "Pending C-Forms",
+  "name": "Pending C-Forms",
+  "show_percentage_stats": 1,
+  "stats_time_interval": "Daily",
+  "type": "Document Type"
+ },
+ {
+  "color": "yellow",
+  "doctype": "Number Card",
+  "document_type": "Supplier Change Request",
+  "filters_json": "[[\"Supplier Change Request\", \"docstatus\", \"=\", 0, false]]",
+  "function": "Count",
+  "is_public": 1,
+  "label": "Open Supplier Change Requests",
+  "name": "Open Supplier Change Requests",
+  "show_percentage_stats": 1,
+  "stats_time_interval": "Daily",
+  "type": "Document Type"
+ },
+ {
+  "doctype": "Number Card",
+  "document_type": "Supplier",
+  "filters_json": "[]",
+  "function": "Count",
+  "is_public": 1,
+  "label": "SRM - Suppliers (Count)",
+  "name": "SRM - Suppliers (Count)",
+  "show_percentage_stats": 1,
+  "stats_time_interval": "Daily",
+  "type": "Document Type"
+ },
+ {
+  "doctype": "Number Card",
+  "document_type": "Supplier Change Request",
+  "filters_json": "[]",
+  "function": "Count",
+  "is_public": 1,
+  "label": "SRM - Supplier Change Requests (Count)",
+  "name": "SRM - Supplier Change Requests (Count)",
+  "show_percentage_stats": 1,
+  "stats_time_interval": "Daily",
+  "type": "Document Type"
+ },
+ {
+  "doctype": "Number Card",
+  "document_type": "Supplier Quotation",
+  "filters_json": "[]",
+  "function": "Count",
+  "is_public": 1,
+  "label": "SRM - Supplier Quotations (Count)",
+  "name": "SRM - Supplier Quotations (Count)",
+  "show_percentage_stats": 1,
+  "stats_time_interval": "Daily",
+  "type": "Document Type"
+ },
+ {
+  "doctype": "Number Card",
+  "document_type": "Purchase Order",
+  "filters_json": "[]",
+  "function": "Count",
+  "is_public": 1,
+  "label": "SRM - Purchase Orders (Count)",
+  "name": "SRM - Purchase Orders (Count)",
+  "show_percentage_stats": 1,
+  "stats_time_interval": "Daily",
+  "type": "Document Type"
+ },
+ {
+  "doctype": "Number Card",
+  "document_type": "Supplier C-Form",
+  "filters_json": "[]",
+  "function": "Count",
+  "is_public": 1,
+  "label": "SRM - Supplier C-Forms (Count)",
+  "name": "SRM - Supplier C-Forms (Count)",
+  "show_percentage_stats": 1,
+  "stats_time_interval": "Daily",
+  "type": "Document Type"
+ }
+]

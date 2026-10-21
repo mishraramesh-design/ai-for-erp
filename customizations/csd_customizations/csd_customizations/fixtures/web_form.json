@@ -1,0 +1,301 @@
+[
+ {
+  "allow_edit": 1,
+  "allow_multiple": 0,
+  "anonymous": 0,
+  "apply_document_permissions": 1,
+  "button_label": "Submit C-Form",
+  "doc_type": "Supplier C-Form",
+  "doctype": "Web Form",
+  "introduction_text": "Submit C-form and upload the document for inter-state liquor exemption requests.",
+  "is_standard": 0,
+  "list_columns": [
+   {
+    "fieldname": "custom_supplier",
+    "fieldtype": "Link",
+    "label": "Supplier"
+   },
+   {
+    "fieldname": "custom_source_state",
+    "fieldtype": "Data",
+    "label": "Source State"
+   },
+   {
+    "fieldname": "custom_destination_state",
+    "fieldtype": "Data",
+    "label": "Destination State"
+   }
+  ],
+  "login_required": 1,
+  "module": "Custom",
+  "name": "supplier-c-form-portal",
+  "published": 1,
+  "route": "supplier-c-form-portal",
+  "show_list": 1,
+  "success_message": "Thank you. Your C-form has been submitted.",
+  "title": "Supplier C Form Portal",
+  "web_form_fields": [
+   {
+    "default": "",
+    "fieldname": "custom_supplier",
+    "fieldtype": "Link",
+    "label": "Supplier",
+    "options": "",
+    "read_only": 0,
+    "reqd": 1
+   },
+   {
+    "default": "",
+    "fieldname": "custom_depot",
+    "fieldtype": "Link",
+    "label": "Depot",
+    "options": "",
+    "read_only": 0,
+    "reqd": 1
+   },
+   {
+    "default": "",
+    "fieldname": "custom_source_state",
+    "fieldtype": "Data",
+    "label": "Source State",
+    "options": "",
+    "read_only": 0,
+    "reqd": 1
+   },
+   {
+    "default": "",
+    "fieldname": "custom_destination_state",
+    "fieldtype": "Data",
+    "label": "Destination State",
+    "options": "",
+    "read_only": 0,
+    "reqd": 1
+   },
+   {
+    "default": "",
+    "fieldname": "custom_c_form_file",
+    "fieldtype": "Attach",
+    "label": "C-form File",
+    "options": "",
+    "read_only": 0,
+    "reqd": 1
+   }
+  ]
+ },
+ {
+  "allow_edit": 1,
+  "allow_multiple": 1,
+  "anonymous": 0,
+  "apply_document_permissions": 1,
+  "button_label": "Submit",
+  "doc_type": "Supplier CPS",
+  "doctype": "Web Form",
+  "introduction_text": "Use this form to submit Consumer Promotion Scheme (CPS) declarations.",
+  "is_standard": 0,
+  "list_columns": [
+   {
+    "fieldname": "scheme_name",
+    "fieldtype": "Data",
+    "label": "Scheme Name"
+   },
+   {
+    "fieldname": "valid_from",
+    "fieldtype": "Date",
+    "label": "Valid From"
+   },
+   {
+    "fieldname": "valid_to",
+    "fieldtype": "Date",
+    "label": "Valid To"
+   }
+  ],
+  "login_required": 1,
+  "module": "Custom",
+  "name": "supplier-cps-portal",
+  "published": 1,
+  "route": "supplier-cps-portal",
+  "show_list": 1,
+  "success_message": "",
+  "title": "Supplier CPS Portal",
+  "web_form_fields": [
+   {
+    "default": "",
+    "fieldname": "scheme_name",
+    "fieldtype": "Data",
+    "label": "Scheme Name",
+    "options": "",
+    "read_only": 0,
+    "reqd": 1
+   },
+   {
+    "default": "",
+    "fieldname": "scheme_type",
+    "fieldtype": "Select",
+    "label": "Scheme Type",
+    "options": "",
+    "read_only": 0,
+    "reqd": 1
+   },
+   {
+    "default": "",
+    "fieldname": "scheme_details",
+    "fieldtype": "Text",
+    "label": "Scheme Details",
+    "options": "",
+    "read_only": 0,
+    "reqd": 1
+   },
+   {
+    "default": "",
+    "fieldname": "custom_benefit_value",
+    "fieldtype": "Currency",
+    "label": "Benefit Value",
+    "options": "",
+    "read_only": 0,
+    "reqd": 1
+   },
+   {
+    "default": "",
+    "fieldname": "valid_from",
+    "fieldtype": "Date",
+    "label": "Valid From",
+    "options": "",
+    "read_only": 0,
+    "reqd": 1
+   },
+   {
+    "default": "",
+    "fieldname": "valid_to",
+    "fieldtype": "Date",
+    "label": "Valid To",
+    "options": "",
+    "read_only": 0,
+    "reqd": 1
+   },
+   {
+    "default": "",
+    "fieldname": "primary_document",
+    "fieldtype": "Attach",
+    "label": "Supporting Document",
+    "options": "",
+    "read_only": 0,
+    "reqd": 0
+   }
+  ]
+ },
+ {
+  "allow_edit": 1,
+  "allow_multiple": 0,
+  "anonymous": 0,
+  "apply_document_permissions": 1,
+  "button_label": "Submit Declaration",
+  "doc_type": "Supplier Source Declaration",
+  "doctype": "Web Form",
+  "introduction_text": "Submit or update your source of supply and label registration details.",
+  "is_standard": 0,
+  "list_columns": [
+   {
+    "fieldname": "supplier",
+    "fieldtype": "Link",
+    "label": "Supplier"
+   },
+   {
+    "fieldname": "source_type",
+    "fieldtype": "Select",
+    "label": "Source Type"
+   },
+   {
+    "fieldname": "label_registration_no",
+    "fieldtype": "Data",
+    "label": "Label Registration No"
+   },
+   {
+    "fieldname": "valid_to",
+    "fieldtype": "Date",
+    "label": "Valid To"
+   }
+  ],
+  "login_required": 1,
+  "module": "Custom",
+  "name": "supplier-source-declaration-portal",
+  "published": 1,
+  "route": "supplier-source-declaration",
+  "show_list": 1,
+  "success_message": "Thank you. Your Supplier Source Declaration has been recorded.",
+  "title": "Supplier Source Declaration Portal",
+  "web_form_fields": [
+   {
+    "default": "",
+    "fieldname": "supplier",
+    "fieldtype": "Link",
+    "label": "Supplier",
+    "options": "Supplier",
+    "read_only": 0,
+    "reqd": 1
+   },
+   {
+    "default": "",
+    "fieldname": "source_type",
+    "fieldtype": "Select",
+    "label": "Source Type",
+    "options": "Manufacturer\nImporter\nDistributor\nOther",
+    "read_only": 0,
+    "reqd": 1
+   },
+   {
+    "default": "",
+    "fieldname": "source_name",
+    "fieldtype": "Data",
+    "label": "Source Name",
+    "options": "",
+    "read_only": 0,
+    "reqd": 1
+   },
+   {
+    "default": "",
+    "fieldname": "label_registration_no",
+    "fieldtype": "Data",
+    "label": "Label Registration No",
+    "options": "",
+    "read_only": 0,
+    "reqd": 1
+   },
+   {
+    "default": "",
+    "fieldname": "label_registration_document",
+    "fieldtype": "Attach",
+    "label": "Label Registration Document",
+    "options": "",
+    "read_only": 0,
+    "reqd": 0
+   },
+   {
+    "default": "",
+    "fieldname": "valid_from",
+    "fieldtype": "Date",
+    "label": "Valid From",
+    "options": "",
+    "read_only": 0,
+    "reqd": 1
+   },
+   {
+    "default": "",
+    "fieldname": "valid_to",
+    "fieldtype": "Date",
+    "label": "Valid To",
+    "options": "",
+    "read_only": 0,
+    "reqd": 1
+   },
+   {
+    "default": "",
+    "fieldname": "notes",
+    "fieldtype": "Small Text",
+    "label": "Notes",
+    "options": "",
+    "read_only": 0,
+    "reqd": 0
+   }
+  ]
+ }
+]

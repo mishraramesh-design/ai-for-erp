@@ -1,0 +1,193 @@
+[
+ {
+  "doctype": "Workflow",
+  "document_type": "Supplier",
+  "is_active": 1,
+  "name": "Supplier Onboarding",
+  "override_status": 0,
+  "send_email_alert": 0,
+  "states": [
+   {
+    "allow_edit": "Supplier",
+    "doc_status": "0",
+    "state": "Draft"
+   },
+   {
+    "allow_edit": "Purchase Manager",
+    "doc_status": "0",
+    "state": "Under Review"
+   },
+   {
+    "allow_edit": "Purchase Manager",
+    "doc_status": "0",
+    "state": "Approved"
+   },
+   {
+    "allow_edit": "Purchase Manager",
+    "doc_status": "0",
+    "state": "Rejected"
+   }
+  ],
+  "transitions": [
+   {
+    "action": "Submit for Review",
+    "allow_self_approval": 1,
+    "allowed": "Supplier",
+    "next_state": "Under Review",
+    "state": "Draft"
+   },
+   {
+    "action": "Approve",
+    "allow_self_approval": 1,
+    "allowed": "Purchase Manager",
+    "next_state": "Approved",
+    "state": "Under Review"
+   },
+   {
+    "action": "Reject",
+    "allow_self_approval": 1,
+    "allowed": "Purchase Manager",
+    "next_state": "Rejected",
+    "state": "Under Review"
+   },
+   {
+    "action": "Resubmit",
+    "allow_self_approval": 1,
+    "allowed": "Supplier",
+    "next_state": "Under Review",
+    "state": "Rejected"
+   }
+  ],
+  "workflow_name": "Supplier Onboarding",
+  "workflow_state_field": "workflow_state"
+ },
+ {
+  "doctype": "Workflow",
+  "document_type": "Supplier C-Form",
+  "is_active": 1,
+  "name": "Supplier C-Form Workflow",
+  "override_status": 0,
+  "send_email_alert": 0,
+  "states": [
+   {
+    "allow_edit": "Supplier",
+    "doc_status": "0",
+    "state": "Draft"
+   },
+   {
+    "allow_edit": "Purchase Manager",
+    "doc_status": "1",
+    "state": "Submitted"
+   },
+   {
+    "allow_edit": "Purchase Manager",
+    "doc_status": "1",
+    "state": "Verified"
+   },
+   {
+    "allow_edit": "Purchase Manager",
+    "doc_status": "1",
+    "state": "Approved"
+   },
+   {
+    "allow_edit": "Purchase Manager",
+    "doc_status": "1",
+    "state": "Rejected"
+   }
+  ],
+  "transitions": [
+   {
+    "action": "Submit",
+    "allow_self_approval": 1,
+    "allowed": "Supplier",
+    "next_state": "Submitted",
+    "state": "Draft"
+   },
+   {
+    "action": "Verify",
+    "allow_self_approval": 1,
+    "allowed": "Purchase Manager",
+    "next_state": "Verified",
+    "state": "Submitted"
+   },
+   {
+    "action": "Approve",
+    "allow_self_approval": 1,
+    "allowed": "Purchase Manager",
+    "next_state": "Approved",
+    "state": "Verified"
+   },
+   {
+    "action": "Reject",
+    "allow_self_approval": 1,
+    "allowed": "Purchase Manager",
+    "next_state": "Rejected",
+    "state": "Submitted"
+   },
+   {
+    "action": "Reject",
+    "allow_self_approval": 1,
+    "allowed": "Purchase Manager",
+    "next_state": "Rejected",
+    "state": "Verified"
+   }
+  ],
+  "workflow_name": "Supplier C-Form Workflow",
+  "workflow_state_field": "workflow_state"
+ },
+ {
+  "doctype": "Workflow",
+  "document_type": "Branch Price Revision",
+  "is_active": 1,
+  "name": "Branch Price Revision Approval",
+  "override_status": 0,
+  "send_email_alert": 0,
+  "states": [
+   {
+    "allow_edit": "Branch User",
+    "doc_status": "0",
+    "state": "Draft"
+   },
+   {
+    "allow_edit": "Branch User",
+    "doc_status": "0",
+    "state": "Pending Approval"
+   },
+   {
+    "allow_edit": "Purchase Manager",
+    "doc_status": "0",
+    "state": "Approved"
+   },
+   {
+    "allow_edit": "Purchase Manager",
+    "doc_status": "0",
+    "state": "Rejected"
+   }
+  ],
+  "transitions": [
+   {
+    "action": "Submit for Approval",
+    "allow_self_approval": 1,
+    "allowed": "Branch User",
+    "next_state": "Pending Approval",
+    "state": "Draft"
+   },
+   {
+    "action": "Approve",
+    "allow_self_approval": 1,
+    "allowed": "Purchase Manager",
+    "next_state": "Approved",
+    "state": "Pending Approval"
+   },
+   {
+    "action": "Reject",
+    "allow_self_approval": 1,
+    "allowed": "Purchase Manager",
+    "next_state": "Rejected",
+    "state": "Pending Approval"
+   }
+  ],
+  "workflow_name": "Branch Price Revision Approval",
+  "workflow_state_field": "workflow_state"
+ }
+]

@@ -1,0 +1,18 @@
+[
+ {
+  "cards": [
+   {
+    "card": "Pending C-Forms"
+   }
+  ],
+  "charts": [
+   {
+    "chart": "C-Form Status Distribution",
+    "width": "Half"
+   }
+  ],
+  "dashboard_name": "Supplier C-Forms Dashboard",
+  "doctype": "Dashboard",
+  "name": "Supplier C-Forms Dashboard"
+ }
+]

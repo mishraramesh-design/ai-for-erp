@@ -1,0 +1,303 @@
+{
+ "app": "csd_customizations",
+ "change_sets": [
+  {
+   "change_set": "01M5D7CYSV8W981QS281ZH4A9V",
+   "created_by": "run:f906b08cb40d",
+   "operations": [
+    "Add Select field \"Vendor Risk Rating\" (custom_risk_rating) to Supplier after supplier_type, options: Low / Medium / High",
+    "Add Date field \"Risk Review Date\" (custom_risk_review_date) to Supplier after custom_risk_rating",
+    "Set mandatory_depends_on = eval:doc.custom_risk_rating=='High' on field \"custom_risk_review_date\" of Supplier",
+    "Add server script \"validate_risk_review_date_when_high\" on Supplier (before save)"
+   ],
+   "requirements": [
+    100005
+   ],
+   "risk": "medium",
+   "session": "f906b08cb40d",
+   "title": "Supplier Risk Rating with Conditional Review Date"
+  },
+  {
+   "change_set": "01M5DAZ1YAKZC3P48E2J48DTEV",
+   "created_by": "run:d421c676b2c8",
+   "operations": [
+    "Add Select field \"Preferred Payment Method\" (custom_preferred_payment_method) to Supplier after default_bank_account, mandatory, options: Bank Transfer / Cheque / UPI",
+    "Add Data field \"UPI ID\" (custom_upi_id) to Supplier after custom_preferred_payment_method",
+    "Set mandatory_depends_on = eval:doc.custom_preferred_payment_method=='UPI' on field \"custom_upi_id\" of Supplier",
+    "Add server script \"Validate UPI ID when method is UPI\" on Supplier (before save)"
+   ],
+   "requirements": [
+    100008
+   ],
+   "risk": "medium",
+   "session": "d421c676b2c8",
+   "title": "Supplier preferred payment method with conditional UPI ID (ERPNext v15)"
+  },
+  {
+   "change_set": "01M5DJ2KXGFNKRDZBGSVGYS3NK",
+   "created_by": "run:8601d0d47058",
+   "operations": [
+    "Add Date field \"Establishment Date\" (custom_establishment_date) to Supplier, mandatory",
+    "Add Int field \"Product Availability (months)\" (custom_product_availability_months) to Supplier, mandatory",
+    "Add Select field \"Is Sole Marketer\" (custom_is_sole_marketer) to Supplier, mandatory, options: Yes / No",
+    "Add server script \"supplier_onboarding_validation\" on Supplier (before save)",
+    "Create workflow \"Supplier Onboarding\" on Supplier: 4 states, 4 transitions"
+   ],
+   "requirements": [
+    7
+   ],
+   "risk": "high",
+   "session": "8601d0d47058",
+   "title": "Supplier Onboarding Gate: Age, Market Availability, Sole Marketer + Workflow (ERPNext v15)"
+  },
+  {
+   "change_set": "01M5DKV7S83BRAAH00SQRFFXY4",
+   "created_by": "run:09e3f5bcaafe",
+   "operations": [
+    "Create role \"Branch User\"",
+    "Add Link field \"Branch\" (custom_branch) to Supplier after supplier_group, options: Branch",
+    "Set in_standard_filter = 1 on field \"supplier_group\" of Supplier",
+    "Set in_list_view = 1 on field \"supplier_group\" of Supplier",
+    "Set options = SUP-.YYYY.-.#####\nSUP-.##### on field \"naming_series\" of Supplier",
+    "Add server script \"Supplier_CSD_Autovalidation\" on Supplier (before save)",
+    "Grant role \"Branch User\" on Supplier (level 0): read, write",
+    "Grant role \"Branch User\" on Bank Account (level 0): read, write"
+   ],
+   "requirements": [
+    18,
+    21
+   ],
+   "risk": "high",
+   "session": "09e3f5bcaafe",
+   "title": "SRM pilot – Supplier classification, Branch edit access, baseline validations, and series options"
+  },
+  {
+   "change_set": "01M5DPPPF1TMVE7Q2E3GJPK2AF",
+   "created_by": "run:09e3f5bcaafe",
+   "operations": [
+    "Create DocType \"Supplier C-Form\" in module Buying with 6 fields and 2 role permission(s)",
+    "Add server script \"validate_c_form_fields\" on Supplier C-Form (before submit)",
+    "Create workflow \"Supplier C-Form Workflow\" on Supplier C-Form: 5 states, 5 transitions",
+    "Create email notification \"C-Form Submitted - Notify Purchase Manager\" on Supplier C-Form (Value Change)",
+    "Create report \"Pending C-Forms\" on Supplier C-Form with 5 columns",
+    "Create number card \"Pending C-Forms\": Count on Supplier C-Form",
+    "Create pie chart \"C-Form Status Distribution\" on Supplier C-Form",
+    "Create dashboard \"Supplier C-Forms Dashboard\" with 1 chart(s) and 1 number card(s)"
+   ],
+   "requirements": [],
+   "risk": "high",
+   "session": "09e3f5bcaafe",
+   "title": "Support for Supplier C-Form uploads (change set)"
+  },
+  {
+   "change_set": "01M5DQE5388F5ZK6Y5WC200TP0",
+   "created_by": "run:f3d3fbbc7503",
+   "operations": [
+    "Create workspace HTML block \"demo-pilot banner\"",
+    "Create number card \"Open Supplier Change Requests\": Count on Supplier Change Request",
+    "Create workspace \"SRM Home\" with 5 number card(s), 6 chart(s) and 6 shortcut(s)"
+   ],
+   "requirements": [
+    100009
+   ],
+   "risk": "low",
+   "session": "f3d3fbbc7503",
+   "title": "SRM Home workspace (demo-pilot) + Open Supplier Change Requests number card"
+  },
+  {
+   "change_set": "01M5E637HX6RHH1T47Z2F8HF0G",
+   "created_by": "run:eb1986a05af3",
+   "operations": [
+    "Set default = SUP-.YYYY.-.##### on field \"naming_series\" of Supplier"
+   ],
+   "requirements": [
+    100011
+   ],
+   "risk": "medium",
+   "session": "eb1986a05af3",
+   "title": "Set default Supplier naming_series to SUP-.YYYY.-.#####"
+  },
+  {
+   "change_set": "01M5E79JVHME6FZX0MV355ABVX",
+   "created_by": "run:95d5378724df",
+   "operations": [
+    "Create number card \"SRM - Suppliers (Count)\": Count on Supplier",
+    "Create number card \"SRM - Supplier Change Requests (Count)\": Count on Supplier Change Request",
+    "Create number card \"SRM - Supplier Quotations (Count)\": Count on Supplier Quotation",
+    "Create number card \"SRM - Purchase Orders (Count)\": Count on Purchase Order",
+    "Create number card \"SRM - Supplier C-Forms (Count)\": Count on Supplier C-Form",
+    "Create workspace HTML block \"SRM Home Header\"",
+    "Create workspace \"SRM Home\" with 5 number card(s), 0 chart(s) and 5 shortcut(s)"
+   ],
+   "requirements": [
+    100012
+   ],
+   "risk": "low",
+   "session": "95d5378724df",
+   "title": "SRM Home workspace fixed (safe cards + shortcuts; no missing doctypes)"
+  },
+  {
+   "change_set": "01M5E7HGA08YK94PPR0ESF95V7",
+   "created_by": "run:ad30d0f85476",
+   "operations": [
+    "Create workspace HTML block \"SRM Tiles\"",
+    "Create workspace HTML block \"SRM Home Header\"",
+    "Create number card \"SRM - Suppliers (Count)\": Count on Supplier",
+    "Create number card \"SRM - Supplier Change Requests (Count)\": Count on Supplier Change Request",
+    "Create number card \"SRM - Supplier Quotations (Count)\": Count on Supplier Quotation",
+    "Create number card \"SRM - Purchase Orders (Count)\": Count on Purchase Order",
+    "Create number card \"SRM - Supplier C-Forms (Count)\": Count on Supplier C-Form",
+    "Create workspace \"SRM Home\" with 5 number card(s), 0 chart(s) and 0 shortcut(s)"
+   ],
+   "requirements": [
+    100014
+   ],
+   "risk": "low",
+   "session": "ad30d0f85476",
+   "title": "SRM Home workspace with 'SRM Tiles' HTML block"
+  },
+  {
+   "change_set": "01M5E7QJWP0WH2D8552PW9BV9J",
+   "created_by": "run:0a4144e92c29",
+   "operations": [
+    "Create workspace HTML block \"SRM Tiles\"",
+    "Create workspace \"SRM Home\" with 5 number card(s), 0 chart(s) and 0 shortcut(s)"
+   ],
+   "requirements": [
+    100015
+   ],
+   "risk": "low",
+   "session": "0a4144e92c29",
+   "title": "Create SRM Tiles block and SRM Home workspace (placed in Buying module)"
+  },
+  {
+   "change_set": "01M5E9W8GNQEHT0WSK59N0TNMC",
+   "created_by": "run:c5d463e3fcc1",
+   "operations": [
+    "Create portal web form \"Supplier C Form Portal\" (/supplier-c-form-portal) on Supplier C-Form with 5 field(s)"
+   ],
+   "requirements": [
+    435
+   ],
+   "risk": "high",
+   "session": "c5d463e3fcc1",
+   "title": "Supplier C Form Portal web form"
+  },
+  {
+   "change_set": "01M5E9ZAJQ3XCSRH1MS10069VD",
+   "created_by": "run:0ea131c61be4",
+   "operations": [
+    "Add Select field \"Scheme Type\" (custom_scheme_type) to Supplier CPS, mandatory, options: Buy 1 Get 1 Free / Flat Discount / Extra Volume Free / Other",
+    "Add Small Text field \"Scheme Mechanics\" (custom_scheme_mechanics) to Supplier CPS, mandatory",
+    "Add Currency field \"Benefit Value\" (custom_benefit_value) to Supplier CPS, mandatory",
+    "Add Date field \"Start Date\" (custom_start_date) to Supplier CPS, mandatory",
+    "Add Date field \"End Date\" (custom_end_date) to Supplier CPS, mandatory",
+    "Add server script \"Validate CPS dates and required fields\" on Supplier CPS (before save)",
+    "Create portal web form \"Supplier CPS Portal\" (/supplier-cps-portal) on Supplier CPS with 5 field(s)"
+   ],
+   "requirements": [
+    441,
+    442,
+    443
+   ],
+   "risk": "high",
+   "session": "0ea131c61be4",
+   "title": "Supplier CPS declaration: fields, validation, and supplier portal"
+  },
+  {
+   "change_set": "01M5ECNBC0G8AVTS42P60RK978",
+   "created_by": "run:009821e441fe",
+   "operations": [
+    "Create child table \"Supplier Product Registration Item\" in module Buying with 3 fields",
+    "Create DocType \"Supplier Product Registration\" in module Buying with 5 fields and 2 role permission(s)"
+   ],
+   "requirements": [
+    426
+   ],
+   "risk": "low",
+   "session": "009821e441fe",
+   "title": "Rebuild Supplier Product Registration DocTypes"
+  },
+  {
+   "change_set": "01M5ECPFAYZ1MC2ZY623XFNHMS",
+   "created_by": "run:72ae50ab56de",
+   "operations": [
+    "Add server script \"Supplier Product Registration - items validation\" on Supplier Product Registration (before save)"
+   ],
+   "requirements": [
+    100016
+   ],
+   "risk": "medium",
+   "session": "72ae50ab56de",
+   "title": "Validate Supplier Product Registration items: require generic_code or item, prohibit duplicate generic_code within a registration"
+  },
+  {
+   "change_set": "01M5ECWBD5MPRP0W2RFRYV9ABW",
+   "created_by": "run:fa76cca34954",
+   "operations": [
+    "Create DocType \"Branch Price Revision\" in module Buying with 3 fields and 3 role permission(s)",
+    "Create workflow \"Branch Price Revision Approval\" on Branch Price Revision: 4 states, 3 transitions",
+    "Create system notification notification \"Branch Price Revision Pending Approval - Notify Purchase Manager\" on Branch Price Revision (Value Change)",
+    "Create report \"Branch Price Revision - Workflow Overview\" on Branch Price Revision with 3 columns"
+   ],
+   "requirements": [
+    440
+   ],
+   "risk": "high",
+   "session": "fa76cca34954",
+   "title": "Branch Price Revision – Workflow, Notification, and Report"
+  },
+  {
+   "change_set": "01M5ED9Q7T335QCHZV2RF44M0B",
+   "created_by": "run:6356d7c90545",
+   "operations": [
+    "Create DocType \"Supplier Source Declaration\" in module Buying with 8 fields and 3 role permission(s)",
+    "Add server script \"ssd_validate_dates\" on Supplier Source Declaration (before save)",
+    "Create portal web form \"Supplier Source Declaration Portal\" (/supplier-source-declaration) on Supplier Source Declaration with 8 field(s)"
+   ],
+   "requirements": [
+    424
+   ],
+   "risk": "high",
+   "session": "6356d7c90545",
+   "title": "Supplier Source Declaration (SSD) — DocType, validation, web form"
+  },
+  {
+   "change_set": "01M5EGPN0604REFWK9VKQD5NWX",
+   "created_by": "run:3f1cf391b004",
+   "operations": [
+    "Set reqd = False on field \"item\" of Supplier Product Registration Item"
+   ],
+   "requirements": [
+    100017
+   ],
+   "risk": "medium",
+   "session": "3f1cf391b004",
+   "title": "Make Supplier Product Registration Item.item optional"
+  },
+  {
+   "change_set": "01M5EZTCM52JJY2S42RAREHTED",
+   "created_by": "run:cc309e75e801",
+   "operations": [
+    "Set reqd = False on field \"custom_scheme_type\" of Supplier CPS",
+    "Set hidden = True on field \"custom_scheme_type\" of Supplier CPS",
+    "Set reqd = False on field \"custom_scheme_mechanics\" of Supplier CPS",
+    "Set hidden = True on field \"custom_scheme_mechanics\" of Supplier CPS",
+    "Set reqd = False on field \"custom_start_date\" of Supplier CPS",
+    "Set hidden = True on field \"custom_start_date\" of Supplier CPS",
+    "Set reqd = False on field \"custom_end_date\" of Supplier CPS",
+    "Set hidden = True on field \"custom_end_date\" of Supplier CPS",
+    "Set reqd = True on field \"valid_from\" of Supplier CPS",
+    "Set reqd = True on field \"valid_to\" of Supplier CPS",
+    "Add server script \"Validate CPS dates and required fields\" on Supplier CPS (before save)",
+    "Create portal web form \"Supplier CPS Portal\" (/supplier-cps-portal) on Supplier CPS with 7 field(s)"
+   ],
+   "requirements": [
+    100018
+   ],
+   "risk": "high",
+   "session": "cc309e75e801",
+   "title": "Supplier CPS — hide duplicates, enforce canonical fields, add validation, recreate portal form"
+  }
+ ]
+}

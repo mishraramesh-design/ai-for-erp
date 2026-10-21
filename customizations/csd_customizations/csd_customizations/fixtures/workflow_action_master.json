@@ -1,0 +1,37 @@
+[
+ {
+  "doctype": "Workflow Action Master",
+  "name": "Approve",
+  "workflow_action_name": "Approve"
+ },
+ {
+  "doctype": "Workflow Action Master",
+  "name": "Reject",
+  "workflow_action_name": "Reject"
+ },
+ {
+  "doctype": "Workflow Action Master",
+  "name": "Resubmit",
+  "workflow_action_name": "Resubmit"
+ },
+ {
+  "doctype": "Workflow Action Master",
+  "name": "Submit for Review",
+  "workflow_action_name": "Submit for Review"
+ },
+ {
+  "doctype": "Workflow Action Master",
+  "name": "Submit",
+  "workflow_action_name": "Submit"
+ },
+ {
+  "doctype": "Workflow Action Master",
+  "name": "Verify",
+  "workflow_action_name": "Verify"
+ },
+ {
+  "doctype": "Workflow Action Master",
+  "name": "Submit for Approval",
+  "workflow_action_name": "Submit for Approval"
+ }
+]
