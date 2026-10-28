@@ -174,3 +174,9 @@ def test_web_form_long_text_maps_to_text():
     op = OpAdapter.validate_python({"op": "create_web_form", "title": "Notes Form", "route": "notes-form", "doctype": "Supplier",
                                     "fields": [{"fieldname": "supplier_name", "fieldtype": "Long Text"}]})
     assert web_form_payload(op)["web_form_fields"][0]["fieldtype"] == "Text"
+
+
+def test_server_script_format_call_is_rejected():
+    got = codes([{"op": "add_server_validation", "name": "fmt", "doctype": "Supplier", "event": "Before Save",
+                  "script": "if doc.supplier_name == 'x':\n    frappe.throw('Bad {0}'.format(doc.supplier_name))"}])
+    assert "py_format" in got
