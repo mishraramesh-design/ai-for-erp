@@ -177,6 +177,6 @@ def test_web_form_long_text_maps_to_text():
 
 
 def test_server_script_format_call_is_rejected():
-    got = codes([{"op": "add_server_validation", "name": "fmt", "doctype": "Supplier", "event": "Before Save",
+    got = codes([{"op": "add_server_validation", "name": "fmt", "doctype": "Supplier", "event": "before_save",
                   "script": "if doc.supplier_name == 'x':\n    frappe.throw('Bad {0}'.format(doc.supplier_name))"}])
     assert "py_format" in got
