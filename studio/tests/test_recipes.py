@@ -77,6 +77,11 @@ def test_html_block_rejects_scripts():
     assert "html_script" in got
 
 
+def test_inline_style_tag_in_html_block_is_rejected():
+    got = codes([{"op": "create_html_block", "name": "styled", "html": "<style>.a{color:red}</style><div class='a'>x</div>"}])
+    assert "html_inline_style" in got
+
+
 def test_workflow_state_field_is_known_after_a_planned_workflow():
     ops = [{"op": "create_workflow", "name": "Supplier flow", "doctype": "Supplier",
             "states": [{"state": "Draft", "doc_status": 0, "allow_edit": "System Manager"},

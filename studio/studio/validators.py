@@ -574,6 +574,10 @@ def _check_record(op, ctx, snap, add, i) -> None:
             add("error", "html_external", "HTML blocks may not load external resources.", i)
         if not op.html.strip():
             add("error", "html_empty", "The HTML block is empty.", i)
+        if "<style" in op.html.lower():
+            add("error", "html_inline_style",
+                "Frappe strips an inline <style> tag from an HTML block, so the block would show unstyled. "
+                "Put all CSS in the separate `style` field instead.", i)
         return
     if t == "create_workspace":
         for n in op.html_blocks:
