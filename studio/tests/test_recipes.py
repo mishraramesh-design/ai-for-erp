@@ -203,3 +203,11 @@ def test_set_property_on_a_doctype_created_in_the_same_plan_is_folded_into_its_f
     assert [o["op"] for o in ops] == ["create_doctype", "set_property"]          # the unrelated one stays
     f = {x["fieldname"]: x for x in ops[0]["fields"]}
     assert f["priority"]["options"] == "Low\nHigh" and f["priority"]["reqd"] is True and f["owner_user"]["options"] == "User"
+
+
+def test_unknown_extra_keys_on_an_operation_are_dropped_not_fatal():
+    from studio.spec import ChangeSet, normalize_ops
+    ops = normalize_ops([{"op": "create_notification", "name": "N", "doctype": "Supplier", "event": "Save", "subject": "s", "message": "m",
+                          "send_system_notification": True, "recipients": [{"role": "System Manager"}]}])
+    assert "send_system_notification" not in ops[0] and ops[0]["name"] == "N"
+    ChangeSet(id="x", title="t", ops=ops)   # validates now

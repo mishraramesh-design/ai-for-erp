@@ -477,10 +477,30 @@ def normalize_ops(ops) -> list:
                 o[k] = str(o[k][0]) if o[k] else None
             elif o.get(k) is not None and not isinstance(o[k], str) and o.get("op") in RECORD_OPS:
                 o[k] = str(o[k])
+        o = _drop_unknown_keys(o)
         if isinstance(o.get("days"), str) and o["days"].strip().lstrip("-").isdigit():
             o["days"] = int(o["days"])
         out.append(o)
     return _fold_new_doctype_properties(out)
+
+
+def _drop_unknown_keys(o: dict) -> dict:
+    """A model sometimes adds a harmless key that the operation does not have (send_system_notification, notes).
+    Dropping it is safer than discarding the whole plan; every real field is still checked by the validators."""
+    cls = _OP_CLASSES().get(o.get("op"))
+    if not cls:
+        return o
+    allowed = set(cls.model_fields)
+    return {k: v for k, v in o.items() if k in allowed}
+
+
+def _OP_CLASSES() -> dict:
+    out = {}
+    for c in _Op.__subclasses__():
+        f = c.model_fields.get("op")
+        if f is not None and f.default is not None:
+            out[f.default] = c
+    return out
 
 
 _FOLD_BOOL = {"reqd", "unique", "in_list_view", "in_standard_filter", "read_only", "hidden"}
