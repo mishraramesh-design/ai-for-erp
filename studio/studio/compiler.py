@@ -66,7 +66,7 @@ def script_name(doctype: str, name: str) -> str:
 
 def client_script_payload(op) -> dict:
     return {"doctype": "Client Script", "name": script_name(op.doctype, op.name), "dt": op.doctype,
-            "view": "Form", "enabled": 1, "script": op.script}
+            "view": getattr(op, "view", "Form"), "enabled": 1, "script": op.script}
 
 
 def server_script_payload(op) -> dict:

@@ -180,3 +180,12 @@ def test_server_script_format_call_is_rejected():
     got = codes([{"op": "add_server_validation", "name": "fmt", "doctype": "Supplier", "event": "before_save",
                   "script": "if doc.supplier_name == 'x':\n    frappe.throw('Bad {0}'.format(doc.supplier_name))"}])
     assert "py_format" in got
+
+
+def test_list_view_client_script_and_marker_check():
+    ok = codes([{"op": "add_client_script", "doctype": "Supplier", "name": "lv", "view": "List",
+                 "script": "frappe.listview_settings['Supplier'] = {onload: function(listview) { listview.page.wrapper.addClass('x'); }};"}])
+    assert "js_no_handler" not in ok
+    bad = codes([{"op": "add_client_script", "doctype": "Supplier", "name": "lv", "view": "List",
+                  "script": "frappe.ui.form.on('Supplier', { <NL> refresh: function(frm) {} <NL> });"}])
+    assert "js_no_handler" in bad and "js_line_markers" in bad

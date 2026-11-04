@@ -208,7 +208,7 @@ def check_python(script: str, doc_fields: Optional[set], doc_ok: bool) -> list:
     return found
 
 
-def check_js(script: str, doctype: str) -> list:
+def check_js(script: str, doctype: str, view: str = "Form") -> list:
     found: list = []
     if not script.strip():
         return [("error", "script_empty", "The script is empty.")]
@@ -217,7 +217,12 @@ def check_js(script: str, doctype: str) -> list:
     for pat, label in FORBIDDEN_JS:
         if re.search(pat, script):
             found.append(("error", "js_forbidden", f"Client script uses {label}, which is not allowed."))
-    if "frappe.ui.form.on(" not in script:
+    if "<NL>" in script:
+        found.append(("error", "js_line_markers", "The script still contains <NL> line-break markers; they must be real newlines."))
+    if view == "List":
+        if "frappe.listview_settings" not in script:
+            found.append(("error", "js_no_handler", "A List-view script must set frappe.listview_settings['<DocType>'] = {...}."))
+    elif "frappe.ui.form.on(" not in script:
         found.append(("error", "js_no_handler", "Client script must register handlers with frappe.ui.form.on(...)."))
     elif doctype not in script:
         found.append(("warning", "js_doctype_mismatch", f'The script does not mention "{doctype}" in its handler.'))
@@ -373,7 +378,7 @@ def validate(cs: ChangeSet, snap) -> list:
                 continue
             if not SCRIPT_NAME_RE.match(op.name):
                 add("error", "script_name", f'Invalid script name "{op.name}".', i)
-            for lv, code, msg in check_js(op.script, op.doctype):
+            for lv, code, msg in check_js(op.script, op.doctype, getattr(op, "view", "Form")):
                 add(lv, code, msg, i)
             if snap.doc_exists("Client Script", op.name):
                 add("warning", "script_exists", f'Client Script "{op.name}" exists and will be overwritten (undo restores it).', i)

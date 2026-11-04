@@ -90,6 +90,7 @@ class AddClientScript(_Op):
     doctype: str
     name: str
     script: str
+    view: Literal["Form", "List"] = "Form"  # List scripts set frappe.listview_settings['<DocType>'] = {...}
 
 
 class AddServerValidation(_Op):
