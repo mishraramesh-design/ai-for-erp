@@ -62,6 +62,7 @@ class Task:
     group: str
     attempt: int = 0
     deps: list = field(default_factory=list)
+    after: list = field(default_factory=list)  # run only once these tasks have ended, however they ended (ordering, not dependency)
     status: str = "pending"       # pending | running | done | failed | skipped | held
     note: str = ""
     result: dict = field(default_factory=dict)
@@ -344,7 +345,8 @@ class Kernel:
                     self._finish(run, "cancelled")
                     return
                 by_id = {t.id: t for t in run.tasks}
-                ready = [t for t in run.tasks if t.status == "pending" and all(by_id[d].status in DONE for d in t.deps)]
+                ready = [t for t in run.tasks if t.status == "pending" and all(by_id[d].status in DONE for d in t.deps)
+                         and all(by_id[a].status in ("done", "skipped", "failed") for a in t.after if a in by_id)]
                 dead = [t for t in run.tasks if t.status == "pending" and any(by_id[d].status == "failed" for d in t.deps)]
                 for t in dead:
                     t.status, t.note = "skipped", "an earlier step failed"
@@ -649,14 +651,18 @@ class Kernel:
         same = bool(feedback) and g.get("feedback", "")[:300] == feedback[:300]
         if (t.attempt >= run.policy.max_repairs or same) and len(ids) > 1 and not g.get("split"):
             # divide and conquer: one stubborn requirement must not sink its neighbours
-            spawn = []
+            spawn, prev_last = [], None
             for rid in ids:
                 sid = f"{t.group}s{rid}"
                 run.groups[sid] = {"label": f"{g['label']} · {rid}", "ids": [rid], "all_ids": [rid], "guidance": g.get("guidance", ""),
                                    "feedback": "", "hints": {k: v for k, v in g["hints"].items() if k == str(rid)},
                                    "approach": {k: v for k, v in g["approach"].items() if k == str(rid)},
                                    "cs_id": "", "attempt": 0, "closed": False, "outcome": "", "split": True}
-                spawn.extend(self._chain(sid, 0, [t.id]))
+                chain = self._chain(sid, 0, [t.id])
+                if prev_last:  # one at a time: a later requirement must see what the earlier one built, not duplicate it
+                    chain[0].after = [prev_last]
+                prev_last = chain[-1].id
+                spawn.extend(chain)
             d.reqs.mark(ids, "backlog", note=f"Splitting into single requirements: {why}")
             self._close(run, t.group, f"split into {len(ids)}", skip_after=t)
             self._log(run, t.id, "warn", f"{why}; retrying each of the {len(ids)} requirements on its own.", tier="rule")
