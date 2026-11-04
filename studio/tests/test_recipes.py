@@ -211,3 +211,14 @@ def test_unknown_extra_keys_on_an_operation_are_dropped_not_fatal():
                           "send_system_notification": True, "recipients": [{"role": "System Manager"}]}])
     assert "send_system_notification" not in ops[0] and ops[0]["name"] == "N"
     ChangeSet(id="x", title="t", ops=ops)   # validates now
+
+
+def test_custom_prefix_not_required_on_a_doctype_we_own():
+    erp = FakeErp()
+    erp._put("DocType", "Case", {"name": "Case", "module": "Custom", "istable": 0, "issingle": 0, "custom": 1})
+    snap = Snapshot(erp, ttl=0)
+    snap.fieldnames = lambda n: {"title"} if n == "Case" else set(Snapshot.fieldnames(snap, n))
+    def errs(dt):
+        op = {"op": "add_custom_field", "doctype": dt, "fieldname": "days_open", "label": "Days Open", "fieldtype": "Int"}
+        return [i.code for i in validate(ChangeSet(ops=[op]), snap) if i.level == "error"]
+    assert "custom_prefix" not in errs("Case") and "custom_prefix" in errs("Supplier")

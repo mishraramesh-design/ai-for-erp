@@ -331,7 +331,8 @@ def validate(cs: ChangeSet, snap) -> list:
                 continue
             if not FIELDNAME_RE.match(op.fieldname):
                 add("error", "fieldname", f'Invalid fieldname "{op.fieldname}".', i)
-            if not op.fieldname.startswith("custom_"):
+            own = op.doctype in ctx.planned_doctypes or bool((snap.doctypes().get(op.doctype) or {}).get("custom"))
+            if not own and not op.fieldname.startswith("custom_"):
                 add("error", "custom_prefix", 'Custom fields must start with "custom_" so they never clash with ERPNext upgrades.', i)
             if op.fieldname in RESERVED_FIELDNAMES:
                 add("error", "fieldname_reserved", f'"{op.fieldname}" is a reserved fieldname.', i)
