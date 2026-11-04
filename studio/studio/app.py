@@ -16,6 +16,7 @@ from fastapi import File, Form, UploadFile
 
 from .applier import Applier
 from .erp import HttpErp
+from .interview import InterviewStore, approve as iv_approve, brd_markdown, turn as iv_turn, FITS, PRIORITIES
 from .kernel import Deps, Kernel, RunStore
 from .ledger import Ledger
 from .models import ConfigStore, Router, UsageLog, apply_profile
@@ -39,6 +40,7 @@ def create_app(data_dir: str | None = None) -> FastAPI:
     usage = UsageLog(Path(data) / "usage.jsonl")
     router = Router(cfg_store, usage)
     reqs = RequirementStore(Path(data) / "requirements.json")
+    interviews = InterviewStore(Path(data) / "interviews.json")
     ledger = Ledger(Path(data) / "ledger")
     app.state.router, app.state.reqs, app.state.ledger = router, reqs, ledger
     # First start: take the ERPNext address and password from the compose file so the user does not retype them.
@@ -556,6 +558,123 @@ def create_app(data_dir: str | None = None) -> FastAPI:
             return gh_client().merge(number)
         except GitHubError as ex:
             raise HTTPException(502, str(ex))
+
+    # ---- requirement interview (the BA talks, requirements build up; nothing reaches the backlog until approved)
+    def _snap_or_none():
+        try:
+            build_deps()
+            return erp_cache.get("snap")
+        except Exception:  # noqa: BLE001 - the chat still works without a site, it just cannot verify fit
+            return None
+
+    def _iv(sid: str):
+        s = interviews.get(sid)
+        if not s:
+            raise HTTPException(404, "unknown interview")
+        return s
+
+    def _iv_view(s) -> dict:
+        d = s.model_dump(mode="json")
+        d["open_questions"] = sum(1 for q in s.questions if q.status == "open")
+        return d
+
+    class IvNew(BaseModel):
+        title: str = ""
+        module: str = ""
+
+    class IvMsg(BaseModel):
+        text: str
+
+    class IvDraft(BaseModel):
+        text: Optional[str] = None
+        process: Optional[str] = None
+        priority: Optional[str] = None
+        fit: Optional[str] = None
+        status: Optional[str] = None  # draft | rejected (reopen or discard)
+
+    class IvAnswer(BaseModel):
+        answer: str = ""
+        dropped: bool = False
+
+    class IvApprove(BaseModel):
+        ids: list[str] = []
+
+    @app.get("/api/interviews")
+    def iv_list(_: str = Depends(authed)) -> list:
+        return [{"id": s.id, "title": s.title, "module": s.module, "created": s.created, "drafts": len([d for d in s.drafts if d.status != "rejected"]),
+                 "approved": len([d for d in s.drafts if d.status == "approved"]), "open_questions": sum(1 for q in s.questions if q.status == "open")}
+                for s in interviews.list()]
+
+    @app.post("/api/interviews")
+    def iv_new(body: IvNew, _: str = Depends(authed)) -> dict:
+        return _iv_view(interviews.create(body.title, body.module))
+
+    @app.get("/api/interviews/{sid}")
+    def iv_get(sid: str, _: str = Depends(authed)) -> dict:
+        return _iv_view(_iv(sid))
+
+    @app.post("/api/interviews/{sid}/message")
+    def iv_message(sid: str, body: IvMsg, _: str = Depends(authed)) -> dict:
+        s = _iv(sid)
+        if not body.text.strip():
+            raise HTTPException(400, "Say something first.")
+        llm = router.for_role("interviewer" if router.enabled("interviewer") else "chat", project="interview", run_id=sid)
+        if not llm.configured():
+            raise HTTPException(409, "No model is set for the interviewer. Open Models and save a key first.")
+        with interviews.lock:
+            ch = iv_turn(s, body.text, llm, _snap_or_none(), Path(data) / "packs")
+            interviews.save()
+        return {**_iv_view(s), "changed": ch}
+
+    @app.post("/api/interviews/{sid}/drafts/{did}")
+    def iv_draft(sid: str, did: str, body: IvDraft, _: str = Depends(authed)) -> dict:
+        s = _iv(sid)
+        d = next((x for x in s.drafts if x.id == did), None)
+        if not d:
+            raise HTTPException(404, "unknown requirement")
+        if d.status == "approved":
+            raise HTTPException(409, "Approved requirements are frozen.")
+        with interviews.lock:
+            if body.text is not None and body.text.strip():
+                d.text = body.text.strip()[:600]
+            if body.process is not None:
+                d.process = body.process.strip()[:80]
+            if body.priority in PRIORITIES:
+                d.priority = body.priority
+            if body.fit in FITS:
+                d.fit = body.fit
+                d.unverified = False
+            if body.status in ("draft", "rejected"):
+                d.status = body.status
+            interviews.save()
+        return _iv_view(s)
+
+    @app.post("/api/interviews/{sid}/questions/{qid}")
+    def iv_answer(sid: str, qid: str, body: IvAnswer, _: str = Depends(authed)) -> dict:
+        s = _iv(sid)
+        q = next((x for x in s.questions if x.id == qid), None)
+        if not q:
+            raise HTTPException(404, "unknown question")
+        with interviews.lock:
+            if body.dropped:
+                q.status = "dropped"
+            else:
+                q.status, q.answer = "answered", body.answer.strip()[:400]
+            interviews.save()
+        return _iv_view(s)
+
+    @app.post("/api/interviews/{sid}/approve")
+    def iv_approve_ep(sid: str, body: IvApprove, user: str = Depends(authed)) -> dict:
+        s = _iv(sid)
+        ids = body.ids or [d.id for d in s.drafts if d.status == "draft"]
+        with interviews.lock:
+            r = iv_approve(s, ids, reqs, user)
+            interviews.save()
+        return {**_iv_view(s), **r}
+
+    @app.get("/api/interviews/{sid}/brd")
+    def iv_brd(sid: str, _: str = Depends(authed)) -> dict:
+        return {"markdown": brd_markdown(_iv(sid))}
 
     # ---- pages
     def gated(name: str):

@@ -38,10 +38,21 @@ button.p{background:var(--accent);color:#fff;border-color:var(--accent);font-wei
 .log .err{color:var(--bad)}.log .warn{color:var(--hold)}.log .ok{color:var(--ok)}
 ul.lines{margin:6px 0 0;padding-left:18px}
 @media (max-width:760px){.app{grid-template-columns:minmax(0,1fr)}nav{flex-direction:row;overflow-x:auto;border-right:0;border-bottom:1px solid var(--line)}nav small{display:none}}
+.iv{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:14px;align-items:start}
+.chat{display:flex;flex-direction:column;gap:8px;max-height:56vh;overflow:auto;padding:4px}
+.msg{padding:8px 12px;border-radius:12px;max-width:92%;white-space:pre-wrap;overflow-wrap:anywhere}
+.msg.ba{align-self:flex-end;background:var(--accent);color:#fff}.msg.agent{align-self:flex-start;background:var(--surface2);border:1px solid var(--line)}
+.rq{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:10px;background:var(--surface)}
+.rq.approved{border-left:4px solid var(--ok)}.rq.rejected{opacity:.5}.rq textarea{min-height:44px;resize:vertical}
+.rq small{color:var(--muted)}.rq select{width:auto;padding:3px 6px}
+.tabs{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}.tabs button.on{background:var(--accent-soft);color:var(--accent);border-color:var(--accent)}
+.opt{margin:3px 4px 3px 0}.opt.sug{border-color:var(--ok);color:var(--ok)}
+.flow{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:6px 0 12px}.flow .node{max-width:230px}
+@media (max-width:900px){.iv{grid-template-columns:minmax(0,1fr)}}
 </style></head><body>
 <header><div class="brand">◆ ERPNext Studio</div><span class="chip" id="ver"></span><div class="sp"></div><button id="out">Sign out</button></header>
 <div class="app"><nav>
-<a data-t="overview">Overview</a><a data-t="reqs">Requirements</a><a data-t="runs">Runs</a><a data-t="export">Export</a><a href="/workbench">Workbench <span class="chip">preview</span></a>
+<a data-t="overview">Overview</a><a data-t="interview">Workshop</a><a data-t="reqs">Requirements</a><a data-t="runs">Runs</a><a data-t="export">Export</a><a href="/workbench">Workbench <span class="chip">preview</span></a>
 <small>Setup</small><a data-t="models">Models</a><a data-t="erp">ERPNext</a></nav>
 <main id="m"></main></div>
 <script>
@@ -223,8 +234,73 @@ V.export.after=()=>{const m=t=>$('#xmsg').textContent=t;
  const prm=$('#prm');if(prm)prm.onclick=async()=>{if(prm.dataset.sure!=='1'){prm.dataset.sure='1';prm.textContent='Click again to merge and start the release build';return}
   const r=await api('/api/export/pr/'+XP.pr.number+'/merge',{method:'POST',body:{}});XP.msg=r.detail||(r.merged?'Merged. CI is building the release image.':r.message);if(r.merged)XP.pr.merged=true;go('export')}};
 
+/* ---------------------------------------------------------------- requirement workshop (interview) */
+const FITC={Standard:'ok',Configuration:'run',Customization:'hold','Not possible':'bad'};
+let IV=null,IVTAB='reqs',IVBRD='';
+V.interview=async(id)=>{
+ if(!id){const l=await api('/api/interviews');
+  const rows=(l||[]).map(x=>`<tr><td><a href="#interview/${x.id}">${esc(x.title)}</a></td><td>${esc(x.module)}</td><td>${x.drafts} (${x.approved} approved)</td><td>${x.open_questions}</td><td class="muted">${new Date(x.created*1000).toLocaleString()}</td></tr>`).join('');
+  return `<h2>Requirement workshop</h2><p class="sub">Talk to the agent like a client meeting. It asks the next question, judges each requirement against the real ERPNext site, and builds the list. Nothing enters the build backlog until you approve it.</p>
+  <div class="card"><div class="grid"><div><label>Workshop title</label><input id="ivt" placeholder="e.g. SRM client workshop 1"></div><div><label>ERPNext module / area</label><input id="ivm" placeholder="Supplier Relationship Management"></div></div>
+  <div class="row"><button class="p" id="ivn">Start workshop</button><span id="ivmsg" class="muted"></span></div></div>
+  <div class="card tablew"><table><tr><th>Workshop</th><th>Module</th><th>Requirements</th><th>Open questions</th><th>Started</th></tr>${rows||'<tr><td colspan=5 class=muted>No workshops yet.</td></tr>'}</table></div>`}
+ IV=await api('/api/interviews/'+id);if(IV.detail)return `<h2>Workshop</h2><p class="bad">${esc(IV.detail)}</p>`;
+ IVTAB='reqs';IVBRD='';return ivHtml()};
+function ivHtml(){const s=IV,live=s.drafts.filter(d=>d.status!=='rejected'),n=f=>live.filter(d=>d.fit===f).length;
+ const chat=s.messages.map(m=>`<div class="msg ${m.role}">${esc(m.text)}</div>`).join('')||'<div class="muted">Describe what the client wants, in their words or yours. Example: "The client wants every supplier to submit a bank guarantee and be blocked when it expires."</div>';
+ const tabs=[['reqs',`Requirements (${live.length})`],['qs',`Questions (${s.open_questions})`],['brd','Document & flow']].map(([k,l])=>`<button data-tab="${k}" class="${IVTAB===k?'on':''}">${l}</button>`).join('');
+ return `<h2>${esc(s.title)} <span class="chip">${esc(s.module)}</span></h2><p class="sub"><a href="#interview">All workshops</a> · ${n('Standard')} standard · ${n('Configuration')} configuration · ${n('Customization')} customization · ${n('Not possible')} not possible · ${s.drafts.filter(d=>d.status==='approved').length} approved</p>
+ <div class="iv"><div class="card"><h3>Conversation</h3><div class="chat" id="chat">${chat}</div>
+  <label>Your message</label><textarea id="ivi" rows="4" placeholder="Type what the client said or what you need to ask… (Ctrl+Enter to send)"></textarea>
+  <div class="row"><button class="p" id="ivs">Send</button><span id="ivst" class="muted"></span></div></div>
+  <div><div class="tabs">${tabs}</div><div id="ivp">${ivPanel()}</div></div></div>`}
+function ivPanel(){const s=IV;
+ if(IVTAB==='qs'){const qs=s.questions.filter(q=>q.status!=='dropped');
+  return qs.map(q=>`<div class="rq ${q.status==='answered'?'approved':''}"><b>${q.id}</b> ${esc(q.text)} ${q.status==='answered'?tag('answered','ok'):tag('open','hold')}
+   ${q.why?`<div class="muted">${esc(q.why)}</div>`:''}${q.blocks.length?`<div><small>Blocks ${q.blocks.join(', ')}</small></div>`:''}
+   ${q.status==='answered'?`<div>Answer: <b>${esc(q.answer)}</b></div>`:`<div style="margin-top:6px">${q.options.map(o=>`<button class="opt ${o===q.suggested?'sug':''}" data-ans="${q.id}" data-v="${esc(o)}">${o===q.suggested?'★ ':''}${esc(o)}</button>`).join('')}
+    <div class="row" style="margin-top:6px"><input id="qa${q.id}" placeholder="or type another answer" style="max-width:320px"><button data-anst="${q.id}">Answer</button><button data-skip="${q.id}">Skip</button></div></div>`}</div>`).join('')||'<div class="card muted">No questions yet. The agent will ask as the picture builds.</div>'}
+ if(IVTAB==='brd'){
+  const live=s.drafts.filter(d=>d.status!=='rejected'),pr={};live.forEach(d=>(pr[d.process||'General']=pr[d.process||'General']||[]).push(d));
+  const flow=Object.entries(pr).map(([p,ds])=>`<b>${esc(p)}</b><div class="flow">${ds.map((d,i)=>`${i?'→':''}<span class="node" title="${esc(d.text)}">${d.id} ${esc(d.text.slice(0,48))}${d.text.length>48?'…':''}</span>`).join(' ')}</div>`).join('');
+  return `<div class="card"><h3>Process flow</h3>${flow||'<span class="muted">Nothing yet.</span>'}</div><div class="card"><div class="row" style="margin:0 0 8px"><button class="p" id="brdg">Generate document</button><button id="brdc" ${IVBRD?'':'disabled'}>Copy</button><button id="brdd" ${IVBRD?'':'disabled'}>Download .md</button></div>
+   <div class="tablew"><pre id="brdt" style="white-space:pre-wrap;margin:0;font-size:12px;max-height:50vh;overflow:auto">${esc(IVBRD||'Generate the Business Requirement Document from the approved requirements (or the drafts if none are approved yet).')}</pre></div></div>`}
+ const ds=s.drafts.filter(d=>d.status!=='rejected'),pend=ds.filter(d=>d.status==='draft');
+ const head=`<div class="row" style="margin:0 0 10px"><button class="p" id="apall" ${pend.length?'':'disabled'}>Approve all ${pend.length} draft(s) → backlog</button><span id="apm" class="muted"></span></div>`;
+ return head+(ds.map(d=>`<div class="rq ${d.status}"><div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"><b>${d.id}</b>${tag(d.fit,FITC[d.fit])}${d.unverified?tag('fit unverified','hold'):''}<span class="chip">${esc(d.process||'General')}</span><span class="chip">${d.priority}</span>${d.status==='approved'?tag('approved → #'+d.req_id,'ok'):''}</div>
+  ${d.status==='approved'?`<div style="margin:6px 0">${esc(d.text)}</div>`:`<textarea data-edit="${d.id}" rows="2">${esc(d.text)}</textarea>`}
+  ${d.doctypes.length?`<div><small>ERPNext: ${d.doctypes.map(esc).join(', ')}</small></div>`:''}${d.rationale?`<div><small>${esc(d.rationale)}</small></div>`:''}${d.workaround?`<div><small>Workaround: ${esc(d.workaround)}</small></div>`:''}
+  ${d.acceptance.length?`<ul class="lines">${d.acceptance.map(a=>`<li><small>${esc(a)}</small></li>`).join('')}</ul>`:''}
+  ${d.status==='draft'?`<div class="row" style="margin-top:6px"><select data-fit="${d.id}">${['Standard','Configuration','Customization','Not possible'].map(f=>`<option ${f===d.fit?'selected':''}>${f}</option>`).join('')}</select><select data-pri="${d.id}">${['Must','Should','Could'].map(f=>`<option ${f===d.priority?'selected':''}>${f}</option>`).join('')}</select><button data-ap="${d.id}">Approve</button><button class="bad" data-rj="${d.id}">Reject</button></div>`:''}</div>`).join('')||'<div class="card muted">Requirements appear here as you talk.</div>')};
+function ivRefresh(){const c=$('#chat'),keep=$('#ivi')?$('#ivi').value:'';$('#m').innerHTML=ivHtml();$('#ivi').value=keep;V.interview.after(IV.id);const ch=$('#chat');if(ch)ch.scrollTop=ch.scrollHeight}
+V.interview.after=(id)=>{
+ if(!id){$('#ivn').onclick=async()=>{const r=await api('/api/interviews',{method:'POST',body:{title:$('#ivt').value,module:$('#ivm').value}});if(r.detail){$('#ivmsg').textContent=r.detail;return}location.hash='#interview/'+r.id};return}
+ const ch=$('#chat');if(ch)ch.scrollTop=ch.scrollHeight;
+ const send=async()=>{const t=$('#ivi').value.trim();if(!t)return;$('#ivs').disabled=true;$('#ivst').textContent='Thinking… (the agent is checking ERPNext)';
+  const r=await api(`/api/interviews/${IV.id}/message`,{method:'POST',body:{text:t}});
+  if(r.detail){$('#ivst').innerHTML='<span class="bad">'+esc(r.detail)+'</span>';$('#ivs').disabled=false;return}
+  IV=r;$('#ivi').value='';ivRefresh()};
+ $('#ivs').onclick=send;$('#ivi').onkeydown=e=>{if(e.ctrlKey&&e.key==='Enter')send()};
+ const post=async(p,b)=>{const r=await api(p,{method:'POST',body:b});if(!r.detail){IV={...IV,...r}}else alert(r.detail);return r};
+ document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{IVTAB=b.dataset.tab;ivRefresh()});
+ document.querySelectorAll('[data-edit]').forEach(t=>t.onchange=async()=>{await post(`/api/interviews/${IV.id}/drafts/${t.dataset.edit}`,{text:t.value})});
+ document.querySelectorAll('[data-fit]').forEach(t=>t.onchange=async()=>{await post(`/api/interviews/${IV.id}/drafts/${t.dataset.fit}`,{fit:t.value});ivRefresh()});
+ document.querySelectorAll('[data-pri]').forEach(t=>t.onchange=async()=>{await post(`/api/interviews/${IV.id}/drafts/${t.dataset.pri}`,{priority:t.value})});
+ document.querySelectorAll('[data-rj]').forEach(b=>b.onclick=async()=>{await post(`/api/interviews/${IV.id}/drafts/${b.dataset.rj}`,{status:'rejected'});ivRefresh()});
+ const approve=async ids=>{const open=IV.questions.filter(q=>q.status==='open'&&q.blocks.some(x=>!ids||ids.includes(x))).length;
+  if(open&&!confirm(open+' open question(s) still affect these requirements. Approve anyway?'))return;
+  const r=await post(`/api/interviews/${IV.id}/approve`,{ids:ids||[]});if(!r.detail){ivRefresh()}};
+ document.querySelectorAll('[data-ap]').forEach(b=>b.onclick=()=>approve([b.dataset.ap]));
+ const aa=$('#apall');if(aa)aa.onclick=()=>approve(null);
+ document.querySelectorAll('[data-ans]').forEach(b=>b.onclick=async()=>{await post(`/api/interviews/${IV.id}/questions/${b.dataset.ans}`,{answer:b.dataset.v});ivRefresh()});
+ document.querySelectorAll('[data-anst]').forEach(b=>b.onclick=async()=>{const v=$('#qa'+b.dataset.anst).value.trim();if(!v)return;await post(`/api/interviews/${IV.id}/questions/${b.dataset.anst}`,{answer:v});ivRefresh()});
+ document.querySelectorAll('[data-skip]').forEach(b=>b.onclick=async()=>{await post(`/api/interviews/${IV.id}/questions/${b.dataset.skip}`,{dropped:true});ivRefresh()});
+ const g=$('#brdg');if(g){g.onclick=async()=>{const r=await api(`/api/interviews/${IV.id}/brd`);IVBRD=r.markdown||r.detail||'';ivRefresh()};
+  $('#brdc').onclick=()=>navigator.clipboard&&navigator.clipboard.writeText(IVBRD);
+  $('#brdd').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([IVBRD],{type:'text/markdown'}));a.download='BRD-'+IV.id+'.md';a.click()}}};
+
 /* ---------------------------------------------------------------- shell */
-async function go(t){stop();NAV++;let arg='';if(t.startsWith('run/')){arg=t.slice(4);t='run'}t=V[t]?t:'overview';
+async function go(t){stop();NAV++;let arg='';if(t.startsWith('run/')){arg=t.slice(4);t='run'}else if(t.startsWith('interview/')){arg=t.slice(10);t='interview'}t=V[t]?t:'overview';
  history.replaceState(0,'','#'+t+(arg?'/'+arg:''));
  document.querySelectorAll('nav a[data-t]').forEach(a=>a.classList.toggle('on',a.dataset.t===(t==='run'?'runs':t)));
  $('#m').innerHTML=await V[t](arg);V[t].after&&V[t].after(arg)}

@@ -39,6 +39,14 @@ class Requirement(BaseModel):
     notes: str = ""
     evidence: list[dict] = Field(default_factory=list)  # verification checks that passed or failed, with run ids
     verified_by: str = ""
+    # filled when the requirement was gathered in an interview (all optional, so older data still loads)
+    fit: str = ""  # Standard | Configuration | Customization | Not possible
+    priority: str = ""
+    acceptance: list[str] = Field(default_factory=list)
+    doctypes: list[str] = Field(default_factory=list)
+    source: str = ""  # e.g. "interview:ab12cd34"
+    approved_by: str = ""
+    approved_at: float = 0.0
 
     @property
     def is_gap(self) -> bool:
@@ -168,6 +176,25 @@ class RequirementStore:
                 added += 1
             self._save()
         return {"added": added, "skipped": len(lines) - added, "total": len(self._items)}
+
+    def add_gathered(self, *, module: str, text: str, process: str, fit: str, priority: str, acceptance: list,
+                     doctypes: list, rationale: str, source: str, by: str, ts: float) -> Requirement:
+        """A requirement the BA approved in an interview. Standard fits are recorded as fit; the rest enter the backlog."""
+        with self._lock:
+            have = next((r for r in self._items.values() if r.source == source and r.text == text), None)
+            if have:
+                return have
+            nxt = max([100000] + list(self._items)) + 1
+            std, cust, status = {"Standard": ("Yes", False, "fit"), "Configuration": ("Partial", False, "backlog"),
+                                 "Customization": ("No", True, "backlog"), "Not possible": ("No", True, "blocked")}.get(
+                fit, ("No", True, "backlog"))
+            r = Requirement(id=nxt, module=module, sheet="Interview", row=nxt - 100000, process=process, text=text,
+                            erp_module=", ".join(doctypes[:3]), std=std, customization=cust, remarks=rationale,
+                            status=status, fit=fit, priority=priority, acceptance=list(acceptance), doctypes=list(doctypes),
+                            source=source, approved_by=by, approved_at=ts, notes=rationale if status == "blocked" else "")
+            self._items[nxt] = r
+            self._save()
+            return r
 
     # ---------------------------------------------------------------- queries
     def get(self, rid: int) -> Optional[Requirement]:

@@ -21,6 +21,7 @@ ROLES = {
     "reviewer": "Independent check that the specification really satisfies each requirement it claims.",
     "tester": "Writes behavioural test cases that the engine runs against the live site.",
     "chat": "Answers free-form requests on the page you have open.",
+    "interviewer": "Runs the requirement-gathering conversation: asks questions, drafts requirements and judges fit with ERPNext.",
 }
 
 
@@ -74,11 +75,14 @@ def apply_profile(cfg: ModelConfig, name: str, provider: str, cheap: str, strong
     R = RoleCfg
     presets = {
         "economy": {"analyst": R(primary=c), "developer": R(primary=c, fallbacks=[s]), "reviewer": R(enabled=False, primary=c),
-                    "tester": R(enabled=False, primary=c), "chat": R(primary=c, fallbacks=[s])},
+                    "tester": R(enabled=False, primary=c), "chat": R(primary=c, fallbacks=[s]),
+                    "interviewer": R(primary=c, fallbacks=[s])},
         "balanced": {"analyst": R(primary=c), "developer": R(primary=c, fallbacks=[s]), "reviewer": R(primary=c, fallbacks=[s]),
-                     "tester": R(primary=c), "chat": R(primary=c, fallbacks=[s])},
+                     "tester": R(primary=c), "chat": R(primary=c, fallbacks=[s]),
+                     "interviewer": R(primary=s, fallbacks=[c])},
         "quality": {"analyst": R(primary=s), "developer": R(primary=s), "reviewer": R(primary=s),
-                    "tester": R(primary=c, fallbacks=[s]), "chat": R(primary=s)},
+                    "tester": R(primary=c, fallbacks=[s]), "chat": R(primary=s),
+                    "interviewer": R(primary=s)},
     }
     if name not in presets:
         raise ValueError("unknown profile")
