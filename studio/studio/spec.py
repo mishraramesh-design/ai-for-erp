@@ -480,6 +480,32 @@ def normalize_ops(ops) -> list:
         if isinstance(o.get("days"), str) and o["days"].strip().lstrip("-").isdigit():
             o["days"] = int(o["days"])
         out.append(o)
+    return _fold_new_doctype_properties(out)
+
+
+_FOLD_BOOL = {"reqd", "unique", "in_list_view", "in_standard_filter", "read_only", "hidden"}
+_FOLD_TEXT = {"options", "default", "description", "depends_on", "fetch_from", "label"}
+
+
+def _fold_new_doctype_properties(ops: list) -> list:
+    """A model often creates a DocType and then tunes its fields with set_property (options, mandatory, list view).
+    Those properties belong in the create_doctype field definition, where the validators and the compiler see them,
+    so move them there and drop the separate step."""
+    new = {o.get("name"): o for o in ops if isinstance(o, dict) and o.get("op") == "create_doctype" and isinstance(o.get("fields"), list)}
+    if not new:
+        return ops
+    out = []
+    for o in ops:
+        if isinstance(o, dict) and o.get("op") == "set_property" and o.get("doctype") in new and o.get("fieldname"):
+            prop, val = o.get("property"), o.get("value")
+            f = next((f for f in new[o["doctype"]]["fields"] if isinstance(f, dict) and f.get("fieldname") == o["fieldname"]), None)
+            if f is not None and prop in _FOLD_BOOL:
+                f[prop] = str(val).strip().lower() in ("1", "true", "yes")
+                continue
+            if f is not None and prop in _FOLD_TEXT and val is not None:
+                f[prop] = str(val)
+                continue
+        out.append(o)
     return out
 
 

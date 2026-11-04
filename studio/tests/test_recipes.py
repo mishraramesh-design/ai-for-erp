@@ -189,3 +189,17 @@ def test_list_view_client_script_and_marker_check():
     bad = codes([{"op": "add_client_script", "doctype": "Supplier", "name": "lv", "view": "List",
                   "script": "frappe.ui.form.on('Supplier', { <NL> refresh: function(frm) {} <NL> });"}])
     assert "js_no_handler" in bad and "js_line_markers" in bad
+
+
+def test_set_property_on_a_doctype_created_in_the_same_plan_is_folded_into_its_fields():
+    from studio.spec import normalize_ops
+    ops = normalize_ops([
+        {"op": "create_doctype", "name": "Case", "fields": [{"fieldname": "priority", "label": "Priority", "fieldtype": "Select"},
+                                                            {"fieldname": "owner_user", "label": "Owner", "fieldtype": "Link"}], "permissions": []},
+        {"op": "set_property", "doctype": "Case", "fieldname": "priority", "property": "options", "value": "Low\nHigh"},
+        {"op": "set_property", "doctype": "Case", "fieldname": "priority", "property": "reqd", "value": 1},
+        {"op": "set_property", "doctype": "Case", "fieldname": "owner_user", "property": "options", "value": "User"},
+        {"op": "set_property", "doctype": "Supplier", "fieldname": "supplier_name", "property": "reqd", "value": 1}])
+    assert [o["op"] for o in ops] == ["create_doctype", "set_property"]          # the unrelated one stays
+    f = {x["fieldname"]: x for x in ops[0]["fields"]}
+    assert f["priority"]["options"] == "Low\nHigh" and f["priority"]["reqd"] is True and f["owner_user"]["options"] == "User"

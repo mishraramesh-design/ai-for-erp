@@ -258,6 +258,10 @@ def validate(cs: ChangeSet, snap) -> list:
     def add(level, code, msg, i):
         issues.append(Issue(level, code, msg, i))
 
+    for wf in cs.ops:  # saving a workflow adds the workflow_state field to its DocType itself
+        if wf.op == "create_workflow":
+            ctx.planned_fields.setdefault(wf.doctype, set()).add("workflow_state")
+
     rebuilt = {o.name for o in cs.ops if o.op == "create_doctype" and getattr(o, "rebuild", False)}
     broken_seen: set = set()
     for i, op in enumerate(cs.ops):
