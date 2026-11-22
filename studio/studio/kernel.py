@@ -23,6 +23,7 @@ from typing import Any, Callable, Optional
 from . import agent as agents
 from .llm import LlmBudgetExceeded, LlmError
 from .spec import ChangeSet, describe
+from .validators import validate
 from .triage import external_clauses, hints as req_hints, triage as rule_triage
 from .verify import run_tests, verify_changeset
 
@@ -569,6 +570,15 @@ class Kernel:
     # -- apply: the only writer; all-or-nothing
     def _x_apply(self, run, t, g, d: Deps) -> Outcome:
         cs = d.ledger.get(g["cs_id"])
+        # Groups plan in parallel, so an earlier group may have changed the site since this plan was validated
+        # (the same workflow, a field, a role). Validate again against the live site before writing anything.
+        with self._write_lock:
+            d.snap.invalidate()
+            stale = [i for i in validate(cs, d.snap) if i.level == "error"]
+        if stale:
+            msg = "; ".join(i.message for i in stale[:6])
+            self._log(run, t.id, "warn", f"Plan no longer valid against the current site: {msg}", tier="rule")
+            return self._repair(run, t, g, f"Another change was applied meanwhile, so this plan now conflicts: {msg}", "plan stale")
         cs.status = "applying"
         d.ledger.save(cs)
         with self._write_lock:
