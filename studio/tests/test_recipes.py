@@ -255,3 +255,9 @@ def test_frappe_imports_in_server_scripts_are_rewritten():
     out = normalize_ops([{"op": "add_server_validation", "doctype": "Supplier", "event": "before_save", "name": "x y z",
                           "script": "import frappe\nfrom frappe.utils import getdate, flt as f\nx = getdate(doc.creation)"}])
     assert out[0]["script"] == "getdate = frappe.utils.getdate\nf = frappe.utils.flt\nx = getdate(doc.creation)"
+
+
+def test_unsupported_chart_timespan_is_mapped_to_a_supported_one():
+    from studio.spec import normalize_ops
+    f = lambda t: normalize_ops([{"op": "create_dashboard_chart", "name": "c", "doctype": "Supplier", "timespan": t}])[0]["timespan"]
+    assert f("Last 6 Months") == "Last Year" and f("Last 30 Days") == "Last Month" and f("Last 7 Days") == "Last Week" and f("Last Year") == "Last Year"

@@ -515,6 +515,10 @@ def normalize_ops(ops) -> list:
         if o.get("op") in ("add_client_script", "add_server_validation", "create_workflow") and isinstance(o.get("name"), str):
             import re as _re
             o["name"] = _re.sub(r"\s+", " ", _re.sub(r"[^A-Za-z0-9 _.\-()&,]", "", o["name"].replace("/", "-"))).strip()
+        if o.get("op") == "create_dashboard_chart" and "timespan" in o:
+            ts = str(o["timespan"]).lower()
+            o["timespan"] = ("Last Week" if "week" in ts or "7" in ts else "Last Month" if "month" in ts and not any(c in ts for c in ("3", "6", "12")) or "30" in ts
+                             else "Last Quarter" if "quarter" in ts or "3 month" in ts or "90" in ts else "Last Year")
         if o.get("op") == "add_server_validation" and isinstance(o.get("script"), str):
             o["script"] = _strip_frappe_imports(o["script"])
         for k in ("value_changed", "date_field", "sort_by", "field"):
