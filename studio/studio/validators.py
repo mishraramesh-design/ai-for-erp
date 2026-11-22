@@ -36,6 +36,8 @@ SETTING_DOCTYPES = {
 SETTING_FIELD_TYPES = {"Data", "Int", "Float", "Currency", "Percent", "Check", "Select", "Link", "Small Text",
                        "Text", "Date", "Duration"}
 
+SYSTEM_DOCTYPES_NO_NOTIFY = {"Notification", "Notification Log", "Email Queue", "Communication", "Error Log", "Version", "Comment",
+                             "Activity Log", "Server Script", "Client Script", "Workflow", "DocType", "Custom Field", "Property Setter", "Scheduled Job Log"}
 FORBIDDEN_PY_NAMES = {"exec", "eval", "compile", "open", "__import__", "globals", "locals", "vars", "getattr",
                       "setattr", "delattr", "input", "breakpoint", "exit", "quit"}
 WARN_PY_CALLS = ("frappe.db.sql", "frappe.db.commit", "frappe.db.delete", "frappe.delete_doc", "frappe.db.rollback")
@@ -568,6 +570,10 @@ def _check_record(op, ctx, snap, add, i) -> None:
              "create_html_block": "Custom HTML Block", "create_workspace": "Workspace", "create_web_form": "Web Form",
              "create_print_format": "Print Format"}[t]
     name = op.label if t == "create_number_card" else op.title if t in ("create_workspace", "create_web_form") else op.name
+    if t == "create_notification" and op.doctype in SYSTEM_DOCTYPES_NO_NOTIFY:
+        add("error", "notify_system", f'A notification on "{op.doctype}" would fire on the platform\'s own records (and can loop). '
+            "Set doctype to the business DocType the event happens on, e.g. Purchase Order or Material Request.", i)
+        return
     if not re.match(r"^[A-Za-z0-9][A-Za-z0-9 _.\-()/&,]{2,120}$", name or ""):
         add("error", "record_name", f'Invalid {label} name "{name}" (3-120 letters, digits, spaces, - _ . ( ) / & ,).', i)
     if t == "create_web_form":

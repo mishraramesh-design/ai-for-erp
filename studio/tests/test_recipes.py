@@ -268,3 +268,9 @@ def test_chart_and_card_on_a_child_table_are_rejected():
            {"op": "create_number_card", "label": "SO items", "doctype": "Sales Order Item"}]
     c = codes(ops)
     assert "chart_child" in c or "card_child" in c or "doctype_missing" in c
+
+
+def test_notification_on_a_system_doctype_is_rejected():
+    bad = {"op": "create_notification", "name": "Loop alert", "doctype": "Notification", "event": "New", "subject": "x",
+           "message": "y", "recipients": [{"role": "System Manager"}]}
+    assert "notify_system" in codes([bad])
