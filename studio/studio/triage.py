@@ -5,7 +5,6 @@ from __future__ import annotations
 import re
 
 OUT_OF_SCOPE = [
-    (r"\bprint\s*formats?\b|\bletter\s*head\b|\bprinted\s+(?:copy|output)\b", "Print formats are not an operation the studio can build yet."),
     (r"\bmobile\s+app\b|\bandroid\b|\bios\s+app\b", "A mobile app is outside configuration of ERPNext."),
     (r"\bsms\b|\bwhats\s*app\b|\bbiometric\b|\bbarcode\s+scanner\b|\brfid\b|\bgps\b", "Needs an external device or gateway integration."),
     (r"\bintegrat(?:e|ion|ed)\b.{0,60}\b(?:with|to)\b.{0,40}\b(?:external|third|bank|gst portal|e-?invoice|api|sap|tally|payment gateway)\b", "Needs an external system integration."),
@@ -22,9 +21,14 @@ HINTS = [
 ]
 
 
-def triage(text: str) -> tuple[str, str]:
+EXTERNAL_REASONS = ("external", "device or gateway", "Identity integration")
+
+
+def triage(text: str, native_poc: bool = False) -> tuple[str, str]:
     t = (text or "").lower()
     for pat, why in OUT_OF_SCOPE:
+        if native_poc and any(why.startswith(x) or x in why for x in EXTERNAL_REASONS):
+            continue  # pilot mode: a native stand-in is built and the integration is recorded as pending
         # Long requirements usually mix several asks; one external clause must not discard the configurable rest.
         if re.search(pat, t) and len(t) < 260:
             return "out_of_scope", why

@@ -214,15 +214,16 @@ def plan_batch(reqs: list, snap, llm, guidance: str = "", created_by: str = "", 
 CLASSES = ("configure", "customize", "standard", "out_of_scope", "clarify")
 
 
-def analyst(reqs: list, snap, llm) -> dict:
+def analyst(reqs: list, snap, llm, native_poc: bool = False) -> dict:
     """Cheap triage. Returns {id: {"class", "reason", "approach", "question"}}; missing ids default to 'configure'."""
     system = ("You are a senior ERPNext v15 business analyst triaging RFP fit-gap items. For EACH requirement choose one class:\n"
               " configure   = achievable with settings, custom fields, property changes, roles/permissions, or a workflow\n"
               " customize   = needs a script or a new DocType, still inside the form layer\n"
               " configure also covers: list reports, email/system notifications, count cards and charts, dashboards\n"
               " standard    = ERPNext already does this out of the box (say where)\n"
-              " out_of_scope= needs print formats, external integrations, devices, migration, or custom code outside forms\n"
-              " clarify     = cannot be built without a business decision (ask ONE precise question)\n"
+              " out_of_scope= needs external integrations, devices, migration, or custom code outside forms\n"
+              " clarify     = cannot be built without a business decision (ask ONE precise question)\n" +
+              (" NATIVE POC MODE: an external integration (regulatory feed, payment gateway, document system) is NOT out_of_scope. Classify it configure or customize and describe the native ERPNext stand-in (registry DocType with seeded records, fee DocType plus print format, private files with a server script); the real integration is recorded as pending.\n" if native_poc else "") +
               'Return JSON: {"items":[{"id":int,"class":str,"reason":str,"approach":str (one line, the ERPNext way),"question":str}]}. JSON only.')
     user = (build_context(" ".join(r.text for r in reqs), {}, snap) + "\n\nREQUIREMENTS:\n" + "\n".join(_req_block(r) for r in reqs))
     raw = llm.complete_json(system, user)

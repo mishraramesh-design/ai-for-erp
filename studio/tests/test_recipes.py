@@ -234,3 +234,11 @@ def test_print_format_and_seed_records_validate_and_apply():
     assert not [c for c in codes(ops) if c.startswith(("seed", "print", "doctype_missing", "html"))]
     assert "print_unsafe" in codes([{"op": "create_print_format", "name": "Bad receipt", "doctype": "Supplier", "html": "<script>x</script>"}])
     assert "seed_field" in codes([{"op": "seed_records", "doctype": "Supplier", "records": [{"nope": 1}]}])
+
+
+def test_native_poc_mode_lets_integration_requirements_through_triage():
+    from studio.triage import triage
+    text = "Integrate with the external payment gateway for fee payment"
+    assert triage(text)[0] == "out_of_scope"
+    assert triage(text, native_poc=True)[0] == "candidate"
+    assert triage("Print format for the receipt")[0] == "candidate"

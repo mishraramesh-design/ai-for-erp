@@ -44,6 +44,7 @@ class Policy:
     use_tester: bool = True
     auto_low: bool = True
     auto_medium: bool = True      # high risk (permissions, workflows) is ALWAYS held for a person
+    native_poc: bool = False      # build a native stand-in for an external integration (registry, gateway, DMS) and mark the real integration pending
     analyze_only: bool = False    # classify and stop: no plan, no change (cheap survey of a whole module)
 
     @classmethod
@@ -436,7 +437,7 @@ class Kernel:
         reqs, out_n = self._reqs(g, d), 0
         keep = []
         for r in reqs:
-            verdict, why = rule_triage(r.text)
+            verdict, why = rule_triage(r.text, native_poc=run.policy.native_poc)
             if verdict == "out_of_scope":
                 d.reqs.mark([r.id], "blocked", note=why)
                 self._log(run, t.id, "warn", f"[{r.id}] {why}", tier="rule")
@@ -457,7 +458,7 @@ class Kernel:
         llm = d.llm_for("analyst", run.id)
         if not run.policy.use_analyst or not d.roles_enabled("analyst"):
             return Outcome("skipped", "analyst not used")
-        res = agents.analyst(reqs, d.snap, llm)
+        res = agents.analyst(reqs, d.snap, llm, native_poc=run.policy.native_poc)
         keep, counts = [], {}
         for r in reqs:
             a = res.get(r.id, {"class": "configure", "reason": "", "approach": "", "question": ""})

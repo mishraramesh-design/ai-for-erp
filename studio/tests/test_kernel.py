@@ -51,7 +51,7 @@ def env(tmp_path):
     snap = Snapshot(erp, ttl=0)
     reqs = RequirementStore(tmp_path / "r.json")
     reqs.import_text("1. Record the date of each supplier site visit on the supplier master.\n"
-                     "2. Prepare a printable print format for the supplier evaluation sheet.\n"
+                     "2. Send an SMS to the supplier on approval.\n"
                      "3. Supplier master must support a risk category for each vendor.", "SRM")
     ledger = Ledger(tmp_path / "ledger")
     holder = {"llm": None, "enabled": {"analyst": True, "developer": True, "reviewer": True, "tester": True}}
@@ -82,7 +82,7 @@ def test_happy_path_rules_then_models_then_verified(env):
     run = k.start("p", [100001, 100002, 100003])
     wait_for(k, run, ("done", "failed"))
     assert run.status == "done", run.error
-    assert reqs.get(100002).status == "blocked" and "Print formats" in reqs.get(100002).notes  # set aside by a rule, no model
+    assert reqs.get(100002).status == "blocked" and "external" in reqs.get(100002).notes  # set aside by a rule, no model
     assert reqs.get(100001).status == "verified" and reqs.get(100003).status == "verified"
     assert ("Custom Field", "Supplier-custom_site_visit_date") in erp.docs
     pub = k.public(run)
