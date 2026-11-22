@@ -32,9 +32,10 @@ PROPERTY_TYPES = {
 SETTING_DOCTYPES = {
     "Selling Settings", "Buying Settings", "Stock Settings", "Accounts Settings", "HR Settings",
     "Manufacturing Settings", "CRM Settings", "Support Settings", "Projects Settings",
+    "CSD Desk Theme",  # desk look and feel: field "css" holds the whole stylesheet, "enabled" switches it on
 }
 SETTING_FIELD_TYPES = {"Data", "Int", "Float", "Currency", "Percent", "Check", "Select", "Link", "Small Text",
-                       "Text", "Date", "Duration"}
+                       "Text", "Date", "Duration", "Code"}
 
 SYSTEM_DOCTYPES_NO_NOTIFY = {"Notification", "Notification Log", "Email Queue", "Communication", "Error Log", "Version", "Comment",
                              "Activity Log", "Server Script", "Client Script", "Workflow", "DocType", "Custom Field", "Property Setter", "Scheduled Job Log"}

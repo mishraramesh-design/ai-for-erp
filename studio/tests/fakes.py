@@ -21,9 +21,10 @@ STD_FIELDS = {
     "Customer Group": [("customer_group_name", "Customer Group Name", "Data", None)],
     "Selling Settings": [("cust_master_name", "Customer Naming By", "Select", "Customer Name\nNaming Series"),
                          ("allow_multiple_items", "Allow Item to be Added Multiple Times", "Check", None)],
+    "CSD Desk Theme": [("enabled", "Use this theme", "Check", None), ("css", "Desk CSS", "Code", "CSS")],
 }
 CHILD = {"Sales Order Item", "Purchase Order Item"}
-SINGLE = {"Selling Settings"}
+SINGLE = {"Selling Settings", "CSD Desk Theme"}
 SUBMITTABLE = {"Sales Order", "Purchase Order"}
 
 

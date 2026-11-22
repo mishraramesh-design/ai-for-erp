@@ -224,3 +224,12 @@ def test_openai_empty_answer_on_length_retries_with_bigger_budget(monkeypatch):
     monkeypatch.setattr(llm, "_post", fake_post)
     out, _ = llm.call_provider("openai", "", "k", "gpt-5", "s", "u")
     assert out == {"ok": 1} and calls[1] == calls[0] * 2
+
+
+def test_desk_theme_css_is_a_settable_single(env):
+    erp, snap, *_ = env
+    css = ".navbar{background:#0b0b0c}"
+    cs = apply_ok(erp, snap, mk([{"op": "set_setting", "doctype": "CSD Desk Theme", "field": "enabled", "value": 1},
+                                  {"op": "set_setting", "doctype": "CSD Desk Theme", "field": "css", "value": css}]))
+    assert erp.docs[("CSD Desk Theme", "CSD Desk Theme")]["css"] == css
+    assert Applier(erp, snap).undo(cs) == []
