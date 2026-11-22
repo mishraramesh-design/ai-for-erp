@@ -526,7 +526,7 @@ class Kernel:
         cs = d.ledger.get(g["cs_id"])
         if not run.policy.use_reviewer or not d.roles_enabled("reviewer") or not cs or not cs.requirement_ids:
             return Outcome("skipped", "reviewer not used")
-        verdicts = agents.reviewer(self._reqs(g, d), cs, d.llm_for("reviewer", run.id))
+        verdicts = agents.reviewer(self._reqs(g, d), cs, d.llm_for("reviewer", run.id), native_poc=run.policy.native_poc)
         bad = {i: v for i, v in verdicts.items() if v["verdict"] != "pass"}
         self._log(run, t.id, "ok" if not bad else "warn",
                   f"Reviewer: {len(verdicts) - len(bad)} pass, {len(bad)} need work.", tier="model")

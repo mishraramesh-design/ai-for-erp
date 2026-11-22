@@ -240,11 +240,15 @@ def analyst(reqs: list, snap, llm, native_poc: bool = False) -> dict:
 
 
 # --------------------------------------------------------------------------------------------------------- reviewer
-def reviewer(reqs: list, cs, llm) -> dict:
+def reviewer(reqs: list, cs, llm, native_poc: bool = False) -> dict:
     """Independent second opinion on coverage claims. Returns {id: {"verdict": pass|partial|fail, "issue": str}}."""
     system = ("You are a strict ERPNext reviewer. A developer proposes operations that claim to satisfy requirements. "
               "For EACH claimed requirement decide: pass (fully satisfied), partial (some of it missing or approximated), "
               "fail (does not satisfy). Judge against the requirement text only; be specific about what is missing. "
+              + ("PILOT SCOPE: this is a proof of concept on a development system. For any requirement that depends on an external system "
+                 "(regulatory feed, payment gateway, document management system, SMS, identity provider) the agreed deliverable is a NATIVE "
+                 "ERPNext stand-in for the data model, screens, rules and documents; the live external connection is deliberately recorded as pending. "
+                 "Do not fail or downgrade a requirement for lacking the live external connection; judge the native part only. " if native_poc else "") +
               'Return JSON: {"verdicts":[{"id":int,"verdict":"pass|partial|fail","issue":str}]}. JSON only.')
     ops = json.dumps([o.model_dump(mode="json", exclude_none=True) for o in cs.ops], ensure_ascii=False)[:9000]
     claimed = [r for r in reqs if r.id in set(cs.requirement_ids)]
