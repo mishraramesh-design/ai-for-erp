@@ -1115,3 +1115,29 @@ QD on field "custom_demand_cycle" of Material Request
   - Create number card "SCM Open Material Requests": Count on Material Request
   - Create number card "SCM Purchase Order Value": Sum of grand_total on Purchase Order
 
+## PoC Stage 1 — Seed Items, Warehouses, Opening Stock  (`01M81VQY0PY9SHZW8GQSTB3BJN`, risk medium)
+- Requirement 100197: PoC dataset: stage 1 - canteen item names, depot warehouses and opening stock in Stores - A
+  - Insert 10 starter record(s) into Item
+  - Insert 2 starter record(s) into Warehouse
+  - Insert 1 starter record(s) into Stock Entry
+
+## PoC dataset - stage 2: seed Purchase Receipts, Stock Entries, Delivery Notes (fixed required fields)  (`01M81W7QAETW76NX4X7P3AX788`, risk medium)
+- Requirement 100198: PoC dataset: stage 2 - supplier purchase receipts, depot stock transfers and deliveries to URCs
+  - Insert 5 starter record(s) into Purchase Receipt
+  - Insert 2 starter record(s) into Stock Entry
+  - Insert 3 starter record(s) into Delivery Note
+
+## PoC dataset: stage 3a finance masters — seed records  (`01M81W9VV23KESNTDXNRS0SGFQ`, risk medium)
+- Requirement 100199: PoC dataset: stage 3a - finance masters: bank accounts, GST accounts, cost centers, banks, TDS categories and GST templates
+  - Insert 5 starter record(s) into Account
+  - Insert 3 starter record(s) into Cost Center
+  - Insert 2 starter record(s) into Bank
+  - Insert 2 starter record(s) into Tax Withholding Category
+  - Insert 1 starter record(s) into Sales Taxes and Charges Template
+  - Insert 1 starter record(s) into Purchase Taxes and Charges Template
+
+## PoC dataset — seed Purchase and Sales Invoices  (`01M81WYJH3QH7NRP7V031XF06X`, risk medium)
+- Requirement 100203: PoC dataset: stage 3c2 - finance: supplier invoices with GST and URC sales invoices (retry, sales without stock movement)
+  - Insert 5 starter record(s) into Purchase Invoice
+  - Insert 3 starter record(s) into Sales Invoice
+
