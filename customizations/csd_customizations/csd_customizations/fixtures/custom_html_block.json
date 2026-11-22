@@ -1,10 +1,10 @@
 [
  {
   "doctype": "Custom HTML Block",
-  "html": "<div class=\"srm-banner\">\n  <div class=\"srm-inner\">\n    <div class=\"srm-topbar\"></div>\n    <div class=\"srm-text\">\n      <h1>demo-pilot</h1>\n      <p class=\"srm-sub\">Supplier Relationship Management</p>\n    </div>\n  </div>\n</div>",
+  "html": "<div class=\"srm-banner\">\n  <div class=\"srm-banner-inner\">\n    <div class=\"srm-banner-title\">demo-pilot</div>\n    <div class=\"srm-banner-sub\">Supplier Relationship Management</div>\n  </div>\n</div>",
   "name": "demo-pilot banner",
   "private": 0,
-  "style": ".srm-banner{box-sizing:border-box;background:#FFFFFF;color:#000000;font-family:-apple-system,BlinkMacSystemFont,\"Segoe UI\",Roboto,\"Helvetica Neue\",Arial,\"Noto Sans\",sans-serif;margin:0;padding:18px;border:1px solid #F2F2F2}.srm-banner .srm-inner{max-width:1200px;margin:0 auto}.srm-banner .srm-topbar{height:6px;background:#FFE600;width:100%;border-radius:2px}.srm-banner .srm-text{padding:12px 0 0 0}.srm-banner h1{margin:0;font-size:28px;font-weight:700;color:#000}.srm-banner .srm-sub{margin:4px 0 0 0;font-size:14px;color:#747480}.srm-banner{border-color:#F2F2F2}.srm-banner .srm-text small{color:#C4C4CD}"
+  "style": ".srm-banner{background:#FFE600;padding:18px 16px;border-radius:4px;margin-bottom:16px;}\n.srm-banner-inner{max-width:1150px;margin:0 auto;}\n.srm-banner-title{font-weight:700;color:#000;font-size:20px;line-height:1;margin-bottom:4px;text-transform:none}\n.srm-banner-sub{color:#000;font-size:14px;opacity:0.95}\n/* ensure block spacing */\n.srm-banner, .srm-tiles{box-sizing:border-box}"
  },
  {
   "doctype": "Custom HTML Block",
@@ -15,10 +15,24 @@
  },
  {
   "doctype": "Custom HTML Block",
-  "html": "<div class=\"srm-tiles\">\n  <a href=\"/app/supplier\">\n    <div>Suppliers</div>\n    <div class=\"caption\">Supplier list</div>\n  </a>\n  <a href=\"/app/supplier-change-request\">\n    <div>Supplier Change Requests</div>\n    <div class=\"caption\">Change requests</div>\n  </a>\n  <a href=\"/app/supplier-quotation\">\n    <div>Supplier Quotations</div>\n    <div class=\"caption\">Quotations</div>\n  </a>\n  <a href=\"/app/purchase-order\">\n    <div>Purchase Orders</div>\n    <div class=\"caption\">Purchase Orders</div>\n  </a>\n  <a href=\"/app/supplier-c-form\">\n    <div>Supplier C-Forms</div>\n    <div class=\"caption\">C-Forms</div>\n  </a>\n  <a href=\"/app/supplier-document\">\n    <div>Supplier Documents</div>\n    <div class=\"caption\">Documents</div>\n  </a>\n</div>",
+  "html": "<div class=\"srm-tiles\">\n  <div class=\"srm-tiles-inner\">\n    <div class=\"srm-section\">\n      <div class=\"srm-section-heading\">Onboarding</div>\n      <div class=\"srm-tiles-row\">\n        <a class=\"srm-tile\" href=\"/app/supplier\">Suppliers</a>\n        <a class=\"srm-tile\" href=\"/app/supplier-change-request\">Supplier Change Requests</a>\n        <a class=\"srm-tile\" href=\"/app/supplier-quotation\">Supplier Quotations</a>\n        <a class=\"srm-tile\" href=\"/app/purchase-order\">Purchase Orders</a>\n      </div>\n    </div>\n\n    <div class=\"srm-section\">\n      <div class=\"srm-section-heading\">Products &amp; Prices</div>\n      <div class=\"srm-tiles-row\">\n        <a class=\"srm-tile\" href=\"/app/supplier-product-registration\">Supplier Product Registration</a>\n        <a class=\"srm-tile\" href=\"/app/supplier-c-form\">Supplier C-Form</a>\n        <a class=\"srm-tile\" href=\"/app/supplier-cps\">Supplier CPS</a>\n        <a class=\"srm-tile\" href=\"/app/bank-guarantee\">Bank Guarantee</a>\n      </div>\n    </div>\n\n    <div class=\"srm-section\">\n      <div class=\"srm-section-heading\">Compliance</div>\n      <div class=\"srm-tiles-row\">\n        <a class=\"srm-tile\" href=\"/app/branch-price-revision\">Branch Price Revision</a>\n        <a class=\"srm-tile\" href=\"/app/supplier-source-declaration\">Supplier Source Declaration</a>\n        <a class=\"srm-tile\" href=\"/app/supplier-eligibility\">Supplier Eligibility</a>\n        <a class=\"srm-tile\" href=\"/app/non-conformance\">Non Conformance</a>\n      </div>\n    </div>\n\n    <div class=\"srm-section\">\n      <div class=\"srm-section-heading\">Quality</div>\n      <div class=\"srm-tiles-row\">\n        <a class=\"srm-tile\" href=\"/app/supplier-product-registration\">Supplier Product Registration</a>\n        <a class=\"srm-tile\" href=\"/app/supplier-eligibility\">Supplier Eligibility</a>\n        <a class=\"srm-tile\" href=\"/app/non-conformance\">Non Conformance</a>\n        <a class=\"srm-tile\" href=\"/app/supplier-quotation\">Supplier Quotations</a>\n      </div>\n    </div>\n\n    <div class=\"srm-reports\">\n      <div class=\"srm-reports-heading\">Reports</div>\n      <div class=\"srm-tiles-row\">\n        <a class=\"srm-report\" href=\"/app/query-report/Supplier Product Registrations (Summary)\">Supplier Product Registrations (Summary)</a>\n        <a class=\"srm-report\" href=\"/app/query-report/Pending C-Forms\">Pending C-Forms</a>\n        <a class=\"srm-report\" href=\"/app/query-report/Supplier C-Form Pending Approval\">Supplier C-Form Pending Approval</a>\n        <a class=\"srm-report\" href=\"/app/query-report/Supplier Eligibility Overview (Summary)\">Supplier Eligibility Overview (Summary)</a>\n        <a class=\"srm-report\" href=\"/app/query-report/Supplier Non Conformances\">Supplier Non Conformances</a>\n        <a class=\"srm-report\" href=\"/app/query-report/Branch Price Revision - Workflow Overview\">Branch Price Revision - Workflow Overview</a>\n      </div>\n    </div>\n\n  </div>\n</div>",
   "name": "SRM Tiles",
   "private": 0,
-  "style": ".srm-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px} .srm-tiles a{display:block;background:#000;color:#FFE600 !important;border-radius:10px;padding:18px;text-decoration:none;font-weight:700;font-size:16px} .srm-tiles .caption{color:#BDBDBD;font-size:12px;margin-top:6px;font-weight:400}"
+  "style": ".srm-tiles{max-width:1200px;margin:0 auto;padding:8px 0}\n.srm-section{margin-bottom:18px}\n.srm-section-heading{background:#F2F2F2;color:#222;padding:8px 12px;font-weight:600;border-radius:4px;margin-bottom:8px}\n.srm-tiles-row{display:flex;flex-wrap:wrap;gap:10px}\n.srm-tile{display:inline-block;padding:12px 14px;background:#000;color:#FFE600;text-decoration:none;border-radius:6px;font-weight:600}\n.srm-tile:hover{opacity:0.9}\n.srm-report{display:inline-block;padding:10px 12px;background:#111;color:#fff;border-left:6px solid #FFE600;text-decoration:none;border-radius:4px}\n.srm-reports-heading{font-weight:700;color:#222;margin:8px 0}\n/* responsive */\n@media (max-width:700px){.srm-tiles-inner{padding:0 10px}.srm-tiles-row{flex-direction:column}.srm-tile,.srm-report{width:100%}}"
+ },
+ {
+  "doctype": "Custom HTML Block",
+  "html": "<div class=\"srm-demo-banner\" style=\"padding:16px;background:#FFF8E1;border-radius:6px;\">\n  <h2 style=\"margin:0;color:#333;\">Demo Pilot</h2>\n  <p style=\"margin:4px 0 0;color:#333;\">This is the demo pilot banner.</p>\n</div>",
+  "name": "demo-pilot-banner",
+  "private": 0,
+  "style": ""
+ },
+ {
+  "doctype": "Custom HTML Block",
+  "html": "<style>\n  /* Tile container */\n  .srm-tiles { display:flex; flex-wrap:wrap; gap:12px; }\n  .srm-tile { background:#000; color:#fff; width:220px; padding:12px; border-radius:6px; text-decoration:none; display:block; }\n  .srm-tile .heading { background:#FFE600; color:#000; padding:6px 8px; font-weight:600; border-radius:4px; display:inline-block; }\n  .srm-tile .title { margin:10px 0 6px; font-size:16px; font-weight:600; color:#fff; }\n  .srm-tile .desc { color:#eee; font-size:13px; }\n  .srm-section { background:#F2F2F2; padding:8px; border-radius:6px; margin-bottom:8px; }\n</style>\n\n<div class=\"srm-section\">\n  <div style=\"font-weight:700;color:#333;\">SRM Tiles</div>\n  <div style=\"margin-top:8px;color:#555;\">Quick links to supplier and SRM pages and reports.</div>\n</div>\n\n<div class=\"srm-tiles\">\n  <!-- Original four tiles -->\n  <a class=\"srm-tile\" href=\"/app/supplier\">\n    <div class=\"heading\">Suppliers</div>\n    <div class=\"title\">Suppliers</div>\n    <div class=\"desc\">List of suppliers</div>\n  </a>\n\n  <a class=\"srm-tile\" href=\"/app/supplier-change-request\">\n    <div class=\"heading\">Supplier Change Requests</div>\n    <div class=\"title\">Supplier Change Requests</div>\n    <div class=\"desc\">List of supplier change requests</div>\n  </a>\n\n  <a class=\"srm-tile\" href=\"/app/supplier-quotation\">\n    <div class=\"heading\">Supplier Quotations</div>\n    <div class=\"title\">Supplier Quotations</div>\n    <div class=\"desc\">List of supplier quotations</div>\n  </a>\n\n  <a class=\"srm-tile\" href=\"/app/purchase-order\">\n    <div class=\"heading\">Purchase Orders</div>\n    <div class=\"title\">Purchase Orders</div>\n    <div class=\"desc\">List of purchase orders</div>\n  </a>\n\n  <!-- Eight new tiles -->\n  <a class=\"srm-tile\" href=\"/app/supplier-c-form\">\n    <div class=\"heading\">Supplier C-Forms</div>\n    <div class=\"title\">Supplier C-Forms</div>\n    <div class=\"desc\">List of supplier C-Forms</div>\n  </a>\n\n  <a class=\"srm-tile\" href=\"/app/bank-guarantee\">\n    <div class=\"heading\">Bank Guarantees</div>\n    <div class=\"title\">Bank Guarantees</div>\n    <div class=\"desc\">List of bank guarantees</div>\n  </a>\n\n  <a class=\"srm-tile\" href=\"/app/branch-price-revision\">\n    <div class=\"heading\">Branch Price Revision</div>\n    <div class=\"title\">Branch Price Revision</div>\n    <div class=\"desc\">List of branch price revisions</div>\n  </a>\n\n  <a class=\"srm-tile\" href=\"/app/supplier-cps\">\n    <div class=\"heading\">Supplier CPS</div>\n    <div class=\"title\">Supplier CPS</div>\n    <div class=\"desc\">List of supplier CPS</div>\n  </a>\n\n  <a class=\"srm-tile\" href=\"/app/supplier-source-declaration\">\n    <div class=\"heading\">Supplier Source Declaration</div>\n    <div class=\"title\">Supplier Source Declaration</div>\n    <div class=\"desc\">List of supplier source declarations</div>\n  </a>\n\n  <a class=\"srm-tile\" href=\"/app/supplier-eligibility\">\n    <div class=\"heading\">Supplier Eligibility</div>\n    <div class=\"title\">Supplier Eligibility</div>\n    <div class=\"desc\">List of supplier eligibility records</div>\n  </a>\n\n  <a class=\"srm-tile\" href=\"/app/non-conformance\">\n    <div class=\"heading\">Non Conformance</div>\n    <div class=\"title\">Non Conformance</div>\n    <div class=\"desc\">List of non conformances</div>\n  </a>\n\n  <a class=\"srm-tile\" href=\"/app/supplier-product-registration\">\n    <div class=\"heading\">Supplier Product Registration</div>\n    <div class=\"title\">Supplier Product Registration</div>\n    <div class=\"desc\">List of supplier product registrations</div>\n  </a>\n\n  <!-- Report shortcuts (query-report routes where applicable) -->\n  <a class=\"srm-tile\" href=\"/app/query-report/Supplier Product Registrations (Summary)\">\n    <div class=\"heading\">Report</div>\n    <div class=\"title\">Supplier Product Registrations (Summary)</div>\n    <div class=\"desc\">Supplier product registrations (summary report)</div>\n  </a>\n\n  <a class=\"srm-tile\" href=\"/app/query-report/Supplier Eligibility Overview (Summary)\">\n    <div class=\"heading\">Report</div>\n    <div class=\"title\">Supplier Eligibility Overview (Summary)</div>\n    <div class=\"desc\">Supplier eligibility overview (summary report)</div>\n  </a>\n\n  <a class=\"srm-tile\" href=\"/app/query-report/Branch Price Revision - Workflow Overview\">\n    <div class=\"heading\">Report</div>\n    <div class=\"title\">Branch Price Revision - Workflow Overview</div>\n    <div class=\"desc\">Branch price revision workflow overview</div>\n  </a>\n\n  <a class=\"srm-tile\" href=\"/app/query-report/Supplier Non Conformances\">\n    <div class=\"heading\">Report</div>\n    <div class=\"title\">Supplier Non Conformances</div>\n    <div class=\"desc\">Supplier non conformances report</div>\n  </a>\n</div>",
+  "name": "srm-tiles-block",
+  "private": 0,
+  "style": ""
  },
  {
   "doctype": "Custom HTML Block",
@@ -33,5 +47,33 @@
   "name": "Case Tiles",
   "private": 0,
   "style": ".case-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px} .case-tiles a{display:block;background:#000;color:#FFE600 !important;border-radius:10px;padding:18px;text-decoration:none;font-weight:700;font-size:16px;border-left:8px solid #FFE600} .case-tiles .caption{color:#FFE600;font-size:12px;margin-top:6px;font-weight:400}"
+ },
+ {
+  "doctype": "Custom HTML Block",
+  "html": "<div style=\"display:flex;align-items:center;gap:16px;padding:16px;background:#000000;color:#000;width:100%;\"><div style=\"background:#FFE600;color:#000;padding:8px 12px;font-weight:700;border-radius:4px;\">SCM</div><div style=\"color:#FFE600;font-weight:600;font-size:16px;\">Depot Overview</div></div>",
+  "name": "SCM Depot Banner",
+  "private": 0,
+  "style": ""
+ },
+ {
+  "doctype": "Custom HTML Block",
+  "html": "<div style=\"padding:12px 16px;background:#000;color:#000;display:flex;align-items:center;gap:12px;border-radius:6px;\"><div style=\"width:14px;height:14px;background:#FFE600;border-radius:2px;\"></div><div style=\"color:#FFE600;font-weight:600;\">SCM QD Overview</div><div style=\"color:#fff;opacity:0.85;margin-left:8px;\">Index-wise QD visibility and stock snapshot</div></div>",
+  "name": "SCM QD Overview Banner",
+  "private": 0,
+  "style": ""
+ },
+ {
+  "doctype": "Custom HTML Block",
+  "html": "<div style=\"padding:12px;background:#000000;color:#FFFFFF;border-left:8px solid #FFE600;font-weight:600;\">SCM Regional Manager</div>",
+  "name": "SCM RM Banner",
+  "private": 0,
+  "style": ""
+ },
+ {
+  "doctype": "Custom HTML Block",
+  "html": "<div class=\"scm-banner\"><h1>SCM Executive BI</h1><p>Supplier Relationship Management — Live Insights</p></div>",
+  "name": "SCM BI Banner",
+  "private": 0,
+  "style": ":root{--black:#000000;--ey:#FFE600;--white:#FFFFFF}.scm-banner{background:var(--black);color:var(--white);padding:16px 20px;border-left:6px solid var(--ey)}.scm-banner h1{color:var(--ey);margin:0;font-weight:700;letter-spacing:.3px}.scm-banner p{margin:4px 0 0;color:var(--white)}"
  }
 ]

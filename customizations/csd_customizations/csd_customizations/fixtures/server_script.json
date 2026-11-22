@@ -32,7 +32,7 @@
   "doctype_event": "Before Save",
   "name": "supplier_onboarding_validation",
   "reference_doctype": "Supplier",
-  "script": "MIN_YEARS = 2\nMIN_MONTHS = 3\n\nstate = doc.get('workflow_state') or ''\nif state in ('Under Review', 'Approved'):\n    est = doc.get('custom_establishment_date')\n    if not est:\n        frappe.throw('Establishment Date is required before review/approval.')\n    today = frappe.utils.getdate(frappe.utils.today())\n    years = (today - frappe.utils.getdate(est)).days / 365.0\n    if years < MIN_YEARS:\n        frappe.throw('Supplier must be in existence for at least {0} years.'.format(MIN_YEARS))\n\n    months = frappe.utils.cint(doc.get('custom_product_availability_months') or 0)\n    if months < MIN_MONTHS:\n        frappe.throw('Product must be available in the civil market for at least {0} months.'.format(MIN_MONTHS))\n\n    if doc.get('custom_is_sole_marketer') != 'Yes':\n        frappe.throw('Supplier must be the sole marketer (set Is Sole Marketer to \"Yes\").')",
+  "script": "MIN_YEARS = 2\nMIN_MONTHS = 3\n\nstate = doc.get('workflow_state') or ''\nif state in ('Under Review', 'Approved'):\n    est = doc.get('custom_establishment_date')\n    if not est:\n        frappe.throw('Establishment Date is required before review/approval.')\n    today = frappe.utils.getdate(frappe.utils.today())\n    years = (today - frappe.utils.getdate(est)).days / 365.0\n    if years < MIN_YEARS:\n        frappe.throw('Supplier must be in existence for at least ' + str(MIN_YEARS) + ' years.')\n\n    months = frappe.utils.cint(doc.get('custom_product_availability_months') or 0)\n    if months < MIN_MONTHS:\n        frappe.throw('Product must be available in the civil market for at least ' + str(MIN_MONTHS) + ' months.')\n\n    if doc.get('custom_is_sole_marketer') != 'Yes':\n        frappe.throw('Supplier must be the sole marketer (set Is Sole Marketer to \"Yes\").')",
   "script_type": "DocType Event"
  },
  {
@@ -59,7 +59,7 @@
   "doctype_event": "Before Save",
   "name": "Supplier_CSD_Autovalidation",
   "reference_doctype": "Supplier",
-  "script": "MIN_TAX_ID_LEN = 6\nMIN_BANK_ACCT_NO_LEN = 6\nMIN_IBAN_LEN = 15\nMAX_IBAN_LEN = 34\n\n# Basic email check\nemail = doc.get('email_id')\nif email:\n    ok = frappe.utils.validate_email_address(email, False)\n    if not ok:\n        frappe.throw('Email ID is not valid.')\n\n# Basic website URL check\nwebsite = doc.get('website')\nif website:\n    ok = frappe.utils.validate_url(website, False)\n    if not ok:\n        frappe.throw('Website URL is not valid.')\n\n# Basic phone check (primary mobile if available)\nmobile = doc.get('mobile_no')\nif mobile:\n    ok = frappe.utils.validate_phone_number(mobile, False)\n    if not ok:\n        frappe.throw('Mobile number is not valid.')\n\n# Basic UPI check (very light since no regex allowed)\nupi = doc.get('custom_upi_id')\nif upi:\n    if ' ' in upi or '@' not in upi or len(upi) < 5:\n        frappe.throw('UPI ID seems invalid. It should contain \"@\" and no spaces.')\n\n# Tax ID presence/format (if provided)\ntax_id = doc.get('tax_id')\nif tax_id:\n    if len(tax_id) < MIN_TAX_ID_LEN or not tax_id.replace(' ', '').isalnum():\n        frappe.throw('Tax ID format looks invalid (min length and alphanumeric expected).')\n\n# Default Bank Account validations (if linked)\ndef_bank = doc.get('default_bank_account')\nif def_bank:\n    values = frappe.db.get_value('Bank Account', def_bank, ['iban', 'bank_account_no'])\n    iban_val = None\n    bank_no_val = None\n    if values:\n        if isinstance(values, tuple):\n            iban_val, bank_no_val = values[0], values[1]\n        else:\n            iban_val = values\n    if not (iban_val or bank_no_val):\n        frappe.throw('Default Bank Account must have either IBAN or Bank Account No.')\n    if iban_val:\n        if len(iban_val) < MIN_IBAN_LEN or len(iban_val) > MAX_IBAN_LEN:\n            frappe.throw('IBAN length must be between {0} and {1} characters.'.format(MIN_IBAN_LEN, MAX_IBAN_LEN))\n    if bank_no_val:\n        clean_no = bank_no_val.replace(' ', '')\n        if len(clean_no) < MIN_BANK_ACCT_NO_LEN or not clean_no.isdigit():\n            frappe.throw('Bank Account No must be numeric and at least {0} digits.'.format(MIN_BANK_ACCT_NO_LEN))\n",
+  "script": "MIN_TAX_ID_LEN = 6\nMIN_BANK_ACCT_NO_LEN = 6\nMIN_IBAN_LEN = 15\nMAX_IBAN_LEN = 34\n\nemail = doc.get('email_id')\nif email:\n    ok = frappe.utils.validate_email_address(email, False)\n    if not ok:\n        frappe.throw('Email ID is not valid.')\n\nwebsite = doc.get('website')\nif website:\n    ok = frappe.utils.validate_url(website, False)\n    if not ok:\n        frappe.throw('Website URL is not valid.')\n\nmobile = doc.get('mobile_no')\nif mobile:\n    ok = frappe.utils.validate_phone_number(mobile, False)\n    if not ok:\n        frappe.throw('Mobile number is not valid.')\n\nupi = doc.get('custom_upi_id')\nif upi:\n    if ' ' in upi or '@' not in upi or len(upi) < 5:\n        frappe.throw('UPI ID seems invalid. It should contain \"@\" and no spaces.')\n\ntax_id = doc.get('tax_id')\nif tax_id:\n    if len(tax_id) < MIN_TAX_ID_LEN or not tax_id.replace(' ', '').isalnum():\n        frappe.throw('Tax ID format looks invalid (min length and alphanumeric expected).')\n\ndef_bank = doc.get('default_bank_account')\nif def_bank:\n    values = frappe.db.get_value('Bank Account', def_bank, ['iban', 'bank_account_no'])\n    iban_val = None\n    bank_no_val = None\n    if values:\n        if isinstance(values, tuple):\n            iban_val, bank_no_val = values[0], values[1]\n        else:\n            iban_val = values\n    if not (iban_val or bank_no_val):\n        frappe.throw('Default Bank Account must have either IBAN or Bank Account No.')\n    if iban_val:\n        if len(iban_val) < MIN_IBAN_LEN or len(iban_val) > MAX_IBAN_LEN:\n            frappe.throw('IBAN length must be between ' + str(MIN_IBAN_LEN) + ' and ' + str(MAX_IBAN_LEN) + ' characters.')\n    if bank_no_val:\n        clean_no = bank_no_val.replace(' ', '')\n        if len(clean_no) < MIN_BANK_ACCT_NO_LEN or not clean_no.isdigit():\n            frappe.throw('Bank Account No must be numeric and at least ' + str(MIN_BANK_ACCT_NO_LEN) + ' digits.')",
   "script_type": "DocType Event"
  },
  {
@@ -86,7 +86,7 @@
   "doctype_event": "Before Save",
   "name": "Supplier - CSD Supplier Auto-Validation",
   "reference_doctype": "Supplier",
-  "script": "TAX_ID_REQUIRED_COUNTRIES = [\"India\"]\nBANK_TRANSFER_OPTIONS = [\"Bank Transfer\", \"NEFT/RTGS\"]\nMIN_ELIGIBILITY_ROWS = 1\nMIN_SUPPORTING_DOC_ROWS = 1\n\nerrors = []\n\ntoday = frappe.utils.getdate(frappe.utils.nowdate())\n\n# Establishment Date cannot be in the future\nif doc.get(\"custom_establishment_date\"):\n    if frappe.utils.getdate(doc.custom_establishment_date) > today:\n        errors.append(\"Establishment Date cannot be in the future.\")\n\n# Tax ID mandatory for specific countries\nif doc.get(\"country\") and doc.country in TAX_ID_REQUIRED_COUNTRIES and not doc.get(\"tax_id\"):\n    errors.append(\"Tax ID is mandatory for suppliers in {}.\".format(\", \".join(TAX_ID_REQUIRED_COUNTRIES)))\n\n# Preferred Payment Method dependent checks\nppm = doc.get(\"custom_preferred_payment_method\")\nif ppm:\n    if ppm in BANK_TRANSFER_OPTIONS and not doc.get(\"default_bank_account\"):\n        errors.append(\"Default Bank Account is required when Preferred Payment Method is {}.\".format(ppm))\n    if \"UPI\" in ppm:\n        upi = (doc.get(\"custom_upi_id\") or \"\").strip()\n        if not upi:\n            errors.append(\"UPI ID is required when Preferred Payment Method is UPI.\")\n        else:\n            if \"@\" not in upi or len(upi) < 5 or len(upi) > 45:\n                errors.append(\"UPI ID appears invalid (expected format like name@bank).\")\n\n# Website basic sanity (must start with http/https if provided)\nif doc.get(\"website\"):\n    w = doc.website.strip()\n    if not (w.startswith(\"http://\") or w.startswith(\"https://\")):\n        errors.append(\"Website URL must start with http:// or https://.\")\n\n# Contact sanity (very light validation)\nif doc.get(\"email_id\"):\n    if not frappe.utils.validate_email_address(doc.email_id, False):\n        errors.append(\"Primary Email appears invalid.\")\n\nif doc.get(\"mobile_no\"):\n    digits = \"\".join([c for c in doc.mobile_no if c.isdigit()])\n    if len(digits) < 7:\n        errors.append(\"Primary Mobile No. appears invalid.\")\n\n# Risk review logic\nif doc.get(\"custom_risk_rating\"):\n    if not doc.get(\"custom_risk_review_date\"):\n        errors.append(\"Risk Review Date is required when Risk Rating is set.\")\n    else:\n        if frappe.utils.getdate(doc.custom_risk_review_date) < today:\n            errors.append(\"Risk Review Date cannot be in the past.\")\n\n# Minimum Eligibility Criteria and Supporting Documents\nelig = doc.get(\"custom_eligibility_criteria\") or []\ndocs = doc.get(\"custom_supporting_documents\") or []\nif len(elig) < MIN_ELIGIBILITY_ROWS:\n    errors.append(\"At least {} Eligibility Criteria row(s) required.\".format(MIN_ELIGIBILITY_ROWS))\nif len(docs) < MIN_SUPPORTING_DOC_ROWS:\n    errors.append(\"At least {} Supporting Document(s) required.\".format(MIN_SUPPORTING_DOC_ROWS))\n\n# Summarize and finalize\nif errors:\n    doc.custom_eligibility_complete = 0\n    doc.custom_csd_validation_summary = \"CSD validation failed:\\n- \" + \"\\n- \".join(errors)\n    frappe.throw(\"CSD validation failed. Please review the Validation Summary.\")\nelse:\n    doc.custom_eligibility_complete = 1\n    doc.custom_csd_validation_summary = \"All CSD checks passed on {0}.\".format(frappe.utils.formatdate(today))\n",
+  "script": "TAX_ID_REQUIRED_COUNTRIES = [\"India\"]\nBANK_TRANSFER_OPTIONS = [\"Bank Transfer\", \"NEFT/RTGS\"]\nMIN_ELIGIBILITY_ROWS = 1\nMIN_SUPPORTING_DOC_ROWS = 1\n\nerrors = []\n\ntoday = frappe.utils.getdate(frappe.utils.nowdate())\n\nif doc.get(\"custom_establishment_date\"):\n    if frappe.utils.getdate(doc.custom_establishment_date) > today:\n        errors.append(\"Establishment Date cannot be in the future.\")\n\nif doc.get(\"country\") and doc.country in TAX_ID_REQUIRED_COUNTRIES and not doc.get(\"tax_id\"):\n    errors.append(\"Tax ID is mandatory for suppliers in \" + \", \".join(TAX_ID_REQUIRED_COUNTRIES) + \".\")\n\nppm = doc.get(\"custom_preferred_payment_method\")\nif ppm:\n    if ppm in BANK_TRANSFER_OPTIONS and not doc.get(\"default_bank_account\"):\n        errors.append(\"Default Bank Account is required when Preferred Payment Method is \" + str(ppm) + \".\")\n    if \"UPI\" in ppm:\n        upi = (doc.get(\"custom_upi_id\") or \"\").strip()\n        if not upi:\n            errors.append(\"UPI ID is required when Preferred Payment Method is UPI.\")\n        else:\n            if \"@\" not in upi or len(upi) < 5 or len(upi) > 45:\n                errors.append(\"UPI ID appears invalid (expected format like name@bank).\")\n\nif doc.get(\"website\"):\n    w = doc.website.strip()\n    if not (w.startswith(\"http://\") or w.startswith(\"https://\")):\n        errors.append(\"Website URL must start with http:// or https://.\")\n\nif doc.get(\"email_id\"):\n    if not frappe.utils.validate_email_address(doc.email_id, False):\n        errors.append(\"Primary Email appears invalid.\")\n\nif doc.get(\"mobile_no\"):\n    digits = \"\".join([c for c in doc.mobile_no if c.isdigit()])\n    if len(digits) < 7:\n        errors.append(\"Primary Mobile No. appears invalid.\")\n\nif doc.get(\"custom_risk_rating\"):\n    if not doc.get(\"custom_risk_review_date\"):\n        errors.append(\"Risk Review Date is required when Risk Rating is set.\")\n    else:\n        if frappe.utils.getdate(doc.custom_risk_review_date) < today:\n            errors.append(\"Risk Review Date cannot be in the past.\")\n\nelig = doc.get(\"custom_eligibility_criteria\") or []\ndocs = doc.get(\"custom_supporting_documents\") or []\nif len(elig) < MIN_ELIGIBILITY_ROWS:\n    errors.append(\"At least \" + str(MIN_ELIGIBILITY_ROWS) + \" Eligibility Criteria row(s) required.\")\nif len(docs) < MIN_SUPPORTING_DOC_ROWS:\n    errors.append(\"At least \" + str(MIN_SUPPORTING_DOC_ROWS) + \" Supporting Document(s) required.\")\n\nif errors:\n    doc.custom_eligibility_complete = 0\n    doc.custom_csd_validation_summary = \"CSD validation failed:\\n- \" + \"\\n- \".join(errors)\n    frappe.throw(\"CSD validation failed. Please review the Validation Summary.\")\nelse:\n    doc.custom_eligibility_complete = 1\n    doc.custom_csd_validation_summary = \"All CSD checks passed on \" + str(frappe.utils.formatdate(today)) + \".\"\n",
   "script_type": "DocType Event"
  },
  {
@@ -114,6 +114,24 @@
   "name": "Supplier Source Declaration - ssd_validate_dates",
   "reference_doctype": "Supplier Source Declaration",
   "script": "if doc.get('valid_from') and doc.get('valid_to'):\n    if frappe.utils.getdate(doc.valid_to) < frappe.utils.getdate(doc.valid_from):\n        frappe.throw('\"Valid To\" cannot be earlier than \"Valid From\"')\n",
+  "script_type": "DocType Event"
+ },
+ {
+  "disabled": 0,
+  "doctype": "Server Script",
+  "doctype_event": "Before Save",
+  "name": "case_append_movement_and_compute_days",
+  "reference_doctype": "Case",
+  "script": "PREV_OWNER = None\nPREV_STATE = None\nPREV_ROLE = None\nif doc.name:\n    PREV_OWNER = frappe.db.get_value('Case', doc.name, 'current_owner')\n    PREV_STATE = frappe.db.get_value('Case', doc.name, 'workflow_state')\n    PREV_ROLE = frappe.db.get_value('Case', doc.name, 'custom_assigned_role')\nowner_changed = False\nrole_changed = False\nstate_escalated = False\nif (PREV_OWNER is None and doc.get('current_owner')) or (PREV_OWNER is not None and doc.get('current_owner') != PREV_OWNER):\n    owner_changed = True\nif (PREV_ROLE is None and doc.get('custom_assigned_role')) or (PREV_ROLE is not None and doc.get('custom_assigned_role') != PREV_ROLE):\n    role_changed = True\nif (PREV_STATE is None and doc.get('workflow_state') == 'Escalated') or (PREV_STATE is not None and doc.get('workflow_state') != PREV_STATE and doc.get('workflow_state') == 'Escalated'):\n    state_escalated = True\nif owner_changed or role_changed or state_escalated:\n    mv = doc.append('movements', {})\n    mv.moved_on = frappe.utils.now_datetime()\n    mv.from_user = PREV_OWNER\n    mv.to_user = doc.get('current_owner')\n    if doc.get('custom_assigned_role'):\n        mv.custom_to_role = doc.get('custom_assigned_role')\n    if doc.get('assignment_remark'):\n        mv.remark = doc.get('assignment_remark')\nif doc.get('date_opened'):\n    start = frappe.utils.getdate(doc.get('date_opened'))\n    if doc.get('date_closed'):\n        end = frappe.utils.getdate(doc.get('date_closed'))\n    else:\n        end = frappe.utils.getdate(frappe.utils.today())\n    doc.custom_days_open = frappe.utils.date_diff(end, start)",
+  "script_type": "DocType Event"
+ },
+ {
+  "disabled": 0,
+  "doctype": "Server Script",
+  "doctype_event": "Before Save",
+  "name": "Case Movement - prevent_edit_of_existing_case_movement_rows",
+  "reference_doctype": "Case Movement",
+  "script": "if doc.name and frappe.db.exists('Case Movement', doc.name):\n    stored_moved_on = frappe.db.get_value('Case Movement', doc.name, 'moved_on')\n    stored_from = frappe.db.get_value('Case Movement', doc.name, 'from_user')\n    stored_to = frappe.db.get_value('Case Movement', doc.name, 'to_user')\n    stored_remark = frappe.db.get_value('Case Movement', doc.name, 'remark')\n    stored_role = frappe.db.get_value('Case Movement', doc.name, 'custom_to_role')\n    changed = False\n    if doc.get('moved_on') != stored_moved_on or doc.get('from_user') != stored_from or doc.get('to_user') != stored_to or doc.get('remark') != stored_remark or doc.get('custom_to_role') != stored_role:\n        changed = True\n    if changed:\n        frappe.throw('Case Movement rows are system-generated and cannot be modified.')",
   "script_type": "DocType Event"
  },
  {
@@ -159,6 +177,288 @@
   "name": "Supplier Document - supplier_document_require_file_and_set_dms_path",
   "reference_doctype": "Supplier Document",
   "script": "if True:\n\t# Require at least one attachment field\n\tif not doc.get('file') and not doc.get('custom_file'):\n\t\tfrappe.throw('An attachment is required on Supplier Document (file or custom_file).')\n\t# Enforce private files by checking the stored path contains \"/private/\" or 'private' prefix\n\tfile_checked = False\n\tfor f in ['file','custom_file']:\n\t\tval = doc.get(f)\n\t\tif val:\n\t\t\tif isinstance(val, str) and ('/private/' in val or val.startswith('private')):\n\t\t\t\tfile_checked = True\n\t\t\telse:\n\t\t\t\tfrappe.throw('Attached files must be private. Please upload via Private Files for ' + f + '.')\n\tif not file_checked:\n\t\tfrappe.throw('No private attachment detected. Please upload files to private storage.')\n\t# Populate or normalize a DMS folder-path metadata field for hierarchical grouping in-ERP\n\t# Use the linked supplier name if available (custom_supplier) else leave generic\n\tsupplier_name = doc.get('custom_supplier') or ''\t\n\tdoctype_label = doc.get('document_type') or 'Documents'\n\tif supplier_name:\n\t\tpath = '/Suppliers/' + supplier_name + '/' + doctype_label + '/'\n\t\tdoc.custom_dms_folder_path = path\n\telse:\n\t\tdoc.custom_dms_folder_path = '/Suppliers/Unlinked/' + doctype_label + '/'",
+  "script_type": "DocType Event"
+ },
+ {
+  "disabled": 0,
+  "doctype": "Server Script",
+  "doctype_event": "Before Save",
+  "name": "Material Request - SCM_require_mstc_before_forward_to_ho",
+  "reference_doctype": "Material Request",
+  "script": "STATE_FORWARD_HO = \"Forwarded to HO\"\nif doc.get(\"workflow_state\") == STATE_FORWARD_HO:\n    if not doc.get(\"custom_mstc_reference\") or len(str(doc.get(\"custom_mstc_reference\")).strip()) == 0:\n        frappe.throw(\"MSTC Reference is required before forwarding to HO.\")\n",
+  "script_type": "DocType Event"
+ },
+ {
+  "disabled": 0,
+  "doctype": "Server Script",
+  "doctype_event": "Before Submit",
+  "name": "Material Request - SCM_require_fd_before_submit",
+  "reference_doctype": "Material Request",
+  "script": "if doc.get(\"custom_demand_cycle\") != \"FD\":\n    frappe.throw(\"Convert Provisional Demand to Firm Demand (set Demand Cycle to FD) before Submit.\")\n",
+  "script_type": "DocType Event"
+ },
+ {
+  "disabled": 0,
+  "doctype": "Server Script",
+  "doctype_event": "Before Submit",
+  "name": "Purchase Order - PO_validate_bg_and_supplier_restriction",
+  "reference_doctype": "Purchase Order",
+  "script": "BG_LINK_FIELD = 'custom_bank_guarantee'\nif not doc.supplier:\n    frappe.throw('Supplier is required.')\n# Supplier restriction\nis_restricted = frappe.db.get_value('Supplier', doc.supplier, 'custom_is_restricted_to_order')\nif is_restricted:\n    reason = frappe.db.get_value('Supplier', doc.supplier, 'custom_restriction_reason')\n    msg = 'Supplier ' + str(doc.supplier) + ' is restricted for Purchase Orders.'\n    if reason:\n        msg = msg + ' Reason: ' + str(reason)\n    frappe.throw(msg)\n# Bank Guarantee presence\nbg = doc.get(BG_LINK_FIELD)\nif not bg:\n    frappe.throw('Bank Guarantee is mandatory. Please select a Bank Guarantee.')\n# BG must be submitted\nbg_docstatus = frappe.db.get_value('Bank Guarantee', bg, 'docstatus')\nif not bg_docstatus or int(bg_docstatus) != 1:\n    frappe.throw('Bank Guarantee ' + str(bg) + ' must be submitted.')\n# Supplier match\nbg_supplier = frappe.db.get_value('Bank Guarantee', bg, 'supplier')\nif bg_supplier and bg_supplier != doc.supplier:\n    frappe.throw('Bank Guarantee ' + str(bg) + ' belongs to supplier ' + str(bg_supplier) + ' and cannot be used for ' + str(doc.supplier))\n# Date validity on PO date\nbg_start = frappe.db.get_value('Bank Guarantee', bg, 'start_date')\nbg_end = frappe.db.get_value('Bank Guarantee', bg, 'end_date')\npo_date = doc.get('transaction_date')\nif po_date:\n    po_dt = frappe.utils.getdate(po_date)\nelse:\n    po_dt = frappe.utils.getdate(frappe.utils.nowdate())\nif bg_start and frappe.utils.getdate(bg_start) > po_dt:\n    frappe.throw('Bank Guarantee ' + str(bg) + ' is not valid on the PO date.')\nif bg_end and frappe.utils.getdate(bg_end) < po_dt:\n    frappe.throw('Bank Guarantee ' + str(bg) + ' has expired for the PO date.')\n# Amount sufficiency (net of margin money)\nbg_amount = frappe.db.get_value('Bank Guarantee', bg, 'amount')\nbg_margin = frappe.db.get_value('Bank Guarantee', bg, 'margin_money')\nif not bg_amount:\n    bg_amount = 0\nif not bg_margin:\n    bg_margin = 0\navailable = frappe.utils.flt(bg_amount) - frappe.utils.flt(bg_margin)\nrequired = frappe.utils.flt(doc.get('grand_total')) if doc.get('grand_total') else frappe.utils.flt(0)\nif available < required:\n    frappe.throw('Bank Guarantee amount is insufficient. Available: ' + str(available) + ' Required: ' + str(required))\n",
+  "script_type": "DocType Event"
+ },
+ {
+  "disabled": 0,
+  "doctype": "Server Script",
+  "doctype_event": "Before Submit",
+  "name": "Material Request - SCM MR - Require UC if QD released",
+  "reference_doctype": "Material Request",
+  "script": "if doc.get('custom_qd_release_date'):\n    if not doc.get('custom_utilization_certificate'):\n        frappe.throw('Attach Utilization Certificate before submitting a QD-released Material Request.')\n    if not doc.get('custom_utilization_certificate_date'):\n        frappe.throw('Utilization Certificate Date is required when QD Release Date is set.')\n    amt = doc.get('custom_utilization_certificate_amount')\n    if amt and amt < 0:\n        frappe.throw('Utilization Amount cannot be negative.')",
+  "script_type": "DocType Event"
+ },
+ {
+  "disabled": 0,
+  "doctype": "Server Script",
+  "doctype_event": "Before Insert",
+  "name": "Purchase Order - PO_set_supplier_warehouse_from_depot",
+  "reference_doctype": "Purchase Order",
+  "script": "if doc.get('custom_depot'):\n    # If supplier_warehouse not explicitly set, default it from depot selection\n    if not doc.get('supplier_warehouse'):\n        doc.supplier_warehouse = doc.get('custom_depot')\nelse:\n    # no depot provided; do nothing\n    pass",
+  "script_type": "DocType Event"
+ },
+ {
+  "disabled": 0,
+  "doctype": "Server Script",
+  "doctype_event": "Before Submit",
+  "name": "Material Request - Enforce URC review chain",
+  "reference_doctype": "Material Request",
+  "script": "TITLE = 'Review Required'\nif doc.get('customer'):\n    if not doc.get('custom_lif_reviewed'):\n        frappe.throw('LIF review is required before submit.')\n    else:\n        pass\n    if not doc.get('custom_agm_secy_reviewed'):\n        frappe.throw('AGM Secretariat review is required before submit.')\n    else:\n        pass\n    if not doc.get('custom_cs_dir_reviewed'):\n        frappe.throw('CS Directorate review is required before submit.')\n    else:\n        pass\nelse:\n    pass",
+  "script_type": "DocType Event"
+ },
+ {
+  "disabled": 0,
+  "doctype": "Server Script",
+  "doctype_event": "After Submit",
+  "name": "Material Request - SCM_auto_create_po_from_approved_mr",
+  "reference_doctype": "Material Request",
+  "script": "AUTO_CREATE_PO = True\n\nif AUTO_CREATE_PO:\n  if doc.get('custom_auto_create_po'):\n    ws = doc.get('workflow_state') or ''\n    if ws == 'Approved':\n      supplier = doc.get('custom_auto_po_supplier')\n      if not supplier:\n        frappe.throw('Auto Create Purchase Order is enabled: please set Auto PO Supplier on this Material Request before submit')\n      po_items = []\n      if doc.get('items'):\n        for it in doc.get('items'):\n          qty_val = it.get('qty') or it.get('required_qty') or 0\n          po_items.append({\n            'doctype': 'Purchase Order Item',\n            'item_code': it.get('item_code'),\n            'qty': qty_val,\n            'rate': 0.0,\n            'schedule_date': doc.get('schedule_date'),\n            'material_request': doc.name,\n            'material_request_item': it.get('name')\n          })\n      try:\n        po = frappe.get_doc({\n          'doctype': 'Purchase Order',\n          'supplier': supplier,\n          'transaction_date': frappe.utils.nowdate(),\n          'schedule_date': doc.get('schedule_date') or frappe.utils.nowdate(),\n          'company': doc.get('company'),\n          'items': po_items,\n          'custom_order_category': doc.get('custom_order_category')\n        })\n        po.insert()\n        frappe.get_doc({'doctype': 'Comment', 'reference_doctype': 'Material Request', 'reference_name': doc.name, 'content': 'Draft Purchase Order ' + po.name + ' created automatically.'}).insert()\n      except Exception as e:\n        frappe.get_doc({'doctype': 'Comment', 'reference_doctype': 'Material Request', 'reference_name': doc.name, 'content': 'Auto PO creation skipped due to validation: ' + str(e)}).insert()",
+  "script_type": "DocType Event"
+ },
+ {
+  "disabled": 0,
+  "doctype": "Server Script",
+  "doctype_event": "Before Save",
+  "name": "Material Request - MR_enforce_warehouse_thresholds",
+  "reference_doctype": "Material Request",
+  "script": "MAX_QTY_CHECK = 99999999\nMIN_QTY_CHECK = 0\nif doc.items:\n    wh = None\n    if doc.get('set_warehouse'):\n        wh = doc.set_warehouse\n    if not wh and doc.items and doc.items[0].get('warehouse'):\n        wh = doc.items[0].warehouse\n    if wh:\n        min_val = frappe.db.get_value('Warehouse', wh, 'custom_min_order_qty')\n        max_val = frappe.db.get_value('Warehouse', wh, 'custom_max_order_qty')\n        try:\n            min_val = float(min_val) if min_val not in (None, '') else None\n        except Exception:\n            min_val = None\n        try:\n            max_val = float(max_val) if max_val not in (None, '') else None\n        except Exception:\n            max_val = None\n        total_qty = 0.0\n        for row in doc.items:\n            qty = row.get('qty') or 0\n            try:\n                total_qty = total_qty + float(qty)\n            except Exception:\n                total_qty = total_qty + 0.0\n        if min_val is not None and total_qty < min_val:\n            frappe.throw('Material Request total qty (' + str(total_qty) + ') is less than the warehouse minimum order quantity (' + str(min_val) + ').')\n        if max_val is not None and total_qty > max_val:\n            frappe.throw('Material Request total qty (' + str(total_qty) + ') exceeds the warehouse maximum order quantity (' + str(max_val) + ').')\n    else:\n        pass",
+  "script_type": "DocType Event"
+ },
+ {
+  "disabled": 0,
+  "doctype": "Server Script",
+  "doctype_event": "Before Submit",
+  "name": "Stock Entry - SE Enforce Storage Type",
+  "reference_doctype": "Stock Entry",
+  "script": "if doc.get('items'):\n\tfor row in doc.items:\n\t\titem_code = row.item_code\n\t\tdest_wh = None\n\t\tif row.get('t_warehouse'):\n\t\t\tdest_wh = row.get('t_warehouse')\n\t\telif doc.get('to_warehouse'):\n\t\t\tdest_wh = doc.get('to_warehouse')\n\t\tif item_code and dest_wh:\n\t\t\titem_req = frappe.db.get_value('Item', item_code, 'custom_storage_requirement')\n\t\t\twh_type = frappe.db.get_value('Warehouse', dest_wh, 'custom_storage_type')\n\t\t\tif item_req and wh_type and item_req != wh_type:\n\t\t\t\tfrappe.throw('Storage mismatch for Item ' + str(item_code) + ': requires ' + str(item_req) + ' storage but target Warehouse ' + str(dest_wh) + ' is ' + str(wh_type) + '.')",
+  "script_type": "DocType Event"
+ },
+ {
+  "disabled": 0,
+  "doctype": "Server Script",
+  "doctype_event": "Before Submit",
+  "name": "Purchase Receipt - PR Enforce Storage Type",
+  "reference_doctype": "Purchase Receipt",
+  "script": "if doc.get('items'):\n\tfor row in doc.items:\n\t\titem_code = row.item_code\n\t\twh = row.get('warehouse')\n\t\tif item_code and wh:\n\t\t\titem_req = frappe.db.get_value('Item', item_code, 'custom_storage_requirement')\n\t\t\twh_type = frappe.db.get_value('Warehouse', wh, 'custom_storage_type')\n\t\t\tif item_req and wh_type and item_req != wh_type:\n\t\t\t\tfrappe.throw('Storage mismatch for Item ' + str(item_code) + ': requires ' + str(item_req) + ' storage but Warehouse ' + str(wh) + ' is ' + str(wh_type) + '.')",
+  "script_type": "DocType Event"
+ },
+ {
+  "disabled": 0,
+  "doctype": "Server Script",
+  "doctype_event": "Before Submit",
+  "name": "Material Request - Require QD Fields",
+  "reference_doctype": "Material Request",
+  "script": "if doc.get('custom_demand_cycle') == 'QD':\n    if not doc.get('custom_qd_number'):\n        frappe.throw('QD Number is required when Demand Cycle is QD.')\n    if not doc.get('custom_qd_release_date'):\n        frappe.throw('QD Release Date is required when Demand Cycle is QD.')",
+  "script_type": "DocType Event"
+ },
+ {
+  "disabled": 0,
+  "doctype": "Server Script",
+  "doctype_event": "After Submit",
+  "name": "Material Request - Post URC Credit",
+  "reference_doctype": "Material Request",
+  "script": "AMOUNT_FIELD = 'custom_urc_credit_amount'\nif doc.get(AMOUNT_FIELD) and frappe.utils.flt(doc.get(AMOUNT_FIELD)) > 0:\n    if doc.get('custom_urc_credit_posted') == 1:\n        pass\n    else:\n        comp = frappe.db.get_value('Company', doc.company, ['custom_urc_payables_account', 'custom_urc_clearing_account'], as_dict=1)\n        if not comp or not comp.get('custom_urc_payables_account') or not comp.get('custom_urc_clearing_account'):\n            frappe.throw('Company URC accounts are not set. Please set URC Payables Account and URC Clearing Account on Company ' + str(doc.company))\n        amount = frappe.utils.flt(doc.get(AMOUNT_FIELD))\n        posting_date = doc.get('transaction_date') or frappe.utils.nowdate()\n        je = frappe.get_doc({\n            'doctype': 'Journal Entry',\n            'voucher_type': 'Journal Entry',\n            'company': doc.company,\n            'posting_date': posting_date,\n            'user_remark': 'URC Credit for Material Request ' + str(doc.name)\n        })\n        je.append('accounts', {\n            'account': comp.get('custom_urc_clearing_account'),\n            'debit_in_account_currency': amount\n        })\n        je.append('accounts', {\n            'account': comp.get('custom_urc_payables_account'),\n            'credit_in_account_currency': amount\n        })\n        je.insert()\n        je.submit()\n        frappe.db.set_value('Material Request', doc.name, 'custom_urc_credit_reference', je.name)\n        frappe.db.set_value('Material Request', doc.name, 'custom_urc_credit_posted', 1)",
+  "script_type": "DocType Event"
+ },
+ {
+  "disabled": 0,
+  "doctype": "Server Script",
+  "doctype_event": "Before Submit",
+  "name": "Material Request - SCM Enforce Beneficiary Monthly Quota",
+  "reference_doctype": "Material Request",
+  "script": "ALLOWED_MR_TYPE = \"Material Issue\"\n\nif doc.material_request_type == ALLOWED_MR_TYPE:\n    # Basic presence checks\n    if not doc.get(\"customer\"):\n        frappe.throw(\"Customer is required for beneficiary quota validation.\")\n    rank = \"\"\n    if doc.get(\"custom_beneficiary_rank\"):\n        rank = str(doc.get(\"custom_beneficiary_rank\")).strip()\n    designation = doc.get(\"custom_beneficiary_designation\")\n    if not rank or not designation:\n        frappe.throw(\"Beneficiary Rank and Beneficiary Designation are required for quota validation.\")\n\n    # Build current request quantities by item group\n    current_by_group = {}\n    for it in (doc.get(\"items\") or []):\n        ig = frappe.db.get_value(\"Item\", it.get(\"item_code\"), \"item_group\")\n        if ig:\n            qty = frappe.utils.flt(it.get(\"qty\"))\n            current_by_group[ig] = current_by_group.get(ig, 0) + qty\n\n    # Determine current month range\n    tx = doc.get(\"transaction_date\")\n    if not tx:\n        tx = frappe.utils.nowdate()\n    d = frappe.utils.getdate(str(tx))\n    month_start = d.replace(day=1)\n    next_month = frappe.utils.add_months(month_start, 1)\n    month_end = frappe.utils.add_days(next_month, -1)\n\n    # Sum historical submitted MR quantities for the same customer in the same month\n    total_by_group = {}\n    names = frappe.db.get_all(\n        \"Material Request\",\n        filters={\n            \"docstatus\": 1,\n            \"customer\": doc.get(\"customer\"),\n            \"material_request_type\": ALLOWED_MR_TYPE,\n            \"transaction_date\": [\"between\", [str(month_start), str(month_end)]]\n        },\n        fields=[\"name\"]\n    )\n    for n in names:\n        rows = frappe.db.get_all(\n            \"Material Request Item\",\n            filters={\"parent\": n.get(\"name\")},\n            fields=[\"item_code\", \"qty\"]\n        )\n        for r in rows:\n            ig = frappe.db.get_value(\"Item\", r.get(\"item_code\"), \"item_group\")\n            if ig:\n                total_by_group[ig] = total_by_group.get(ig, 0) + frappe.utils.flt(r.get(\"qty\"))\n\n    # Add current request quantities\n    for ig in current_by_group:\n        total_by_group[ig] = total_by_group.get(ig, 0) + current_by_group.get(ig, 0)\n\n    # Validate against Beneficiary Quota Rule per item group\n    for ig in total_by_group:\n        rules = frappe.db.get_all(\n            \"Beneficiary Quota Rule\",\n            filters={\n                \"designation\": designation,\n                \"rank\": rank,\n                \"item_group\": ig\n            },\n            fields=[\"monthly_quota_qty\"],\n            limit=1\n        )\n        if rules and len(rules) > 0:\n            allowed = frappe.utils.flt(rules[0].get(\"monthly_quota_qty\"))\n            consumed = frappe.utils.flt(total_by_group.get(ig, 0))\n            if consumed > allowed:\n                msg = \"Monthly quota exceeded for Item Group '\" + str(ig) + \"'. Allowed: \" + str(allowed) + \", Requested this month (incl. current): \" + str(consumed)\n                frappe.throw(msg)\n        else:\n            # No rule -> allow (assumption). If required, change policy to hard block.\n            pass\nelse:\n    # Not a beneficiary issue; no quota enforcement\n    pass",
+  "script_type": "DocType Event"
+ },
+ {
+  "disabled": 0,
+  "doctype": "Server Script",
+  "doctype_event": "Before Submit",
+  "name": "Consolidated Demand - cd_require_rm_before_ho_submit",
+  "reference_doctype": "Consolidated Demand",
+  "script": "if doc.get('custom_workflow_state') in (None, ''):\n    frappe.throw('Consolidated Demand must have Workflow State set before submit')\n# enforce that RM approver is set before submitting to HO state\nif doc.get('custom_workflow_state') and 'HO' in doc.get('custom_workflow_state'):\n    if not doc.get('custom_rm_approver'):\n        frappe.throw('Regional Manager approval is required before Head Office submission')\n    if not doc.get('custom_depot_approver'):\n        frappe.throw('Depot validation must be present before Head Office submission')\n# basic locking: prevent submit if no items/material_requests listed\nif not doc.get('items_summary') and not doc.get('material_requests'):\n    frappe.throw('Consolidated Demand must reference material requests or have an items summary')",
+  "script_type": "DocType Event"
+ },
+ {
+  "disabled": 0,
+  "doctype": "Server Script",
+  "doctype_event": "Before Submit",
+  "name": "URC Payment Advice - urc_payment_auth_required_on_submit",
+  "reference_doctype": "URC Payment Advice",
+  "script": "if doc.get('payment_mode') and doc.get('payment_mode') != 'Cash':\n    if not doc.get('custom_authenticated'):\n        frappe.throw('Non-cash payments must be authenticated before submitting this URC Payment Advice. Set Authenticated = Yes and record method.')\n# ensure method recorded if authenticated\nif doc.get('custom_authenticated') and not doc.get('custom_auth_method'):\n    frappe.throw('If payment is marked Authenticated, select an Authentication Method.')",
+  "script_type": "DocType Event"
+ },
+ {
+  "disabled": 0,
+  "doctype": "Server Script",
+  "event_frequency": "Daily",
+  "name": "Daily Consolidated Demand Aggregation",
+  "script": "THRESHOLD_DAYS = 1\n# Aggregates submitted Material Requests into a Consolidated Demand once per day (PD schedule stand-in)\ntoday = frappe.utils.nowdate()\nmrs = frappe.get_all('Material Request', filters={'docstatus': 1, 'transaction_date': today}, fields=['name','transaction_date','set_warehouse'])\nif mrs:\n    by_depot = {}\n    for r in mrs:\n        depot = r.get('set_warehouse') or 'UNASSIGNED'\n        lst = by_depot.get(depot) or []\n        lst.append(r)\n        by_depot[depot] = lst\n    for depot, docs in by_depot.items():\n        title = 'CD for ' + str(depot) + ' - ' + str(today)\n        cd = frappe.get_doc({\n            'doctype': 'Consolidated Demand',\n            'title': title,\n            'depot': depot if depot != 'UNASSIGNED' else None,\n            'period_start': today,\n            'period_end': today,\n            'material_requests': ', '.join([d.get('name') for d in docs]),\n            'items_summary': 'Auto-aggregated from ' + str(len(docs)) + ' Material Requests',\n            'custom_workflow_state': 'Pending RM Approval'\n        })\n        try:\n            cd.insert()\n        except Exception:\n            pass",
+  "script_type": "Scheduler Event"
+ },
+ {
+  "disabled": 0,
+  "doctype": "Server Script",
+  "doctype_event": "Before Save",
+  "name": "Project - enforce_delegation_and_workflow_state",
+  "reference_doctype": "Project",
+  "script": "UPPER_LIMIT_CHECK = 100000000\nif doc.get('custom_estimated_cost'):\n    est = flt(doc.get('custom_estimated_cost') or 0)\n    limit = flt(doc.get('custom_depot_manager_limit') or 0)\n    state = doc.get('workflow_state') or ''\n    if limit and est > limit:\n        if state and state not in ('Pending Regional Manager Approval', 'Approved'):\n            frappe.throw('Estimated Cost exceeds Depot Manager limit; document must be Escalated to Regional Manager (workflow state: Pending Regional Manager Approval)')\n    else:\n        pass",
+  "script_type": "DocType Event"
+ },
+ {
+  "disabled": 0,
+  "doctype": "Server Script",
+  "doctype_event": "Before Save",
+  "name": "Purchase Invoice - enforce_regional_approval_when_threshold_exceeded",
+  "reference_doctype": "Purchase Invoice",
+  "script": "if doc.get('custom_regional_manager_threshold'):\n    amt = flt(doc.get('grand_total') or 0)\n    thresh = flt(doc.get('custom_regional_manager_threshold') or 0)\n    state = doc.get('workflow_state') or ''\n    if thresh and amt > thresh:\n        if state and state not in ('Pending Regional Manager Approval', 'Approved'):\n            frappe.throw('Invoice amount exceeds Regional Manager threshold. Escalate to Pending Regional Manager Approval before saving.')\n    else:\n        pass",
+  "script_type": "DocType Event"
+ },
+ {
+  "disabled": 0,
+  "doctype": "Server Script",
+  "doctype_event": "Before Save",
+  "name": "SCM Market Intelligence - HO_issue_flag_enforces_state",
+  "reference_doctype": "SCM Market Intelligence",
+  "script": "if doc.get('custom_ho_issued'):\n    state = doc.get('workflow_state') or ''\n    # Prevent skipping assignment when HO issues: created/edited records flagged as HO issued should not be directly Closed or Completed without going through assignment\n    if state in ('Completed', 'Closed') and doc.get('__islocal'):\n        frappe.throw('HO-issued surveys must be assigned and progressed by the Regional Manager before marking Completed/Closed.')\n    else:\n        pass",
+  "script_type": "DocType Event"
+ },
+ {
+  "disabled": 0,
+  "doctype": "Server Script",
+  "doctype_event": "Before Insert",
+  "name": "Case_require_type_for_waiver",
+  "reference_doctype": "Case",
+  "script": "THRESHOLD = 0\nif doc.get('custom_waiver_amount'):\n    if not doc.get('custom_case_type'):\n        frappe.throw('custom_case_type is required when custom_waiver_amount is provided')\nif doc.get('custom_case_type') == 'Waiver of Penal Interest':\n    if not doc.get('custom_related_urc'):\n        frappe.throw('custom_related_urc (Customer) is required for Waiver of Penal Interest cases')\n    if not doc.get('custom_related_depot'):\n        frappe.throw('custom_related_depot (Warehouse) is required for Waiver of Penal Interest cases')",
+  "script_type": "DocType Event"
+ },
+ {
+  "disabled": 0,
+  "doctype": "Server Script",
+  "event_frequency": "Daily",
+  "name": "Compute Offtake and Flag Slow Items",
+  "script": "DEFAULT_MONTHS = 3\nSLOW_THRESHOLD = 0.01\nmonths_field = 'custom_offtake_months'\nitem_list = frappe.get_all('Item', fields=['name', months_field])\nfor it in item_list:\n    months = DEFAULT_MONTHS\n    if it.get(months_field):\n        months = frappe.utils.cint(it.get(months_field))\n    if months <= 0:\n        months = DEFAULT_MONTHS\n    end = frappe.utils.today()\n    start = frappe.utils.add_months(end, -months)\n    invs = frappe.get_all('Sales Invoice', fields=['name'], filters=[['posting_date', '>=', start], ['posting_date', '<=', end], ['docstatus', '=', 1]])\n    inv_names = []\n    for inv in invs:\n        inv_names.append(inv.get('name'))\n    qtysum = 0.0\n    if len(inv_names) > 0:\n        rows = frappe.get_all('Sales Invoice Item', fields=['sum(qty) as qtysum'], filters=[['item_code', '=', it.get('name')], ['parent', 'in', inv_names]])\n        if rows and rows[0].get('qtysum'):\n            qtysum = frappe.utils.flt(rows[0].get('qtysum'))\n    avg = 0.0\n    if months > 0:\n        avg = qtysum / months\n    try:\n        frappe.db.set_value('Item', it.get('name'), 'custom_avg_offtake', avg, update_modified=False)\n        is_slow = 1\n        if avg > SLOW_THRESHOLD:\n            is_slow = 0\n        frappe.db.set_value('Item', it.get('name'), 'custom_is_slow_moving', is_slow, update_modified=False)\n    except Exception:\n        pass",
+  "script_type": "Scheduler Event"
+ },
+ {
+  "disabled": 0,
+  "doctype": "Server Script",
+  "event_frequency": "Daily",
+  "name": "Expenditure Variance Monitor",
+  "script": "VARIANCE_PERCENT_THRESHOLD = 50.0\nMONTHS = 3\nend = frappe.utils.today()\nstart_recent = frappe.utils.add_months(end, -1)\nstart_hist = frappe.utils.add_months(end, -MONTHS)\ncompanies = frappe.get_all('Company', fields=['name'])\nfor c in companies:\n    cname = c.get('name')\n    hist = frappe.get_all('Purchase Invoice', filters=[['company', '=', cname], ['posting_date', '>=', start_hist], ['posting_date', '<=', end], ['docstatus', '=', 1]], fields=['sum(grand_total) as total'])\n    hist_total = 0.0\n    if hist and hist[0].get('total'):\n        hist_total = frappe.utils.flt(hist[0].get('total'))\n    hist_avg = 0.0\n    if MONTHS > 0:\n        hist_avg = hist_total / MONTHS\n    recent = frappe.get_all('Purchase Invoice', filters=[['company', '=', cname], ['posting_date', '>=', start_recent], ['posting_date', '<=', end], ['docstatus', '=', 1]], fields=['sum(grand_total) as total'])\n    recent_total = 0.0\n    if recent and recent[0].get('total'):\n        recent_total = frappe.utils.flt(recent[0].get('total'))\n    pct = 0.0\n    if hist_avg > 0:\n        pct = abs(recent_total - hist_avg) / hist_avg * 100.0\n    if pct >= VARIANCE_PERCENT_THRESHOLD:\n        try:\n            cdoc = frappe.new_doc('Case')\n            cdoc.custom_case_type = 'Expenditure Variance'\n            cdoc.title = 'Expenditure variance alert for ' + str(cname)\n            cdoc.insert()\n        except Exception:\n            pass",
+  "script_type": "Scheduler Event"
+ },
+ {
+  "disabled": 0,
+  "doctype": "Server Script",
+  "doctype_event": "Before Save",
+  "name": "Sales Invoice - SI_compute_qd_amount_and_flag",
+  "reference_doctype": "Sales Invoice",
+  "script": "QD_FLAG_FIELD = \"custom_is_qd\"\n\ntotal = 0.0\nhas_qd = 0\nitems = doc.get(\"items\")\nif items:\n    for it in items:\n        item_code = it.get(\"item_code\")\n        if item_code:\n            is_qd = frappe.db.get_value(\"Item\", item_code, QD_FLAG_FIELD)\n            if is_qd and int(is_qd) == 1:\n                amt = 0.0\n                if it.get(\"base_net_amount\"):\n                    amt = float(it.get(\"base_net_amount\"))\n                elif it.get(\"net_amount\"):\n                    amt = float(it.get(\"net_amount\"))\n                elif it.get(\"amount\"):\n                    amt = float(it.get(\"amount\"))\n                total = total + amt\n    if total > 0:\n        has_qd = 1\n\ndoc.custom_has_qd_item = has_qd\ndoc.custom_qd_net_amount = total",
+  "script_type": "DocType Event"
+ },
+ {
+  "disabled": 0,
+  "doctype": "Server Script",
+  "event_frequency": "Daily",
+  "name": "SCM revoke URC temp credit daily",
+  "script": "COMPANY_CREDIT_ACCOUNT_FIELD = \"custom_urc_temp_credit_account\"\nCOMPANY_RECEIVABLE_ACCOUNT_FIELD = \"custom_urc_receivable_account\"\n\n\ndef get_company_account(company, fieldname):\n    val = frappe.db.get_value(\"Company\", company, fieldname)\n    return val\n\n\ndef get_cds_to_process(today):\n    cds = frappe.get_all(\n        \"Consolidated Demand\",\n        filters={\n            \"period_end\": [\"<=\", str(today)],\n            \"custom_credit_revoked\": [\"!=\", 1]\n        },\n        fields=[\"name\", \"company\", \"period_start\", \"period_end\"]\n    )\n    return cds\n\n\ndef main():\n    today = frappe.utils.getdate()\n    cds = get_cds_to_process(today)\n    for cd in cds:\n        groups = {}\n        mrs = frappe.get_all(\n            \"Material Request\",\n            filters=[\n                [\"Material Request\", \"transaction_date\", \">=\", cd.get(\"period_start\")],\n                [\"Material Request\", \"transaction_date\", \"<=\", cd.get(\"period_end\")],\n                [\"Material Request\", \"custom_urc_credit_posted\", \"=\", 1],\n                [\"Material Request\", \"custom_urc_credit_amount\", \">\", 0],\n                [\"Material Request\", \"custom_urc_credit_revoked\", \"!=\", 1]\n            ],\n            fields=[\"name\", \"company\", \"customer\", \"custom_urc_credit_amount\"]\n        )\n        for r in mrs:\n            company = r.get(\"company\")\n            customer = r.get(\"customer\") or \"\"\n            key = company + \"||\" + customer\n            if not groups.get(key):\n                groups[key] = {\"company\": company, \"customer\": customer, \"total\": 0.0, \"mrs\": []}\n            amt = frappe.utils.flt(r.get(\"custom_urc_credit_amount\"))\n            groups[key][\"total\"] = groups[key][\"total\"] + amt\n            groups[key][\"mrs\"].append(r.get(\"name\"))\n        for key in groups:\n            g = groups.get(key)\n            if not g:\n                continue\n            if not g.get(\"customer\"):\n                continue\n            temp_acc = get_company_account(g.get(\"company\"), COMPANY_CREDIT_ACCOUNT_FIELD)\n            recv_acc = get_company_account(g.get(\"company\"), COMPANY_RECEIVABLE_ACCOUNT_FIELD)\n            if not temp_acc or not recv_acc:\n                continue\n            total_amt = frappe.utils.flt(g.get(\"total\"))\n            if total_amt <= 0:\n                continue\n            je = frappe.get_doc({\n                \"doctype\": \"Journal Entry\",\n                \"posting_date\": str(today),\n                \"company\": g.get(\"company\"),\n                \"user_remark\": \"URC Temporary Credit Reversal for \" + g.get(\"customer\") + \" in cycle \" + cd.get(\"name\")\n            })\n            je.append(\"accounts\", {\n                \"account\": temp_acc,\n                \"debit_in_account_currency\": total_amt\n            })\n            je.append(\"accounts\", {\n                \"account\": recv_acc,\n                \"credit_in_account_currency\": total_amt,\n                \"party_type\": \"Customer\",\n                \"party\": g.get(\"customer\")\n            })\n            je.insert()\n            if je.docstatus == 0:\n                je.submit()\n            for mr_name in g.get(\"mrs\"):\n                mr = frappe.get_doc(\"Material Request\", mr_name)\n                mr.custom_urc_credit_revoked = 1\n                mr.custom_urc_credit_revoked_on = str(today)\n                mr.custom_urc_credit_reversal_reference = je.name\n                mr.save()\n        cd_doc = frappe.get_doc(\"Consolidated Demand\", cd.get(\"name\"))\n        cd_doc.custom_credit_revoked = 1\n        cd_doc.custom_credit_revoked_on = str(today)\n        cd_doc.save()\n\nmain()",
+  "script_type": "Scheduler Event"
+ },
+ {
+  "disabled": 0,
+  "doctype": "Server Script",
+  "doctype_event": "Before Submit",
+  "name": "URC Payment Advice - urc_create_payment_request",
+  "reference_doctype": "URC Payment Advice",
+  "script": "PR_TRIES = 1\nif doc.get('custom_authenticated'):\n    # Create a Payment Request to represent the URC-initiated payment attempt if not already created\n    if not doc.get('custom_payment_request'):\n        # prepare minimal Payment Request doc; if site requires more fields, extend script later\n        pr = {\n            'doctype': 'Payment Request',\n            'party_type': 'Customer',\n            'party': doc.get('urc') or doc.get('company') or None,\n            'amount': doc.get('amount') or 0.0,\n            'reference_doctype': 'URC Payment Advice',\n            'reference_docname': doc.name,\n            'title': doc.get('title') or ('Payment for ' + doc.name)\n        }\n        # Ensure a party exists\n        if not pr.get('party'):\n            frappe.throw('Cannot create Payment Request: no party (URC) found on this URC Payment Advice')\n        # try insertion; if it fails due to additional mandatory fields, surface a clear error\n        created = None\n        tries = 0\n        while not created and tries < PR_TRIES:\n            tries = tries + 1\n            try:\n                new_pr = frappe.get_doc(pr).insert()\n                created = new_pr.name\n            except Exception as e:\n                # raise a clear validation error to notify administrator to map extra fields\n                frappe.throw('Failed to create Payment Request automatically: ' + str(e))\n        if created:\n            doc.custom_payment_request = created\n            doc.custom_payment_status = 'Pending'\n            # persist the linkage in DB for this submit flow\n            frappe.db.set_value('URC Payment Advice', doc.name, 'custom_payment_request', created)\n            frappe.db.set_value('URC Payment Advice', doc.name, 'custom_payment_status', 'Pending')",
+  "script_type": "DocType Event"
+ },
+ {
+  "disabled": 0,
+  "doctype": "Server Script",
+  "doctype_event": "Before Save",
+  "name": "Material Request - SCM MR - compute_offtake_fields",
+  "reference_doctype": "Material Request",
+  "script": "DEFAULT_MONTHS = 3\nDAYS_IN_MONTH = 30\n\ndef get_int(v):\n    return frappe.utils.cint(v) if v is not None else 0\n\ndef get_flt(v):\n    return frappe.utils.flt(v) if v is not None else 0.0\n\n# Only proceed if there are items\nif doc.get('items'):\n    for it in doc.get('items'):\n        item_code = it.get('item_code')\n        wh = it.get('warehouse')\n        if not item_code or not wh:\n            continue\n        # Only liquor products\n        is_liquor = frappe.db.get_value('Item', item_code, 'custom_is_liquor_product')\n        if frappe.utils.cint(is_liquor) != 1:\n            continue\n        # Depot tuning\n        months = get_int(frappe.db.get_value('Warehouse', wh, 'custom_offtake_months'))\n        if months <= 0:\n            months = DEFAULT_MONTHS\n        admin_days = get_int(frappe.db.get_value('Warehouse', wh, 'custom_admin_time_days'))\n        lead_days = get_int(frappe.db.get_value('Warehouse', wh, 'custom_lead_time_days'))\n        sale_days = get_int(frappe.db.get_value('Warehouse', wh, 'custom_sale_period_days'))\n        reserve_pct = get_flt(frappe.db.get_value('Warehouse', wh, 'custom_reserve_percent'))\n        from_date = frappe.utils.add_months(frappe.utils.getdate(frappe.utils.today()), -months)\n        # Sum past provisional demand for this item+warehouse within window\n        total_qty = 0.0\n        rows = frappe.get_all('Material Request Item', filters={'item_code': item_code, 'warehouse': wh}, fields=['name', 'qty', 'parent'])\n        for r in rows:\n            p = frappe.db.get_value('Material Request', r.get('parent'), ['transaction_date', 'custom_demand_cycle', 'docstatus'], as_dict=1)\n            if not p:\n                continue\n            if frappe.utils.cint(p.get('docstatus')) == 2:\n                continue\n            tx_date = frappe.utils.getdate(p.get('transaction_date')) if p.get('transaction_date') else None\n            if not tx_date:\n                continue\n            if tx_date >= from_date and p.get('custom_demand_cycle') == 'Provisional':\n                total_qty = total_qty + get_flt(r.get('qty'))\n        avg_monthly = 0.0\n        if months > 0:\n            avg_monthly = total_qty / float(months)\n        per_day = avg_monthly / float(DAYS_IN_MONTH)\n        planned_days = admin_days + lead_days + sale_days\n        recommended = 0.0\n        if planned_days > 0:\n            recommended = per_day * float(planned_days) * (1.0 + (reserve_pct / 100.0))\n        # Set values on the child row\n        it.custom_offtake_avg_monthly_qty = frappe.utils.flt(avg_monthly, 2)\n        it.custom_offtake_recommended_qty = frappe.utils.flt(recommended, 2)\n        it.custom_offtake_notes = 'Off-take calc on ' + str(frappe.utils.today()) + '; N=' + str(months) + '; Admin ' + str(admin_days) + ' + Lead ' + str(lead_days) + ' + Sale ' + str(sale_days) + '; Reserve ' + str(reserve_pct) + '%'",
+  "script_type": "DocType Event"
+ },
+ {
+  "disabled": 0,
+  "doctype": "Server Script",
+  "event_frequency": "Weekly",
+  "name": "SCM Offtake Forecaster - Weekly",
+  "script": "DEFAULT_MONTHS = 3\nDAYS_IN_MONTH = 30\n\ndef get_int(v):\n    return frappe.utils.cint(v) if v is not None else 0\n\ndef get_flt(v):\n    return frappe.utils.flt(v) if v is not None else 0.0\n\n# Process all open/active Provisional Material Requests\nmrs = frappe.get_all('Material Request', filters={'custom_demand_cycle': 'Provisional', 'docstatus': ['<', 2]}, fields=['name'])\nfor m in mrs:\n    items = frappe.get_all('Material Request Item', filters={'parent': m.get('name')}, fields=['name', 'item_code', 'warehouse'])\n    for it in items:\n        item_code = it.get('item_code')\n        wh = it.get('warehouse')\n        if not item_code or not wh:\n            continue\n        is_liquor = frappe.db.get_value('Item', item_code, 'custom_is_liquor_product')\n        if frappe.utils.cint(is_liquor) != 1:\n            continue\n        months = get_int(frappe.db.get_value('Warehouse', wh, 'custom_offtake_months'))\n        if months <= 0:\n            months = DEFAULT_MONTHS\n        admin_days = get_int(frappe.db.get_value('Warehouse', wh, 'custom_admin_time_days'))\n        lead_days = get_int(frappe.db.get_value('Warehouse', wh, 'custom_lead_time_days'))\n        sale_days = get_int(frappe.db.get_value('Warehouse', wh, 'custom_sale_period_days'))\n        reserve_pct = get_flt(frappe.db.get_value('Warehouse', wh, 'custom_reserve_percent'))\n        from_date = frappe.utils.add_months(frappe.utils.getdate(frappe.utils.today()), -months)\n        total_qty = 0.0\n        hist = frappe.get_all('Material Request Item', filters={'item_code': item_code, 'warehouse': wh}, fields=['name', 'qty', 'parent'])\n        for r in hist:\n            p = frappe.db.get_value('Material Request', r.get('parent'), ['transaction_date', 'custom_demand_cycle', 'docstatus'], as_dict=1)\n            if not p:\n                continue\n            if frappe.utils.cint(p.get('docstatus')) == 2:\n                continue\n            tx_date = frappe.utils.getdate(p.get('transaction_date')) if p.get('transaction_date') else None\n            if not tx_date:\n                continue\n            if tx_date >= from_date and p.get('custom_demand_cycle') == 'Provisional':\n                total_qty = total_qty + get_flt(r.get('qty'))\n        avg_monthly = 0.0\n        if months > 0:\n            avg_monthly = total_qty / float(months)\n        per_day = avg_monthly / float(DAYS_IN_MONTH)\n        planned_days = admin_days + lead_days + sale_days\n        recommended = 0.0\n        if planned_days > 0:\n            recommended = per_day * float(planned_days) * (1.0 + (reserve_pct / 100.0))\n        notes = 'Off-take calc on ' + str(frappe.utils.today()) + '; N=' + str(months) + '; Admin ' + str(admin_days) + ' + Lead ' + str(lead_days) + ' + Sale ' + str(sale_days) + '; Reserve ' + str(reserve_pct) + '%'\n        frappe.db.set_value('Material Request Item', it.get('name'), 'custom_offtake_avg_monthly_qty', frappe.utils.flt(avg_monthly, 2))\n        frappe.db.set_value('Material Request Item', it.get('name'), 'custom_offtake_recommended_qty', frappe.utils.flt(recommended, 2))\n        frappe.db.set_value('Material Request Item', it.get('name'), 'custom_offtake_notes', notes)",
+  "script_type": "Scheduler Event"
+ },
+ {
+  "disabled": 0,
+  "doctype": "Server Script",
+  "doctype_event": "After Submit",
+  "name": "URC Payment Advice - urc_payment_advice_update_payment_request_and_urc",
+  "reference_doctype": "URC Payment Advice",
+  "script": "if doc.docstatus == 1:\n    # If this Payment Advice references a Payment Request, push key payment fields to it\n    if doc.get('custom_payment_request'):\n        pr_name = doc.get('custom_payment_request')\n        # Update Payment Request fields with values from this approved Payment Advice\n        frappe.db.set_value('Payment Request', pr_name, 'payment_reference', doc.get('payment_reference') or '')\n        frappe.db.set_value('Payment Request', pr_name, 'payment_date', doc.get('payment_date') or None)\n        # update amount if present on Payment Advice\n        if doc.get('amount') is not None:\n            frappe.db.set_value('Payment Request', pr_name, 'amount', doc.get('amount'))\n        # reflect payment status if provided\n        if doc.get('custom_payment_status'):\n            frappe.db.set_value('Payment Request', pr_name, 'status', doc.get('custom_payment_status'))\n    # Always record last payment advice info on the URC (Customer) if URC linked\n    if doc.get('urc'):\n        try:\n            frappe.db.set_value('Customer', doc.get('urc'), 'custom_last_payment_advice_date', doc.get('payment_date') or None)\n            if doc.get('amount') is not None:\n                frappe.db.set_value('Customer', doc.get('urc'), 'custom_last_payment_advice_amount', doc.get('amount'))\n        except Exception:\n            # Avoid blocking submission because of a non-critical Customer update\n            pass",
+  "script_type": "DocType Event"
+ },
+ {
+  "disabled": 0,
+  "doctype": "Server Script",
+  "doctype_event": "Before Save",
+  "name": "Temporary Credit Request - TCR_validate_core_fields_and_amount",
+  "reference_doctype": "Temporary Credit Request",
+  "script": "MIN_AMOUNT = 0.0\nif not doc.urc:\n\tfrappe.throw(\"URC is required\")\nif not doc.request_date:\n\tfrappe.throw(\"Request Date is required\")\nif doc.get('amount') and float(doc.amount) <= MIN_AMOUNT:\n\tfrappe.throw(\"Requested Amount must be greater than 0\")",
+  "script_type": "DocType Event"
+ },
+ {
+  "disabled": 0,
+  "doctype": "Server Script",
+  "event_frequency": "Weekly",
+  "name": "Compute Liquor Demand Forecast Weekly",
+  "script": "MONTHSDEFAULT = 3\nmonths = MONTHSDEFAULT\ncfgs = frappe.get_all('Liquor Forecast Settings', fields=['name', 'forecast_months'], limit_page_length=1)\nif len(cfgs) > 0:\n    m = cfgs[0].get('forecast_months') or 0\n    mi = frappe.utils.cint(m)\n    if mi > 0:\n        months = mi\n\n# define period references (use current month as forecast month; average over last N complete months)\ntoday = frappe.utils.getdate(frappe.utils.nowdate())\ncurrent_first = today.replace(day=1)\nprev_first = frappe.utils.add_months(current_first, -1)\nforecast_month = current_first\n\n# collect Liquor items (by Item Group)\nliquor_items = frappe.get_all('Item', filters={'item_group': 'Liquor'}, fields=['name'])\nitems_map = {}\nfor it in liquor_items:\n    nm = it.get('name')\n    if nm:\n        items_map[nm] = 1\n\nif len(items_map) > 0 and months > 0:\n    totals = {}\n    idx = 0\n    while idx < months:\n        m_first = frappe.utils.add_months(prev_first, -idx)\n        m_second = frappe.utils.add_months(m_first, 1)\n        m_end = frappe.utils.add_days(m_second, -1)\n        invs = frappe.get_all('Sales Invoice', filters={'docstatus': 1, 'posting_date': ['between', [m_first, m_end]]}, fields=['name'])\n        inv_names = []\n        for inv in invs:\n            inv_names.append(inv.get('name'))\n        if len(inv_names) > 0:\n            rows = frappe.get_all('Sales Invoice Item', filters={'parent': ['in', inv_names]}, fields=['item_code', 'qty'])\n            for r in rows:\n                code = r.get('item_code')\n                if code and (code in items_map):\n                    q = r.get('qty') or 0\n                    if not (code in totals):\n                        totals[code] = {}\n                    existing = 0\n                    if idx in totals[code]:\n                        existing = totals[code][idx]\n                    totals[code][idx] = existing + q\n        idx = idx + 1\n\n    for code in totals:\n        s = 0.0\n        j = 0\n        while j < months:\n            part = 0.0\n            if j in totals[code]:\n                val = totals[code][j]\n                if val:\n                    part = float(val)\n            s = s + part\n            j = j + 1\n        avg = 0.0\n        if months > 0:\n            avg = s / float(months)\n        if avg > 0:\n            existing = frappe.get_all('Liquor Demand Forecast', filters={'item': code, 'month': forecast_month}, fields=['name'])\n            if len(existing) > 0:\n                docname = existing[0].get('name')\n                if docname:\n                    d = frappe.get_doc('Liquor Demand Forecast', docname)\n                    d.forecast_qty = avg\n                    d.save()\n            else:\n                d = frappe.get_doc({'doctype': 'Liquor Demand Forecast', 'item': code, 'month': forecast_month, 'forecast_qty': avg})\n                d.insert()",
+  "script_type": "Scheduler Event"
+ },
+ {
+  "disabled": 0,
+  "doctype": "Server Script",
+  "doctype_event": "Before Save",
+  "name": "Dependency Request - Block Edit if Approved",
+  "reference_doctype": "Dependency Request",
+  "script": "old_state = None\nif doc.name:\n    old_state = frappe.db.get_value('Dependency Request', doc.name, 'workflow_state')\nif old_state and old_state == 'Approved':\n    roles = frappe.get_roles()\n    if 'Depot Manager' not in roles:\n        frappe.throw('Only Depot Manager can modify an Approved Dependency Request.')",
+  "script_type": "DocType Event"
+ },
+ {
+  "disabled": 0,
+  "doctype": "Server Script",
+  "doctype_event": "After Save",
+  "name": "Dependency Request - Auto NOC on Approval",
+  "reference_doctype": "Dependency Request",
+  "script": "if doc.workflow_state == 'Approved' and doc.dual_dependency == 1:\n    issued = 0\n    if doc.get('noc_issued'):\n        issued = 1\n    if issued == 0:\n        frappe.db.set_value('Dependency Request', doc.name, 'noc_issued', 1)\n        frappe.db.set_value('Dependency Request', doc.name, 'noc_issue_date', frappe.utils.nowdate())\n        frappe.db.set_value('Dependency Request', doc.name, 'noc_issued_by', frappe.session.user)\n        if not doc.get('noc_remarks'):\n            frappe.db.set_value('Dependency Request', doc.name, 'noc_remarks', 'Auto-issued for Dual Dependency')",
   "script_type": "DocType Event"
  }
 ]

@@ -286,5 +286,61 @@
   "name": "supplier_registry_lookup",
   "script": "frappe.ui.form.on('Supplier', {\n\tcustom_registry_registration_number: function(frm) {\n\t\tvar reg = frm.doc.custom_registry_registration_number;\n\t\tif (!reg) {\n\t\t\treturn;\n\t\t}\n\t\tfrappe.call({\n\t\t\tmethod: 'frappe.client.get_value',\n\t\t\targs: {\n\t\t\t\tdoctype: 'Regulatory Registry',\n\t\t\t\tfilters: { registration_number: reg },\n\t\t\t\tfieldname: ['registration_number','legal_name','status','source','verified_on']\n\t\t\t},\n\t\t\tcallback: function(r) {\n\t\t\t\tif(r.message) {\n\t\t\t\t\tfrm.set_value('custom_registry_registration_number', r.message.registration_number);\n\t\t\t\t\tfrm.set_value('custom_registry_source', r.message.source);\n\t\t\t\t\tfrm.set_value('custom_registry_verified_on', r.message.verified_on);\n\t\t\t\t\tfrm.set_value('custom_registry_verified', 1);\n\t\t\t\t\tif(!frm.doc.supplier_name && r.message.legal_name) {\n\t\t\t\t\t\tfrm.set_value('supplier_name', r.message.legal_name);\n\t\t\t\t\t}\n\t\t\t\t} else {\n\t\t\t\t\tfrm.set_value('custom_registry_verified', 0);\n\t\t\t\t\tfrm.set_value('custom_registry_source', '');\n\t\t\t\t\tfrm.set_value('custom_registry_verified_on', '');\n\t\t\t\t\tfrappe.msgprint('No matching Regulatory Registry record found for ' + reg);\n\t\t\t\t}\n\t\t\t}\n\t\t});\n\t}\n});",
   "view": "Form"
+ },
+ {
+  "doctype": "Client Script",
+  "dt": "Purchase Order",
+  "enabled": 1,
+  "name": "Purchase Order - PO Permit Conversion Button",
+  "script": "frappe.ui.form.on('Purchase Order', {\n  refresh: function(frm) {\n    if (frm.doc.docstatus === 1 && !frm.doc.custom_is_permit) {\n      frm.add_custom_button('Convert to Permit', function() {\n        frm.set_value('custom_is_permit', 1);\n        frm.set_value('custom_permit_date', frappe.datetime.get_today());\n        frm.set_value('custom_permit_by', frappe.session.user);\n        frm.save().then(function() {\n          frappe.msgprint('Converted to Permit. Use Print > Depot Permit (PO) to print.');\n        });\n      });\n    }\n  }\n});",
+  "view": "Form"
+ },
+ {
+  "doctype": "Client Script",
+  "dt": "Sales Order",
+  "enabled": 1,
+  "name": "Sales Order - SO Permit Conversion Button",
+  "script": "frappe.ui.form.on('Sales Order', {\n  refresh: function(frm) {\n    if (frm.doc.docstatus === 1 && !frm.doc.custom_is_permit) {\n      frm.add_custom_button('Convert to Permit', function() {\n        frm.set_value('custom_is_permit', 1);\n        frm.set_value('custom_permit_date', frappe.datetime.get_today());\n        frm.set_value('custom_permit_by', frappe.session.user);\n        frm.save().then(function() {\n          frappe.msgprint('Converted to Permit. Use Print > Depot Permit (SO) to print.');\n        });\n      });\n    }\n  }\n});",
+  "view": "Form"
+ },
+ {
+  "doctype": "Client Script",
+  "dt": "Material Request",
+  "enabled": 1,
+  "name": "Material Request - Issue Release Order Button",
+  "script": "frappe.ui.form.on('Material Request', {\n  refresh: function(frm) {\n    if (frm.doc.docstatus === 1 && frappe.user.has_role('Depot Manager')) {\n      frm.add_custom_button('Issue Release Order', function() {\n        frappe.route_options = {\n          customer: frm.doc.customer,\n          company: frm.doc.company,\n          posting_date: frappe.datetime.get_today(),\n          custom_urc_material_request: frm.doc.name,\n          remarks: 'Against Material Request ' + frm.doc.name\n        };\n        frappe.new_doc('Delivery Note');\n      }, 'Create');\n    }\n  }\n});",
+  "view": "Form"
+ },
+ {
+  "doctype": "Client Script",
+  "dt": "Material Request",
+  "enabled": 1,
+  "name": "Material Request - SCM cascading reviewers",
+  "script": "frappe.ui.form.on('Material Request', {\n  custom_lif_reviewed: function(frm) {\n    if (frm.doc.custom_lif_reviewed && !frm.doc.custom_lif_reviewer_user) {\n      frm.set_value('custom_lif_reviewer_user', frappe.session.user);\n    }\n  },\n  custom_agm_secy_reviewed: function(frm) {\n    if (frm.doc.custom_agm_secy_reviewed && !frm.doc.custom_agm_secy_user) {\n      frm.set_value('custom_agm_secy_user', frappe.session.user);\n    }\n  },\n  custom_cs_dir_reviewed: function(frm) {\n    if (frm.doc.custom_cs_dir_reviewed && !frm.doc.custom_cs_dir_user) {\n      frm.set_value('custom_cs_dir_user', frappe.session.user);\n    }\n  }\n});",
+  "view": "Form"
+ },
+ {
+  "doctype": "Client Script",
+  "dt": "Material Request Item",
+  "enabled": 1,
+  "name": "Material Request Item - SCM_MR_Item_Suggest_Alternate",
+  "script": "frappe.ui.form.on('Material Request Item', {\n  item_code: function(frm, cdt, cdn) { scm_check_alternates(frm, cdt, cdn); },\n  qty: function(frm, cdt, cdn) { scm_check_alternates(frm, cdt, cdn); }\n});\n\nfunction scm_check_alternates(frm, cdt, cdn) {\n  var row = frappe.get_doc(cdt, cdn);\n  var wh = row.warehouse || frm.doc.set_warehouse || frm.doc.set_from_warehouse;\n  if (!row.item_code || !wh) { return; }\n  frappe.db.get_value('Bin', { item_code: row.item_code, warehouse: wh }, 'actual_qty').then(function(r) {\n    var needed = (row.qty || 0);\n    var have = (r && r.message && r.message.actual_qty) ? r.message.actual_qty : 0;\n    if (have >= needed && needed > 0) { return; }\n    frappe.db.get_list('Item Alternative', { filters: { item_code: row.item_code }, fields: ['alternative_item'], limit: 10 }).then(function(alts) {\n      if (!alts || alts.length === 0) { return; }\n      var found = null;\n      var checks = [];\n      alts.forEach(function(a) {\n        checks.push(\n          frappe.db.get_value('Bin', { item_code: a.alternative_item, warehouse: wh }, 'actual_qty').then(function(rr) {\n            var aq = (rr && rr.message && rr.message.actual_qty) ? rr.message.actual_qty : 0;\n            if (!found && aq > 0) { found = a.alternative_item; }\n          })\n        );\n      });\n      Promise.all(checks).then(function() {\n        if (found) {\n          frappe.model.set_value(cdt, cdn, 'custom_alternate_item', found);\n          frappe.msgprint({ title: 'Alternate Available', message: 'Alternate item ' + found + ' is available in ' + wh + '. It has been suggested in Alternate Item field.' });\n        }\n      });\n    });\n  });\n}\n",
+  "view": "Form"
+ },
+ {
+  "doctype": "Client Script",
+  "dt": "Promotional Scheme",
+  "enabled": 1,
+  "name": "Promotional Scheme - List default approved filter",
+  "script": "frappe.listview_settings['Promotional Scheme'] = { onload: function(listview) { try { listview.filter_area.add([[ 'Promotional Scheme', 'custom_approved_for_depot', '=', 1 ]]); listview.filter_area.add([[ 'Promotional Scheme', 'disable', '=', 0 ]]); } catch (e) {} } };",
+  "view": "List"
+ },
+ {
+  "doctype": "Client Script",
+  "dt": "Supplier Fee Schedule",
+  "enabled": 1,
+  "name": "Supplier Fee Schedule - List default approved filter",
+  "script": "frappe.listview_settings['Supplier Fee Schedule'] = { onload: function(listview) { try { listview.filter_area.add([[ 'Supplier Fee Schedule', 'custom_approved_for_depot', '=', 1 ]]); } catch (e) {} } };",
+  "view": "List"
  }
 ]

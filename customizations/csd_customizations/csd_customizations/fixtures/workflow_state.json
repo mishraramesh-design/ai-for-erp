@@ -71,6 +71,11 @@
  },
  {
   "doctype": "Workflow State",
+  "name": "Escalated",
+  "workflow_state_name": "Escalated"
+ },
+ {
+  "doctype": "Workflow State",
   "name": "Open",
   "workflow_state_name": "Open"
  },
@@ -83,5 +88,115 @@
   "doctype": "Workflow State",
   "name": "For BOA Approval",
   "workflow_state_name": "For BOA Approval"
+ },
+ {
+  "doctype": "Workflow State",
+  "name": "PD Draft",
+  "workflow_state_name": "PD Draft"
+ },
+ {
+  "doctype": "Workflow State",
+  "name": "PD Submitted to Depot",
+  "workflow_state_name": "PD Submitted to Depot"
+ },
+ {
+  "doctype": "Workflow State",
+  "name": "Depot Validated",
+  "workflow_state_name": "Depot Validated"
+ },
+ {
+  "doctype": "Workflow State",
+  "name": "FD Ready",
+  "workflow_state_name": "FD Ready"
+ },
+ {
+  "doctype": "Workflow State",
+  "name": "Forwarded to HO",
+  "workflow_state_name": "Forwarded to HO"
+ },
+ {
+  "doctype": "Workflow State",
+  "name": "HO Approved",
+  "workflow_state_name": "HO Approved"
+ },
+ {
+  "doctype": "Workflow State",
+  "name": "Release Order Issued",
+  "workflow_state_name": "Release Order Issued"
+ },
+ {
+  "doctype": "Workflow State",
+  "name": "Pending Regional Approval",
+  "workflow_state_name": "Pending Regional Approval"
+ },
+ {
+  "doctype": "Workflow State",
+  "name": "Pending RM Approval",
+  "workflow_state_name": "Pending RM Approval"
+ },
+ {
+  "doctype": "Workflow State",
+  "name": "Pending Depot Manager Approval",
+  "workflow_state_name": "Pending Depot Manager Approval"
+ },
+ {
+  "doctype": "Workflow State",
+  "name": "Pending Regional Manager Approval",
+  "workflow_state_name": "Pending Regional Manager Approval"
+ },
+ {
+  "doctype": "Workflow State",
+  "name": "Pending AM Approval",
+  "workflow_state_name": "Pending AM Approval"
+ },
+ {
+  "doctype": "Workflow State",
+  "name": "Issued by HO",
+  "workflow_state_name": "Issued by HO"
+ },
+ {
+  "doctype": "Workflow State",
+  "name": "Assigned to RM",
+  "workflow_state_name": "Assigned to RM"
+ },
+ {
+  "doctype": "Workflow State",
+  "name": "In Progress",
+  "workflow_state_name": "In Progress"
+ },
+ {
+  "doctype": "Workflow State",
+  "name": "Completed",
+  "workflow_state_name": "Completed"
+ },
+ {
+  "doctype": "Workflow State",
+  "name": "URC Submitted",
+  "workflow_state_name": "URC Submitted"
+ },
+ {
+  "doctype": "Workflow State",
+  "name": "Depot Review",
+  "workflow_state_name": "Depot Review"
+ },
+ {
+  "doctype": "Workflow State",
+  "name": "RM Review",
+  "workflow_state_name": "RM Review"
+ },
+ {
+  "doctype": "Workflow State",
+  "name": "Finance Approval",
+  "workflow_state_name": "Finance Approval"
+ },
+ {
+  "doctype": "Workflow State",
+  "name": "Disbursed",
+  "workflow_state_name": "Disbursed"
+ },
+ {
+  "doctype": "Workflow State",
+  "name": "Submitted to HO",
+  "workflow_state_name": "Submitted to HO"
  }
 ]

@@ -1,7 +1,7 @@
 [
  {
   "charts": [],
-  "content": "[{\"id\": \"b01\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>SRM Home</b></span>\", \"col\": 12}}, {\"id\": \"b02\", \"type\": \"custom_block\", \"data\": {\"custom_block_name\": \"demo-pilot banner\", \"col\": 12}}, {\"id\": \"b03\", \"type\": \"custom_block\", \"data\": {\"custom_block_name\": \"SRM Tiles\", \"col\": 12}}, {\"id\": \"b04\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"SRM - Suppliers (Count)\", \"col\": 4}}, {\"id\": \"b05\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"SRM - Supplier Change Requests (Count)\", \"col\": 4}}, {\"id\": \"b06\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"SRM - Supplier Quotations (Count)\", \"col\": 4}}, {\"id\": \"b07\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"SRM - Purchase Orders (Count)\", \"col\": 4}}, {\"id\": \"b08\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"SRM - Supplier C-Forms (Count)\", \"col\": 4}}, {\"id\": \"b09\", \"type\": \"spacer\", \"data\": {\"col\": 12}}]",
+  "content": "[{\"id\": \"b01\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>SRM Home</b></span>\", \"col\": 12}}, {\"id\": \"b02\", \"type\": \"custom_block\", \"data\": {\"custom_block_name\": \"demo-pilot banner\", \"col\": 12}}, {\"id\": \"b03\", \"type\": \"custom_block\", \"data\": {\"custom_block_name\": \"SRM Tiles\", \"col\": 12}}]",
   "custom_blocks": [
    {
     "custom_block_name": "demo-pilot banner",
@@ -16,28 +16,7 @@
   "label": "SRM Home",
   "module": "Buying",
   "name": "SRM Home",
-  "number_cards": [
-   {
-    "label": "SRM - Suppliers (Count)",
-    "number_card_name": "SRM - Suppliers (Count)"
-   },
-   {
-    "label": "SRM - Supplier Change Requests (Count)",
-    "number_card_name": "SRM - Supplier Change Requests (Count)"
-   },
-   {
-    "label": "SRM - Supplier Quotations (Count)",
-    "number_card_name": "SRM - Supplier Quotations (Count)"
-   },
-   {
-    "label": "SRM - Purchase Orders (Count)",
-    "number_card_name": "SRM - Purchase Orders (Count)"
-   },
-   {
-    "label": "SRM - Supplier C-Forms (Count)",
-    "number_card_name": "SRM - Supplier C-Forms (Count)"
-   }
-  ],
+  "number_cards": [],
   "public": 1,
   "roles": [],
   "shortcuts": [],
@@ -96,5 +75,227 @@
    }
   ],
   "title": "Case Management"
+ },
+ {
+  "charts": [
+   {
+    "chart_name": "SCM Material Requests by State",
+    "label": "SCM Material Requests by State"
+   }
+  ],
+  "content": "[{\"id\": \"b01\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>SCM Depot</b></span>\", \"col\": 12}}, {\"id\": \"b02\", \"type\": \"custom_block\", \"data\": {\"custom_block_name\": \"SCM Depot Banner\", \"col\": 12}}, {\"id\": \"b03\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"SCM Material Requests (Count)\", \"col\": 4}}, {\"id\": \"b04\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"b05\", \"type\": \"chart\", \"data\": {\"chart_name\": \"SCM Material Requests by State\", \"col\": 6}}, {\"id\": \"b06\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"b07\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h5\\\"><b>Shortcuts</b></span>\", \"col\": 12}}, {\"id\": \"b08\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Material Requests\", \"col\": 3}}, {\"id\": \"b09\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Delivery Notes (Release Orders)\", \"col\": 3}}]",
+  "custom_blocks": [
+   {
+    "custom_block_name": "SCM Depot Banner",
+    "label": "SCM Depot Banner"
+   }
+  ],
+  "doctype": "Workspace",
+  "label": "SCM Depot",
+  "module": "Stock",
+  "name": "SCM Depot",
+  "number_cards": [
+   {
+    "label": "SCM Material Requests (Count)",
+    "number_card_name": "SCM Material Requests (Count)"
+   }
+  ],
+  "public": 1,
+  "roles": [
+   {
+    "role": "Depot User"
+   },
+   {
+    "role": "Depot Manager"
+   },
+   {
+    "role": "Accounts User"
+   },
+   {
+    "role": "Accounts Manager"
+   }
+  ],
+  "shortcuts": [
+   {
+    "doc_view": "List",
+    "label": "Material Requests",
+    "link_to": "Material Request",
+    "type": "DocType"
+   },
+   {
+    "doc_view": "List",
+    "label": "Delivery Notes (Release Orders)",
+    "link_to": "Delivery Note",
+    "type": "DocType"
+   }
+  ],
+  "title": "SCM Depot"
+ },
+ {
+  "charts": [
+   {
+    "chart_name": "SCM Depot Stock Levels Chart",
+    "label": "SCM Depot Stock Levels Chart"
+   }
+  ],
+  "content": "[{\"id\": \"b01\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>SCM Regional Manager</b></span>\", \"col\": 12}}, {\"id\": \"b02\", \"type\": \"custom_block\", \"data\": {\"custom_block_name\": \"SCM RM Banner\", \"col\": 12}}, {\"id\": \"b03\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"SCM Low Stock Bins\", \"col\": 4}}, {\"id\": \"b04\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"b05\", \"type\": \"chart\", \"data\": {\"chart_name\": \"SCM Depot Stock Levels Chart\", \"col\": 6}}, {\"id\": \"b06\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"b07\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h5\\\"><b>Shortcuts</b></span>\", \"col\": 12}}, {\"id\": \"b08\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Supplementary Statements\", \"col\": 3}}, {\"id\": \"b09\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Transport Claim Waivers\", \"col\": 3}}, {\"id\": \"b10\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Market Intelligence\", \"col\": 3}}]",
+  "custom_blocks": [
+   {
+    "custom_block_name": "SCM RM Banner",
+    "label": "SCM RM Banner"
+   }
+  ],
+  "doctype": "Workspace",
+  "label": "SCM Regional Manager",
+  "module": "Stock",
+  "name": "SCM Regional Manager",
+  "number_cards": [
+   {
+    "label": "SCM Low Stock Bins",
+    "number_card_name": "SCM Low Stock Bins"
+   }
+  ],
+  "public": 1,
+  "roles": [
+   {
+    "role": "Regional Manager"
+   },
+   {
+    "role": "Depot Manager"
+   },
+   {
+    "role": "System Manager"
+   }
+  ],
+  "shortcuts": [
+   {
+    "doc_view": "List",
+    "label": "Supplementary Statements",
+    "link_to": "Supplementary Demand Statement",
+    "type": "DocType"
+   },
+   {
+    "doc_view": "List",
+    "label": "Transport Claim Waivers",
+    "link_to": "Transport Claim Waiver",
+    "type": "DocType"
+   },
+   {
+    "doc_view": "List",
+    "label": "Market Intelligence",
+    "link_to": "SCM Market Intelligence",
+    "type": "DocType"
+   }
+  ],
+  "title": "SCM Regional Manager"
+ },
+ {
+  "charts": [],
+  "content": "[{\"id\": \"b01\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>SCM Depot Overview</b></span>\", \"col\": 12}}, {\"id\": \"b02\", \"type\": \"custom_block\", \"data\": {\"custom_block_name\": \"SCM Depot Banner\", \"col\": 12}}, {\"id\": \"b03\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"SCM QD Items In Stock\", \"col\": 4}}, {\"id\": \"b04\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"b05\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"b06\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h5\\\"><b>Shortcuts</b></span>\", \"col\": 12}}, {\"id\": \"b07\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Material Requests\", \"col\": 3}}, {\"id\": \"b08\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Purchase Orders\", \"col\": 3}}]",
+  "custom_blocks": [
+   {
+    "custom_block_name": "SCM Depot Banner",
+    "label": "SCM Depot Banner"
+   }
+  ],
+  "doctype": "Workspace",
+  "label": "SCM Depot Overview",
+  "module": "Buying",
+  "name": "SCM Depot Overview",
+  "number_cards": [
+   {
+    "label": "SCM QD Items In Stock",
+    "number_card_name": "SCM QD Items In Stock"
+   }
+  ],
+  "public": 1,
+  "roles": [
+   {
+    "role": "Depot Manager"
+   },
+   {
+    "role": "Depot User"
+   },
+   {
+    "role": "Purchase User"
+   }
+  ],
+  "shortcuts": [
+   {
+    "doc_view": "List",
+    "label": "Material Requests",
+    "link_to": "Material Request",
+    "type": "DocType"
+   },
+   {
+    "doc_view": "List",
+    "label": "Purchase Orders",
+    "link_to": "Purchase Order",
+    "type": "DocType"
+   }
+  ],
+  "title": "SCM Depot Overview"
+ },
+ {
+  "charts": [
+   {
+    "chart_name": "SCM Purchase Orders by Supplier",
+    "label": "SCM Purchase Orders by Supplier"
+   },
+   {
+    "chart_name": "SCM Material Requests by Status",
+    "label": "SCM Material Requests by Status"
+   },
+   {
+    "chart_name": "SCM Stock by Warehouse",
+    "label": "SCM Stock by Warehouse"
+   }
+  ],
+  "content": "[{\"id\": \"b01\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>SCM BI Home</b></span>\", \"col\": 12}}, {\"id\": \"b02\", \"type\": \"custom_block\", \"data\": {\"custom_block_name\": \"SCM BI Banner\", \"col\": 12}}, {\"id\": \"b03\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"SCM Open Material Requests\", \"col\": 4}}, {\"id\": \"b04\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"SCM Open Purchase Orders\", \"col\": 4}}, {\"id\": \"b05\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"SCM Purchase Order Value\", \"col\": 4}}, {\"id\": \"b06\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"SCM Pending URC Payment Advices\", \"col\": 4}}, {\"id\": \"b07\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"b08\", \"type\": \"chart\", \"data\": {\"chart_name\": \"SCM Purchase Orders by Supplier\", \"col\": 6}}, {\"id\": \"b09\", \"type\": \"chart\", \"data\": {\"chart_name\": \"SCM Material Requests by Status\", \"col\": 6}}, {\"id\": \"b10\", \"type\": \"chart\", \"data\": {\"chart_name\": \"SCM Stock by Warehouse\", \"col\": 6}}, {\"id\": \"b11\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"b12\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h5\\\"><b>Shortcuts</b></span>\", \"col\": 12}}, {\"id\": \"b13\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Material Requests\", \"col\": 3}}, {\"id\": \"b14\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Purchase Orders\", \"col\": 3}}]",
+  "custom_blocks": [
+   {
+    "custom_block_name": "SCM BI Banner",
+    "label": "SCM BI Banner"
+   }
+  ],
+  "doctype": "Workspace",
+  "label": "SCM BI Home",
+  "module": "Buying",
+  "name": "SCM BI Home",
+  "number_cards": [
+   {
+    "label": "SCM Open Material Requests",
+    "number_card_name": "SCM Open Material Requests"
+   },
+   {
+    "label": "SCM Open Purchase Orders",
+    "number_card_name": "SCM Open Purchase Orders"
+   },
+   {
+    "label": "SCM Purchase Order Value",
+    "number_card_name": "SCM Purchase Order Value"
+   },
+   {
+    "label": "SCM Pending URC Payment Advices",
+    "number_card_name": "SCM Pending URC Payment Advices"
+   }
+  ],
+  "public": 1,
+  "roles": [],
+  "shortcuts": [
+   {
+    "doc_view": "List",
+    "label": "Material Requests",
+    "link_to": "Material Request",
+    "type": "DocType"
+   },
+   {
+    "doc_view": "List",
+    "label": "Purchase Orders",
+    "link_to": "Purchase Order",
+    "type": "DocType"
+   }
+  ],
+  "title": "SCM BI Home"
  }
 ]
