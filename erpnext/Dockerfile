@@ -9,6 +9,3 @@ RUN SP="$(/home/frappe/frappe-bench/env/bin/python -c 'import site;print(site.ge
  && echo /home/frappe/frappe-bench/apps/studio_bridge > "$SP/studio_bridge.pth" \
  && echo /home/frappe/frappe-bench/apps/csd_customizations > "$SP/csd_customizations.pth" \
  && printf '%s\n' frappe erpnext studio_bridge csd_customizations > /home/frappe/frappe-bench/sites/apps.txt
-# Static files of csd_customizations (theme CSS): bench build does not link a newly added app, so link it here.
-RUN rm -rf /home/frappe/frappe-bench/sites/assets/csd_customizations \
- && ln -s /home/frappe/frappe-bench/apps/csd_customizations/csd_customizations/public /home/frappe/frappe-bench/sites/assets/csd_customizations

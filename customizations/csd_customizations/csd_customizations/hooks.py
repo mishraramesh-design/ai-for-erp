@@ -710,5 +710,4 @@ after_migrate = ["csd_customizations.studio_apply.run"]
 # GENERATED BLOCK END
 
 # CSD theme (hand-written, outside the generated block)
-app_include_css = "/assets/csd_customizations/css/csd_theme.css"
-after_migrate = ["csd_customizations.studio_apply.run", "csd_customizations.theme_assets.ensure"]
+app_include_css = "/api/method/csd_customizations.theme.css"
