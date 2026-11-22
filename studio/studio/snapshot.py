@@ -122,7 +122,11 @@ class Snapshot:
                 return hit[1]
         ok = True
         try:
-            self.erp.list_docs(doctype, fields=["name"], limit=1)
+            m = self.meta(doctype) or {}
+            if m.get("issingle"):  # a Single DocType has no table of its own: read the document instead
+                self.erp.get_doc(doctype, doctype)
+            else:
+                self.erp.list_docs(doctype, fields=["name"], limit=1)
         except Exception as e:  # noqa: BLE001 - only a server error means a broken table; permissions or 404 do not
             ok = getattr(e, "status", 0) < 500
         with self._lock:

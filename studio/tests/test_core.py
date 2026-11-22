@@ -233,3 +233,22 @@ def test_desk_theme_css_is_a_settable_single(env):
                                   {"op": "set_setting", "doctype": "CSD Desk Theme", "field": "css", "value": css}]))
     assert erp.docs[("CSD Desk Theme", "CSD Desk Theme")]["css"] == css
     assert Applier(erp, snap).undo(cs) == []
+
+
+def test_single_doctype_is_not_reported_as_missing_table(env):
+    erp, snap, *_ = env
+
+    class Boom(Exception):
+        status = 500
+
+    orig = erp.list_docs
+
+    def list_docs(doctype, *a, **k):
+        if doctype == "Selling Settings":  # a real Single DocType has no table: listing rows fails with a server error
+            raise Boom()
+        return orig(doctype, *a, **k)
+
+    erp.list_docs = list_docs
+    assert snap.table_ok("Selling Settings")
+    cs = mk([{"op": "set_setting", "doctype": "Selling Settings", "field": "allow_multiple_items", "value": 1}])
+    assert "doctype_broken" not in codes(cs, snap)
