@@ -468,6 +468,28 @@ class ChangeSet(BaseModel):
         return d
 
 
+def _strip_frappe_imports(src: str) -> str:
+    """Server Scripts run in a sandbox where `frappe` is already available. Models often start with `import frappe` or
+    `from frappe.utils import x`; rewrite those deterministically instead of failing the whole plan."""
+    import re as _re
+    out = []
+    for line in src.splitlines():
+        t = line.strip()
+        ind = line[: len(line) - len(line.lstrip())]
+        if _re.fullmatch(r"import\s+frappe", t):
+            continue
+        m = _re.fullmatch(r"from\s+frappe\.utils\s+import\s+(.+)", t)
+        if m:
+            for part in m.group(1).split(","):
+                name = part.strip().split(" as ")[-1].strip()
+                real = part.strip().split(" as ")[0].strip()
+                if name and real.isidentifier():
+                    out.append(f"{ind}{name} = frappe.utils.{real}")
+            continue
+        out.append(line)
+    return "\n".join(out)
+
+
 def normalize_ops(ops) -> list:
     """Tolerate the common ways a model mis-shapes an operation, so one slip does not discard a whole plan."""
     if not isinstance(ops, list):
@@ -490,6 +512,11 @@ def normalize_ops(ops) -> list:
                         o = {**v, "op": k}
         if isinstance(o.get("op"), str):
             o["op"] = o["op"].strip().lower().replace("-", "_").replace(" ", "_")
+        if o.get("op") in ("add_client_script", "add_server_validation", "create_workflow") and isinstance(o.get("name"), str):
+            import re as _re
+            o["name"] = _re.sub(r"\s+", " ", _re.sub(r"[^A-Za-z0-9 _.\-()&,]", "", o["name"].replace("/", "-"))).strip()
+        if o.get("op") == "add_server_validation" and isinstance(o.get("script"), str):
+            o["script"] = _strip_frappe_imports(o["script"])
         for k in ("value_changed", "date_field", "sort_by", "field"):
             if isinstance(o.get(k), dict):
                 v = o[k].get("field") or o[k].get("fieldname") or next(iter(o[k].values()), None)

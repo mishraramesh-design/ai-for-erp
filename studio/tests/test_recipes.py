@@ -242,3 +242,16 @@ def test_native_poc_mode_lets_integration_requirements_through_triage():
     assert triage(text)[0] == "out_of_scope"
     assert triage(text, native_poc=True)[0] == "candidate"
     assert triage("Print format for the receipt")[0] == "candidate"
+
+
+def test_script_and_workflow_names_are_sanitised():
+    from studio.spec import normalize_ops
+    out = normalize_ops([{"op": "create_workflow", "name": "PD/FD Demand Cycle", "doctype": "Supplier", "states": [], "transitions": []}])
+    assert out[0]["name"] == "PD-FD Demand Cycle"
+
+
+def test_frappe_imports_in_server_scripts_are_rewritten():
+    from studio.spec import normalize_ops
+    out = normalize_ops([{"op": "add_server_validation", "doctype": "Supplier", "event": "before_save", "name": "x y z",
+                          "script": "import frappe\nfrom frappe.utils import getdate, flt as f\nx = getdate(doc.creation)"}])
+    assert out[0]["script"] == "getdate = frappe.utils.getdate\nf = frappe.utils.flt\nx = getdate(doc.creation)"
