@@ -371,5 +371,293 @@
     "reqd": 0
    }
   ]
+ },
+ {
+  "allow_edit": 1,
+  "allow_multiple": 1,
+  "anonymous": 0,
+  "apply_document_permissions": 1,
+  "button_label": "Submit",
+  "doc_type": "Material Request",
+  "doctype": "Web Form",
+  "introduction_text": "Create a Provisional Demand (PD). Depot will validate and forward to HO.",
+  "is_standard": 0,
+  "list_columns": [
+   {
+    "fieldname": "title",
+    "fieldtype": "Data",
+    "label": "Title"
+   },
+   {
+    "fieldname": "customer",
+    "fieldtype": "Link",
+    "label": "URC (Customer)"
+   },
+   {
+    "fieldname": "custom_demand_cycle",
+    "fieldtype": "Select",
+    "label": "Demand Cycle"
+   },
+   {
+    "fieldname": "schedule_date",
+    "fieldtype": "Date",
+    "label": "Schedule Date"
+   }
+  ],
+  "login_required": 1,
+  "module": "Custom",
+  "name": "scm-provisional-demand",
+  "published": 1,
+  "route": "scm-provisional-demand",
+  "show_list": 1,
+  "success_message": "Your Provisional Demand has been saved. Depot will review it.",
+  "title": "SCM Provisional Demand",
+  "web_form_fields": [
+   {
+    "default": "",
+    "fieldname": "title",
+    "fieldtype": "Data",
+    "label": "Title",
+    "options": "",
+    "read_only": 0,
+    "reqd": 0
+   },
+   {
+    "default": "",
+    "fieldname": "customer",
+    "fieldtype": "Link",
+    "label": "URC (Customer)",
+    "options": "",
+    "read_only": 0,
+    "reqd": 1
+   },
+   {
+    "default": "",
+    "fieldname": "material_request_type",
+    "fieldtype": "Select",
+    "label": "Request Type",
+    "options": "",
+    "read_only": 0,
+    "reqd": 1
+   },
+   {
+    "default": "",
+    "fieldname": "set_warehouse",
+    "fieldtype": "Link",
+    "label": "Depot/Warehouse",
+    "options": "",
+    "read_only": 0,
+    "reqd": 0
+   },
+   {
+    "default": "",
+    "fieldname": "schedule_date",
+    "fieldtype": "Date",
+    "label": "Schedule Date",
+    "options": "",
+    "read_only": 0,
+    "reqd": 0
+   },
+   {
+    "default": "",
+    "fieldname": "custom_demand_cycle",
+    "fieldtype": "Select",
+    "label": "Demand Cycle",
+    "options": "",
+    "read_only": 0,
+    "reqd": 1
+   },
+   {
+    "default": "",
+    "fieldname": "items",
+    "fieldtype": "Table",
+    "label": "Items",
+    "options": "",
+    "read_only": 0,
+    "reqd": 1
+   }
+  ]
+ },
+ {
+  "allow_edit": 1,
+  "allow_multiple": 1,
+  "anonymous": 0,
+  "apply_document_permissions": 1,
+  "button_label": "Submit Payment",
+  "doc_type": "URC Payment Advice",
+  "doctype": "Web Form",
+  "introduction_text": "Submit payment details against your Sales Invoice for Depot Manager approval.",
+  "is_standard": 0,
+  "list_columns": [
+   {
+    "fieldname": "sales_invoice",
+    "fieldtype": "Link",
+    "label": "Sales Invoice"
+   },
+   {
+    "fieldname": "amount",
+    "fieldtype": "Currency",
+    "label": "Amount"
+   },
+   {
+    "fieldname": "payment_date",
+    "fieldtype": "Date",
+    "label": "Payment Date"
+   },
+   {
+    "fieldname": "payment_mode",
+    "fieldtype": "Select",
+    "label": "Payment Mode"
+   }
+  ],
+  "login_required": 1,
+  "module": "Custom",
+  "name": "urc-invoice-payment",
+  "published": 1,
+  "route": "urc-invoice-payment",
+  "show_list": 1,
+  "success_message": "Your payment advice has been submitted. Depot Manager will review and approve.",
+  "title": "URC Invoice Payment",
+  "web_form_fields": [
+   {
+    "default": "",
+    "fieldname": "urc",
+    "fieldtype": "Link",
+    "label": "URC",
+    "options": "",
+    "read_only": 0,
+    "reqd": 1
+   },
+   {
+    "default": "",
+    "fieldname": "sales_invoice",
+    "fieldtype": "Link",
+    "label": "Sales Invoice",
+    "options": "",
+    "read_only": 0,
+    "reqd": 1
+   },
+   {
+    "default": "",
+    "fieldname": "amount",
+    "fieldtype": "Currency",
+    "label": "Amount",
+    "options": "",
+    "read_only": 0,
+    "reqd": 1
+   },
+   {
+    "default": "",
+    "fieldname": "payment_mode",
+    "fieldtype": "Select",
+    "label": "Payment Mode",
+    "options": "",
+    "read_only": 0,
+    "reqd": 1
+   },
+   {
+    "default": "",
+    "fieldname": "payment_reference",
+    "fieldtype": "Data",
+    "label": "Payment Reference No.",
+    "options": "",
+    "read_only": 0,
+    "reqd": 0
+   },
+   {
+    "default": "",
+    "fieldname": "payment_date",
+    "fieldtype": "Date",
+    "label": "Payment Date",
+    "options": "",
+    "read_only": 0,
+    "reqd": 1
+   },
+   {
+    "default": "",
+    "fieldname": "proof_attachment",
+    "fieldtype": "Attach",
+    "label": "Payment Proof",
+    "options": "",
+    "read_only": 0,
+    "reqd": 0
+   }
+  ]
+ },
+ {
+  "allow_edit": 0,
+  "allow_multiple": 0,
+  "anonymous": 0,
+  "apply_document_permissions": 1,
+  "button_label": "Submit Request",
+  "doc_type": "Temporary Credit Request",
+  "doctype": "Web Form",
+  "introduction_text": "Submit a Temporary Credit Request (URC). Provide supporting details and contact.",
+  "is_standard": 0,
+  "list_columns": [],
+  "login_required": 1,
+  "module": "Custom",
+  "name": "temporary-credit-request",
+  "published": 1,
+  "route": "temporary-credit-request",
+  "show_list": 0,
+  "success_message": "Thank you — your Temporary Credit Request has been submitted. We will notify you on progress.",
+  "title": "Temporary Credit Request",
+  "web_form_fields": [
+   {
+    "default": "",
+    "fieldname": "title",
+    "fieldtype": "Data",
+    "label": "Title",
+    "options": "",
+    "read_only": 0,
+    "reqd": 1
+   },
+   {
+    "default": "",
+    "fieldname": "urc",
+    "fieldtype": "Link",
+    "label": "URC (Customer)",
+    "options": "",
+    "read_only": 0,
+    "reqd": 1
+   },
+   {
+    "default": "",
+    "fieldname": "amount",
+    "fieldtype": "Currency",
+    "label": "Requested Amount",
+    "options": "",
+    "read_only": 0,
+    "reqd": 1
+   },
+   {
+    "default": "",
+    "fieldname": "reason",
+    "fieldtype": "Text",
+    "label": "Reason / Justification",
+    "options": "",
+    "read_only": 0,
+    "reqd": 0
+   },
+   {
+    "default": "",
+    "fieldname": "request_date",
+    "fieldtype": "Date",
+    "label": "Request Date",
+    "options": "",
+    "read_only": 0,
+    "reqd": 1
+   },
+   {
+    "default": "",
+    "fieldname": "supporting_document",
+    "fieldtype": "Attach",
+    "label": "Supporting Document",
+    "options": "",
+    "read_only": 0,
+    "reqd": 0
+   }
+  ]
  }
 ]

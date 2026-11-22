@@ -288,6 +288,35 @@ SUP-.##### on field "naming_series" of Supplier
   - Add server script "Validate CPS dates and required fields" on Supplier CPS (before save)
   - Create portal web form "Supplier CPS Portal" (/supplier-cps-portal) on Supplier CPS with 7 field(s)
 
+## Add SRM Tiles HTML Block and SRM Home Workspace with Report Shortcuts  (`01M61K2Z442D37YXHQMK7HQC9N`, risk low)
+- Requirement 100021: On the SRM Home workspace, extend the existing 'SRM Tiles' HTML block with black tiles and yellow #FFE600 headings, plus grey #F2F2F2 helper text, for: Supplier Product Registration, Supplier C-Form, Supplier CPS, Bank Guarantee, Branch Pri
+  - Create workspace HTML block "SRM Tiles"
+  - Create workspace "SRM Home" with 0 number card(s), 0 chart(s) and 7 shortcut(s)
+
+## Restore SRM Home workspace: demo banner + SRM Tiles HTML block; recreate workspace  (`01M61KAQ65AKAZN26M4HKP285D`, risk low)
+- Requirement 100022: Correct the SRM Home workspace (UI Theme). Problems to fix: (1) The yellow 'demo-pilot banner' custom HTML block was dropped from the workspace content; put it back as the first block, above 'SRM Tiles'. (2) In the 'SRM Tiles' block every t
+  - Create workspace HTML block "demo-pilot-banner"
+  - Create workspace HTML block "srm-tiles-block"
+  - Create workspace "SRM Home" with 0 number card(s), 0 chart(s) and 0 shortcut(s)
+
+## SRM Home workspace and HTML blocks repair  (`01M61KFSR4NCC2TGD24QVNKKDQ`, risk low)
+- Requirement 100023: SRM Home workspace repair (UI Theme). The workspace currently shows unstyled plain text and lost its yellow band, because a previous attempt created new blocks 'demo-pilot-banner' and 'srm-tiles-block' with the CSS in an inline <style> tag 
+  - Create workspace HTML block "demo-pilot banner"
+  - Create workspace HTML block "SRM Tiles"
+  - Create workspace "SRM Home" with 0 number card(s), 0 chart(s) and 0 shortcut(s)
+
+## Overwrite Supplier server validation script to remove .format() usage  (`01M61WVBNS62QRK7V9Z0MKM0WM`, risk medium)
+- Requirement 100122: Script repair (SRM Repair). The Server Script 'supplier_onboarding_validation' on Supplier (event before_save) calls .format(), which the Frappe sandbox rejects (format is an unsafe attribute), so EVERY save of a Supplier fails. Overwrite t
+  - Add server script "supplier_onboarding_validation" on Supplier (before save)
+
+## Fix Supplier_CSD_Autovalidation server script  (`01M61WWR0V30BDGBCZ7F7VDD0N`, risk medium)
+- Requirement 100123: Script repair (SRM Repair). The Server Script 'Supplier_CSD_Autovalidation' on Supplier (event before_save) calls .format(), which the Frappe sandbox rejects (format is an unsafe attribute), so EVERY save of a Supplier fails. Overwrite this
+  - Add server script "Supplier_CSD_Autovalidation" on Supplier (before save)
+
+## Replace Supplier CSD auto-validation server script  (`01M61WY7PEFQT1AJ9GHV0DQN4M`, risk medium)
+- Requirement 100124: Script repair (SRM Repair). The Server Script 'Supplier - CSD Supplier Auto-Validation' on Supplier (event before_save) calls .format(), which the Frappe sandbox rejects (format is an unsafe attribute), so EVERY save of a Supplier fails. Ov
+  - Add server script "Supplier - CSD Supplier Auto-Validation" on Supplier (before save)
+
 ## SRM Theme for Supplier Form (client script)  (`01M61XG4GZNWAHXNXK8NA1YXHA`, risk medium)
 - Requirement 100125: SRM form theme, pilot on the Supplier form (UI Theme). Use exactly one add_client_script op on doctype Supplier named 'SRM Theme - Supplier' with exactly this JavaScript, in which every <NL> marks a line break and leading spaces after it ar
   - Add client script "SRM Theme - Supplier" to the Supplier form
@@ -512,6 +541,34 @@ SUP-.##### on field "naming_series" of Supplier
 - Requirement 100180: Build SRM contrast fix v2 for the List view of Supplier Change Request: create exactly ONE add_client_script op with doctype 'Supplier Change Request', view 'List', script_name 'SRM Contrast Fix List', enabled true, with this script exactly
   - Add client script "SRM Contrast Fix List" to the Supplier Change Request form
 
+## Case Management (Custom) – Workflow, Notification, Dashboard  (`01M6JPPC8DPSTMF679AY0XRZD7`, risk high)
+- Requirement 100181: Create a 'Case' DocType to store personnel/administration cases with fields: Case ID (Auto Name), Title, Description, Category (Select), Priority (Select), Reporter (Link to User), Current Owner (Link to User), Current Owner Role (Link to R
+- Requirement 100182: Provide a configurable Workflow for the Case DocType enforcing states Draft -> Submitted -> Under Review -> Escalated -> Resolved -> Closed, with transitions restricted by Role and optional conditions on fields.
+  - Create role "HR Reviewer"
+  - Create role "Department Head"
+  - Create child table "Case Movement" in module Custom with 4 fields and 1 role permission(s)
+  - Create DocType "Case" in module Custom with 11 fields and 3 role permission(s)
+  - Create workflow "Case Approval" on Case: 6 states, 6 transitions
+  - Create email notification "Case Pending Reminder" on Case (Days After)
+  - Create number card "Open Cases": Count on Case
+  - Create bar chart "Cases by State" on Case
+  - Create bar chart "Cases by Owner" on Case
+  - Create dashboard "Case Dashboard" with 2 chart(s) and 1 number card(s)
+  - Create workspace "Case Management" with 1 number card(s), 2 chart(s) and 4 shortcut(s)
+
+## Case Assignment Log, Ageing KPIs, and Escalation Alert  (`01M6JR25VJHH0N81WCNXNKNBXT`, risk medium)
+- Requirement 100183: Allow a user to assign/forward a Case to a specific person or role from within the Case and record an immutable assignment log entry with date/time, from-user, to-user/role, and optional comment for each assignment.
+  - Add Int field "Days Open" (custom_days_open) to Case
+  - Add Link field "Assigned Role" (custom_assigned_role) to Case, options: Role
+  - Add Link field "To Role" (custom_to_role) to Case Movement, options: Role
+  - Set read_only = True on field "movements" of Case
+  - Add server script "case_append_movement_and_compute_days" on Case (before save)
+  - Add server script "prevent_edit_of_existing_case_movement_rows" on Case Movement (before save)
+  - Create report "Case Lifecycle" on Case with 9 columns
+  - Create report "Case Ageing" on Case with 7 columns
+  - Create number card "Average Days Open": Average of custom_days_open on Case
+  - Create email notification "Case Escalated Alert" on Case (Value Change)
+
 ## Add Case list theme client script  (`01M6K5XPESJVQ5ZFY15PCWHQMN`, risk medium)
 - Requirement 100189: Build Case list theme: create exactly ONE add_client_script op with doctype 'Case', view 'List', name 'Case List Theme', whose script is exactly this single line of JavaScript: frappe.listview_settings['Case'] = Object.assign(frappe.listvie
   - Add client script "Case List Theme" to the Case form
@@ -577,4 +634,484 @@ SUP-.##### on field "naming_series" of Supplier
   - Grant role "AGM Secretariat" on Supplier Document (level 0): read, write, create, delete, report, export, print, email, share
   - Create print format "Supplier Fee Receipt" for Supplier Fee Schedule
   - Insert 8 starter record(s) into Regulatory Registry
+
+## SCM PD/FD Demand on Material Request with Portal Intake and Validations  (`01M81C8VYHFMVDKXC5GHB8555A`, risk high)
+- Requirement 199: System to enable Provisional Demand (PD) process, which consists of collecting demand data (both PD and FD) from Unit Run Canteens (URCs). This data is then validated at the Depot level before being submitted to the Head Office for final ap
+- Requirement 200: System to facilitate URCs to place orders or purchase requisitions through web-interface.
+- Requirement 202: PD and system to follow CSD defined (configurable in system) demand cycle. The cycle begins with URCs submitting PD Depot, which forwards the PD along with MSTC data to CSD HO.
+- Requirement 203: The system to enable a process-driven workflow tailored to the operational needs of the CSD for submitting Provisional Demands (PD), validating demands, and obtaining further approvals at the
+  - Add Select field "Demand Cycle" (custom_demand_cycle) to Material Request, mandatory, options: PD / FD
+  - Add Data field "MSTC Reference" (custom_mstc_reference) to Material Request
+  - Set reqd = True on field "customer" of Material Request
+  - Add server script "SCM_require_mstc_before_forward_to_ho" on Material Request (before save)
+  - Add server script "SCM_require_fd_before_submit" on Material Request (before submit)
+  - Create workflow "SCM PD FD Cycle" on Material Request: 6 states, 6 transitions
+  - Grant role "Customer" on Material Request (level 0): read, write, create
+  - Create portal web form "SCM Provisional Demand" (/scm-provisional-demand) on Material Request with 7 field(s)
+  - Create system notification notification "SCM New PD" on Material Request (New)
+  - Create system notification notification "SCM Forwarded to HO" on Material Request (Value Change)
+  - Create system notification notification "SCM MR Approved (FD Submitted)" on Material Request (Submit)
+
+## SCM Depot: Permit Conversion, Depot Brand/Label Registration, PO Visibility  (`01M81CCTRPWNEDPJK4BK6NSMT4`, risk high)
+- Requirement 215: System should have ability to convert order to permit as per operational requirement.
+- Requirement 216: System to facilitate Label registration and Brand registration by Depot.
+- Requirement 222: Provision in the system to view all the POs issued to Supplier in response to demands for a specified period or schedule.
+  - Create role "Depot User"
+  - Add Check field "Converted to Permit" (custom_is_permit) to Purchase Order after workflow_state
+  - Add Date field "Permit Date" (custom_permit_date) to Purchase Order after custom_is_permit
+  - Add Link field "Permit By" (custom_permit_by) to Purchase Order after custom_permit_date, options: User
+  - Add Check field "Converted to Permit" (custom_is_permit) to Sales Order after status
+  - Add Date field "Permit Date" (custom_permit_date) to Sales Order after custom_is_permit
+  - Add Link field "Permit By" (custom_permit_by) to Sales Order after custom_permit_date, options: User
+  - Add Link field "Depot (Warehouse)" (custom_depot) to Supplier Product Registration, mandatory, options: Warehouse
+  - Add Link field "Brand" (custom_brand) to Supplier Product Registration, mandatory, options: Brand
+  - Add Data field "Label Name" (custom_label_name) to Supplier Product Registration
+  - Add client script "PO Permit Conversion Button" to the Purchase Order form
+  - Add client script "SO Permit Conversion Button" to the Sales Order form
+  - Create workflow "Depot Registration Workflow" on Supplier Product Registration: 4 states, 4 transitions
+  - Grant role "Depot User" on Supplier Product Registration (level 0): read, write, create, print, email
+  - Create print format "Depot Permit (PO)" for Purchase Order
+  - Create print format "Depot Permit (SO)" for Sales Order
+  - Create email notification "Depot Registration Submitted" on Supplier Product Registration (Value Change)
+  - Create report "SCM Purchase Orders by Supplier and Period" on Purchase Order with 5 columns
+  - Create bar chart "SCM POs by Supplier (Count)" on Purchase Order
+  - Create number card "SCM Open POs": Count on Purchase Order
+  - Create dashboard "SCM Procurement" with 1 chart(s) and 1 number card(s)
+
+## SCM – Order Categories, Depot Tagging, BG Enforcement and Supplier Restrictions  (`01M81CV2GQK02JQNM6ST0FNZ5H`, risk medium)
+- Requirement 223: Provision in the system to put order restrictions and it should be defined based on CSD’s operational requirements such as coverage of BG (Bank Guarantee).
+- Requirement 224: System to provide Categories of orders (regular, supplementary, initial, confirmatory) as per processes defined by CSD.
+- Requirement 230: System should enforce specific restrictions on orders related to Suppliers who fail to deliver Thrice consecutive in a year as per CSD policy. Should be configurable.
+  - Add Select field "Order Category" (custom_order_category) to Purchase Order after supplier, options: Regular / Supplementary / Initial / Confirmatory
+  - Add Select field "Order Category" (custom_order_category) to Material Request after material_request_type, options: Regular / Supplementary / Initial / Confirmatory
+  - Add Link field "Bank Guarantee" (custom_bank_guarantee) to Purchase Order after supplier_name, mandatory, options: Bank Guarantee
+  - Add Check field "Restricted for Purchase Orders" (custom_is_restricted_to_order) to Supplier
+  - Add Small Text field "Restriction Reason" (custom_restriction_reason) to Supplier
+  - Set reqd = True on field "set_warehouse" of Purchase Order
+  - Set reqd = True on field "set_warehouse" of Material Request
+  - Add server script "PO_validate_bg_and_supplier_restriction" on Purchase Order (before submit)
+
+## SCM Depot: URC Payments, Release Orders and Visibility  (`01M81D17YTJF2WKM063R1XX3V0`, risk high)
+- Requirement 256: Once the payment is completed by the URC; system to generate acknowledgment and send notification to concerned Branch i.e., Depot Manager, Account section etc.
+- Requirement 257: Provision should be available in the system for Depot Manager to issue Release Order
+- Requirement 265: System to facilitate Depot to process the request received from the URCs post approval from concerned branch
+- Requirement 266: System to provide view access to all the requests received from URC and their status.
+- Requirement 268: System to provide URC creation notifications. The Depot Manager should receive the notification from CSD HO about new URC creation and its dependency.
+  - Create role "Depot Manager"
+  - Add Link field "URC Material Request" (custom_urc_material_request) to Delivery Note after company, options: Material Request
+  - Add Check field "Is URC" (custom_is_urc) to Customer after customer_group
+  - Add Link field "Default Depot Warehouse" (custom_depot_warehouse) to Customer after custom_is_urc, options: Warehouse
+  - Set in_standard_filter = True on field "workflow_state" of Material Request
+  - Add client script "Material Request - Issue Release Order Button" to the Material Request form
+  - Create workflow "SCM Release Order" on Delivery Note: 2 states, 1 transitions
+  - Grant role "Depot Manager" on Material Request (level 0): read, report, print, email
+  - Grant role "Depot User" on Material Request (level 0): read, report, print, email
+  - Grant role "Depot Manager" on Delivery Note (level 0): read, write, create, submit, cancel, report, print, email
+  - Create report "SCM URC Requests" on Material Request with 8 columns
+  - Create pie chart "SCM Material Requests by State" on Material Request
+  - Create number card "SCM Material Requests (Count)": Count on Material Request
+  - Create workspace HTML block "SCM Depot Banner"
+  - Create print format "SCM Payment Acknowledgement" for Payment Entry
+  - Create email notification "SCM URC Payment Acknowledged" on Payment Entry (Submit)
+  - Create print format "SCM Release Order" for Delivery Note
+  - Create system notification notification "SCM MR Approved - Notify Depot" on Material Request (Value Change)
+  - Create system notification notification "SCM New URC Created" on Customer (New)
+  - Create workspace "SCM Depot" with 1 number card(s), 1 chart(s) and 2 shortcut(s)
+
+## SCM QD and Utilization Certificate (MR-centric) – Minimal Config Pack  (`01M81D4J48ESSDFKHTKFBNJDTX`, risk high)
+- Requirement 276: The system to allow Depot Managers to receive and utilization certificates from URCs. URC
+  - Add Data field "QD Number" (custom_qd_number) to Material Request
+  - Add Date field "QD Release Date" (custom_qd_release_date) to Material Request
+  - Add Small Text field "QD Remarks" (custom_qd_remarks) to Material Request
+  - Add Attach field "Utilization Certificate" (custom_utilization_certificate) to Material Request
+  - Add Date field "Utilization Certificate Date" (custom_utilization_certificate_date) to Material Request
+  - Add Currency field "Utilization Amount" (custom_utilization_certificate_amount) to Material Request
+  - Set mandatory_depends_on = eval:doc.custom_qd_release_date on field "custom_utilization_certificate" of Material Request
+  - Set in_standard_filter = True on field "custom_qd_release_date" of Material Request
+  - Set in_standard_filter = True on field "custom_utilization_certificate_date" of Material Request
+  - Add server script "SCM MR - Require UC if QD released" on Material Request (before submit)
+  - Grant role "Depot User" on Material Request (level 0): read, write, report, print, email, share
+  - Create email notification "SCM Utilization Certificate Received" on Material Request (Value Change)
+  - Create report "SCM QD Tracker" on Material Request with 9 columns
+
+## SCM QD visibility and Utilization Certificate forwarding  (`01M81EN4FKAR6D2BY60ZN6N7AW`, risk medium)
+- Requirement 277: Post assessment, Depot to release QD to URCs the system should automatically forward the utilization certificates to the F&A Branch. (Monthly update on
+  - Add Data field "CSD Index Code" (custom_csd_index_code) to Item
+  - Add Check field "QD Item" (custom_is_qd) to Item
+  - Add Currency field "URC Credit Amount" (custom_urc_credit_amount) to Material Request
+  - Add Link field "URC Credit Reference" (custom_urc_credit_reference) to Material Request, options: Journal Entry
+  - Add Check field "URC Credit Posted" (custom_urc_credit_posted) to Material Request
+  - Set read_only = True on field "custom_urc_credit_posted" of Material Request
+  - Create report "SCM QD Items Master" on Item with 6 columns
+  - Create report "SCM Available Stock by Warehouse" on Bin with 3 columns
+  - Create bar chart "SCM QD Items by Index (Count)" on Item
+  - Create bar chart "SCM Bins with Stock (Count) by Warehouse" on Bin
+  - Create workspace HTML block "SCM QD Overview Banner"
+  - Create print format "SCM Utilization Certificate" for Material Request
+  - Create email notification "SCM Forward UC to F&A" on Material Request (Days After)
+  - Create dashboard "SCM QD Overview" with 2 chart(s) and 0 number card(s)
+
+## SCM: Depot-specific PO, notifications for PO/MR status changes, and defaults  (`01M81FCM041434Z97H4KA3Q5DD`, risk medium)
+- Requirement 225: System to enable Supplier and Depot to receive notifications / alerts for purchase order (PO) generation.
+- Requirement 226: System should be able to generate Depot specific PO.
+- Requirement 231: Provision in the proposed system to notify about TNA or denial
+  - Add Link field "Depot" (custom_depot) to Purchase Order, options: Warehouse
+  - Set description = Depot (Warehouse) selected for this PO. When set, supplier_warehouse is defaulted from this depot if empty. on field "custom_depot" of Purchase Order
+  - Set label = Depot on field "custom_depot" of Purchase Order
+  - Add server script "PO_set_supplier_warehouse_from_depot" on Purchase Order (before insert)
+  - Create email notification "SCM PO Submitted - Notify Supplier" on Purchase Order (Submit)
+  - Create email notification "SCM PO Submitted - Notify Depot" on Purchase Order (Submit)
+  - Create email notification "SCM PO WorkflowState TNA or Denied - Notify SCM and Depot" on Purchase Order (Value Change)
+  - Create email notification "SCM MR WorkflowState TNA or Denied - Notify SCM and Depot" on Material Request (Value Change)
+
+## SCM Demand Reviews on Material Request (URC → LIF → AGM Secretariat → CS Directorate)  (`01M81FJ79X86E55J82BV5D0F13`, risk high)
+- Requirement 211: In the system, URCs to act as the demand requester, while the LIF branch will serve as the demand reviewer in the workflow.
+- Requirement 264: This process is further extension of URC Request of AGM Secy. branch and CS Directorate branch.
+  - Create role "URC Demand User"
+  - Create role "LIF Reviewer"
+  - Create role "CS Directorate"
+  - Add Link field "URC Requester" (custom_urc_requester) to Material Request, options: User
+  - Add Link field "LIF Reviewer" (custom_lif_reviewer_user) to Material Request, options: User
+  - Add Check field "LIF Reviewed" (custom_lif_reviewed) to Material Request
+  - Add Link field "AGM Secretariat Reviewer" (custom_agm_secy_user) to Material Request, options: User
+  - Add Check field "AGM Secretariat Reviewed" (custom_agm_secy_reviewed) to Material Request
+  - Add Link field "CS Directorate Reviewer" (custom_cs_dir_user) to Material Request, options: User
+  - Add Check field "CS Directorate Reviewed" (custom_cs_dir_reviewed) to Material Request
+  - Add client script "Material Request - SCM cascading reviewers" to the Material Request form
+  - Add server script "Material Request - Enforce URC review chain" on Material Request (before submit)
+  - Grant role "URC Demand User" on Material Request (level 0): read, write, create
+  - Grant role "LIF Reviewer" on Material Request (level 0): read, write
+  - Grant role "AGM Secretariat" on Material Request (level 0): read, write
+  - Grant role "CS Directorate" on Material Request (level 0): read, write
+  - Create email notification "SCM MR - Notify LIF Reviewer" on Material Request (New)
+  - Create email notification "SCM MR - Notify AGM Secretariat" on Material Request (Value Change)
+  - Create email notification "SCM MR - Notify CS Directorate" on Material Request (Value Change)
+  - Create email notification "SCM MR - Reviewer Chain Complete (Notify URC)" on Material Request (Value Change)
+
+## SCM Auto‑PO from Approved MR and Alternate Item Suggestion  (`01M81FP23B3A1WABPDJ2R8E7Z2`, risk medium)
+- Requirement 217: URCs should have the option to select alternate products while preparing PD based on availability
+  - Add Check field "Auto Create Purchase Order" (custom_auto_create_po) to Material Request
+  - Add Link field "Auto PO Supplier" (custom_auto_po_supplier) to Material Request, options: Supplier
+  - Add Link field "Alternate Item (if available)" (custom_alternate_item) to Material Request Item, options: Item
+  - Set mandatory_depends_on = eval:doc.custom_auto_create_po on field "custom_auto_po_supplier" of Material Request
+  - Add server script "SCM_auto_create_po_from_approved_mr" on Material Request (after submit)
+  - Add client script "SCM_MR_Item_Suggest_Alternate" to the Material Request Item form
+  - Create email notification "SCM MR Submitted Notify Purchase" on Material Request (Submit)
+  - Create report "SCM Auto Generated POs" on Purchase Order with 5 columns
+  - Create number card "SCM Draft POs": Count on Purchase Order
+
+## SCM consolidation, thresholds, promotions access/alerts, and collection scheduling (corrected)  (`01M81HJEZX8ABJ1VNQB7H3XWC9`, risk high)
+- Requirement 212: Demands or orders will be consolidated centrally within the system.
+- Requirement 213: Provision in the system to define maximum and minimum order acceptance thresholds.
+- Requirement 235: System to provide notification to Depot and RM office for Consumer promotion scheme.
+- Requirement 239: System should enable Depot to prepare collection schedule and notify URCs for collection as per defined schedule.
+  - Create role "Regional Manager"
+  - Create DocType "Consolidated Demand" in module Custom with 6 fields and 3 role permission(s)
+  - Create child table "Collection Schedule Line" in module Custom with 6 fields and 2 role permission(s)
+  - Create DocType "Collection Schedule" in module Custom with 5 fields and 2 role permission(s)
+  - Add Float field "Minimum Order Quantity" (custom_min_order_qty) to Warehouse
+  - Add Float field "Maximum Order Quantity" (custom_max_order_qty) to Warehouse
+  - Add Link field "Supplier" (custom_supplier) to Promotional Scheme, options: Supplier
+  - Add Link field "URC (Customer)" (custom_urc) to Collection Schedule, mandatory, options: Customer
+  - Add Data field "URC Notification Email" (custom_recipient_email) to Collection Schedule, mandatory, options: Email
+  - Add server script "MR_enforce_warehouse_thresholds" on Material Request (before save)
+  - Grant role "Depot User" on Promotional Scheme (level 0): read, report, print
+  - Grant role "Depot Manager" on Promotional Scheme (level 0): read, report, print
+  - Grant role "URC Demand User" on Promotional Scheme (level 0): read, report, print
+  - Grant role "Regional Manager" on Promotional Scheme (level 0): read, report, print
+  - Create report "SCM Promotional Schemes" on Promotional Scheme with 5 columns
+  - Create email notification "SCM Promotional Scheme - New Notify Depot and RM" on Promotional Scheme (New)
+  - Create email notification "SCM Collection Schedule - Notify URC Days Before" on Collection Schedule (Days Before)
+
+## SCM Regional Manager: Supplementary Demands, Storage Controls, Short/Surplus, Waiver Approval, Market Intelligence  (`01M81J0682YFBMMAFWJPA8DQHE`, risk high)
+- Requirement 306: Provision to scrutinize supplementary demands as per guidelines issued by the HO.
+- Requirement 307: Provision to ensure appropriate storage of products by Depots.
+- Requirement 309: Provision to facilitate submission of short / surplus statement.
+- Requirement 312: Provision to approve waiver of delay in submission of transport claim by URCs
+- Requirement 326: Provision to carry out market intelligence on rates in market, consumer promotion schemes, etc.
+  - Create role "Regional Manager"
+  - Create DocType "Supplementary Demand Statement" in module Stock with 8 fields and 4 role permission(s)
+  - Create DocType "Transport Claim Waiver" in module Stock with 7 fields and 4 role permission(s)
+  - Create DocType "SCM Market Intelligence" in module Buying with 7 fields and 4 role permission(s)
+  - Add Select field "Storage Requirement" (custom_storage_requirement) to Item, options: Ambient / Chilled / Frozen
+  - Add Select field "Storage Type" (custom_storage_type) to Warehouse, options: Ambient / Chilled / Frozen
+  - Add server script "SE Enforce Storage Type" on Stock Entry (before submit)
+  - Add server script "PR Enforce Storage Type" on Purchase Receipt (before submit)
+  - Create workflow "Supplementary Demand Statement Workflow" on Supplementary Demand Statement: 4 states, 4 transitions
+  - Create workflow "Transport Claim Waiver Workflow" on Transport Claim Waiver: 4 states, 3 transitions
+  - Create report "SCM Depot Stock Overview" on Bin with 5 columns
+  - Create report "SCM Supplementary Statements" on Supplementary Demand Statement with 7 columns
+  - Create report "SCM Market Intelligence Report" on SCM Market Intelligence with 7 columns
+  - Create bar chart "SCM Depot Stock Levels Chart" on Bin
+  - Create number card "SCM Low Stock Bins": Count on Bin
+  - Create system notification notification "SDS - Pending RM Approval" on Supplementary Demand Statement (Value Change)
+  - Create system notification notification "TCW - Pending RM Approval" on Transport Claim Waiver (Value Change)
+  - Create workspace HTML block "SCM RM Banner"
+  - Create dashboard "SCM Regional Manager Dashboard" with 1 chart(s) and 1 number card(s)
+  - Create workspace "SCM Regional Manager" with 1 number card(s), 1 chart(s) and 3 shortcut(s)
+
+## CSD SCM – URC Payment Advice, PO Acknowledgement SLA, Store Order Filters/Report  (`01M81JN1MEN3FP378XZMQ0XAQJ`, risk high)
+- Requirement 219: This process is the further extension of Store Order process.
+- Requirement 237: In case, Supplier is not able to notify the CPS within prescribed time, provision to raise the SLA / Applicable penalties to the concerned Supplier as per CSD policy.
+  - Create DocType "URC Payment Advice" in module CSD Customizations with 9 fields and 4 role permission(s)
+  - Add Int field "Acknowledgement SLA (Days)" (custom_ack_sla_days) to Purchase Order
+  - Add Currency field "Penalty Amount" (custom_penalty_amount) to Purchase Order
+  - Add Link field "Penalty Journal Entry" (custom_penalty_journal_entry) to Purchase Order, options: Journal Entry
+  - Set allow_on_submit = 1 on field "custom_penalty_amount" of Purchase Order
+  - Set allow_on_submit = 1 on field "custom_penalty_journal_entry" of Purchase Order
+  - Set in_standard_filter = 1 on field "custom_demand_cycle" of Material Request
+  - Set in_standard_filter = 1 on field "custom_order_category" of Material Request
+  - Create workflow "URC Payment Advice Approval" on URC Payment Advice: 3 states, 3 transitions
+  - Create portal web form "URC Invoice Payment" (/urc-invoice-payment) on URC Payment Advice with 7 field(s)
+  - Create system notification notification "URC Payment Advice Submitted - Notify Depot Manager" on URC Payment Advice (Save)
+  - Create print format "URC Payment Receipt" for URC Payment Advice
+  - Create email notification "PO Acknowledgement SLA Breach - Action Penalty" on Purchase Order (Days After)
+  - Create report "SCM Store Orders - Pending Approval" on Material Request with 8 columns
+
+## SCM: QD availability, URC credit posting, and QD cycle controls  (`01M81JR14ZKWK75HZ1BEMC9C6E`, risk medium)
+- Requirement 207: System to provide automated order processing to reduce manual entry and processing time.
+- Requirement 274: The system to allow visibility of the index wise available QD products.
+- Requirement 278: System to allow credit the approved amount in URC payables as per operational requirement of CSD.
+- Requirement 280: System to facilitate execution of complete QD cycle of QD management
+  - Add Link field "URC Payables Account" (custom_urc_payables_account) to Company, options: Account
+  - Add Link field "URC Clearing Account" (custom_urc_clearing_account) to Company, options: Account
+  - Set mandatory_depends_on = eval:doc.custom_demand_cycle=='QD' on field "custom_qd_number" of Material Request
+  - Set mandatory_depends_on = eval:doc.custom_demand_cycle=='QD' on field "custom_qd_release_date" of Material Request
+  - Set description = Required when Demand Cycle is QD on field "custom_qd_number" of Material Request
+  - Set options = PD
+FD
+QD on field "custom_demand_cycle" of Material Request
+  - Add server script "Material Request - Require QD Fields" on Material Request (before submit)
+  - Add server script "Material Request - Post URC Credit" on Material Request (after submit)
+  - Create report "SCM QD Index Availability" on Bin with 5 columns
+  - Create number card "SCM QD Items In Stock": Count on Bin
+  - Create workspace HTML block "SCM Depot Banner"
+  - Create report "SCM Depot Demands" on Material Request with 9 columns
+  - Create workspace "SCM Depot Overview" with 1 number card(s), 0 chart(s) and 2 shortcut(s)
+
+## SCM Executive BI – SRM-branded workspace, cards and charts  (`01M81KVPM0MKMMKZXA4QDBAPX3`, risk low)
+- Requirement 100193: Provide an SCM business-intelligence home in the SRM brand (black #000000, EY yellow #FFE600, white, no grey): number cards for open Material Requests, open Purchase Orders, Purchase Order value and pending URC payment advices; dashboard ch
+  - Create workspace HTML block "SCM BI Banner"
+  - Create number card "SCM Open Material Requests": Count on Material Request
+  - Create number card "SCM Open Purchase Orders": Count on Purchase Order
+  - Create number card "SCM Purchase Order Value": Sum of grand_total on Purchase Order
+  - Create number card "SCM Pending URC Payment Advices": Count on URC Payment Advice
+  - Create pie chart "SCM Purchase Orders by Supplier" on Purchase Order
+  - Create donut chart "SCM Material Requests by Status" on Material Request
+  - Create bar chart "SCM Stock by Warehouse" on Bin
+  - Create workspace "SCM BI Home" with 4 number card(s), 3 chart(s) and 2 shortcut(s)
+
+## SCM Quota Enforcement and Approvals Visibility (ERPNext v15)  (`01M81KWSNS8AMMXVFF9WER0A94`, risk medium)
+- Requirement 210: System should have provision to map monthly quotas for each beneficiary based on their ranks and designation.
+- Requirement 252: System to provide process driven workflow for initiation, review, and approval of transactions.
+  - Create DocType "Beneficiary Quota Rule" in module Custom with 4 fields and 4 role permission(s)
+  - Add Link field "Beneficiary Designation" (custom_beneficiary_designation) to Material Request after customer, options: Designation
+  - Add Data field "Beneficiary Rank" (custom_beneficiary_rank) to Material Request after custom_beneficiary_designation
+  - Set mandatory_depends_on = eval:doc.material_request_type=='Material Issue' on field "custom_beneficiary_designation" of Material Request
+  - Set mandatory_depends_on = eval:doc.material_request_type=='Material Issue' on field "custom_beneficiary_rank" of Material Request
+  - Add server script "SCM Enforce Beneficiary Monthly Quota" on Material Request (before submit)
+  - Create report "SCM - Material Requests by Workflow State" on Material Request with 8 columns
+  - Create pie chart "Material Requests by Workflow State" on Material Request
+  - Create dashboard "SCM Approvals" with 1 chart(s) and 0 number card(s)
+
+## Depot Demand Validation, PD Schedule, and URC Payment Authentication - Config Pack  (`01M81MN7G048W2D7095S3164DK`, risk medium)
+- Requirement 201: System to provide ability to validate orders, authenticate URCs' payments, and authorize transactions in real-time mode. Indicative activities include: Consolidating Depot orders / demands centrally for validation at Depot level, followed b
+- Requirement 208: System to provide ability to generate PD (Provisional Demand) schedule for supply chain management.
+  - Add Link field "Workflow State" (custom_workflow_state) to Consolidated Demand, options: Workflow State
+  - Add Link field "Depot Approver" (custom_depot_approver) to Consolidated Demand, options: User
+  - Add Link field "Regional Manager Approver" (custom_rm_approver) to Consolidated Demand, options: User
+  - Add Link field "HO Approver" (custom_ho_approver) to Consolidated Demand, options: User
+  - Add Small Text field "Regional Manager Comments" (custom_rm_comments) to Consolidated Demand
+  - Add Check field "Authenticated" (custom_authenticated) to URC Payment Advice
+  - Add Select field "Authentication Method" (custom_auth_method) to URC Payment Advice, options: Manual / Bank Reconciliation / Gateway Callback / Other
+  - Add Small Text field "Authentication Notes" (custom_auth_notes) to URC Payment Advice
+  - Add server script "cd_require_rm_before_ho_submit" on Consolidated Demand (before submit)
+  - Add server script "urc_payment_auth_required_on_submit" on URC Payment Advice (before submit)
+  - Create daily scheduled job "Daily Consolidated Demand Aggregation"
+  - Create email notification "Consolidated Demand - Pending RM Approval" on Consolidated Demand (New)
+  - Create email notification "Consolidated Demand - RM Approved - Notify HO" on Consolidated Demand (Save)
+  - Create email notification "URC Payment Advice - Submitted - Notify Depot Manager" on URC Payment Advice (Submit)
+
+## Delegation Workflows: Project, Expense, Market Survey  (`01M81MWYT4QJHFDPP7XN0JKCM2`, risk high)
+- Requirement 323: Works project Provision to sanction works project if the project is above the delegated financial powers of area Depot Manager.
+- Requirement 324: System to possess the ability to sanction – Medical bills beyond the powers of AM, but within delegated powers of RM. Office expenses IT equipment Furniture Budgetary expenditure
+- Requirement 325: Provision to carry out market survey as directed by HO.
+  - Add Currency field "Estimated Cost" (custom_estimated_cost) to Project
+  - Add Currency field "Depot Manager Delegation Limit" (custom_depot_manager_limit) to Project
+  - Add Select field "Expense Type" (custom_expense_type) to Purchase Invoice, options: Office Expenses / Medical Bills / IT Equipment / Furniture / Budgetary Expenditure / Other
+  - Add Currency field "Regional Manager Threshold" (custom_regional_manager_threshold) to Purchase Invoice
+  - Add Check field "Issued by HO" (custom_ho_issued) to SCM Market Intelligence
+  - Add server script "Project - enforce_delegation_and_workflow_state" on Project (before save)
+  - Add server script "Purchase Invoice - enforce_regional_approval_when_threshold_exceeded" on Purchase Invoice (before save)
+  - Add server script "SCM Market Intelligence - HO_issue_flag_enforces_state" on SCM Market Intelligence (before save)
+  - Create workflow "Project Delegation Approval" on Project: 5 states, 6 transitions
+  - Create workflow "Expense Approval Workflow" on Purchase Invoice: 5 states, 6 transitions
+  - Create workflow "SCM Market Survey Workflow" on SCM Market Intelligence: 5 states, 4 transitions
+
+## RM Analytics + Corrective Actions (Slow/Non-Moving, Spend Variance, Waiver Cases)  (`01M81NEYWM6B68HK34F5EZ7X36`, risk medium)
+- Requirement 304: Provision to identify slow & non-moving products and to initiate corrective actions.
+- Requirement 318: System to match the expenditure requested against legacy trend to highlight discrepancy. Additionally, system to send an automatic prompt to the depots on alerts against expenditure.
+- Requirement 320: Provision to identify the cases related to waiver of overdue penal interest levied by the depots on the defaulter URC to accord approval or otherwise.
+  - Add Int field "Offtake Months (for moving average)" (custom_offtake_months) to Item
+  - Add Float field "Average Offtake (monthly)" (custom_avg_offtake) to Item
+  - Add Check field "Slow / Non-moving Item" (custom_is_slow_moving) to Item
+  - Add Select field "Case Type" (custom_case_type) to Case, options: General / Expenditure Variance / Waiver of Penal Interest
+  - Add Link field "Related URC" (custom_related_urc) to Case, options: Customer
+  - Add Link field "Related Depot" (custom_related_depot) to Case, options: Warehouse
+  - Add Currency field "Waiver Amount" (custom_waiver_amount) to Case
+  - Add Int field "Days Overdue" (custom_days_overdue) to Case
+  - Add server script "Case_require_type_for_waiver" on Case (before insert)
+  - Create report "Slow and Non-moving Items Report" on Item with 7 columns
+  - Create pie chart "Slow/Non-moving Items Chart" on Item
+  - Create number card "Slow Items": Count on Item
+  - Create line chart "Monthly Expenditure (Sum)" on Purchase Invoice
+  - Create report "Expenditure Trend Report" on Purchase Invoice with 7 columns
+  - Create email notification "Case - New Expenditure Variance - Notify Depot Manager" on Case (New)
+  - Create email notification "Case - New Waiver of Penal Interest - Notify Regional Manager" on Case (New)
+  - Create email notification "Item Flagged Slow Moving - Notify Regional Manager" on Item (Value Change)
+  - Create daily scheduled job "Compute Offtake and Flag Slow Items"
+  - Create daily scheduled job "Expenditure Variance Monitor"
+  - Create dashboard "SCM Regional Manager Overview" with 2 chart(s) and 1 number card(s)
+
+## URC Temp Credit Auto-Revocation and QD Sales by URC  (`01M81NHE7XNDG8KCMJ20EBM371`, risk medium)
+- Requirement 273: The system to automatically revoke the URC's temporary credit in the next PD payment cycle. Quantitative Discount (QD)
+- Requirement 275: The system to display sales data for QD products w.r.t URC.
+  - Add Link field "URC Temporary Credit Account" (custom_urc_temp_credit_account) to Company, options: Account
+  - Add Link field "Default Receivable Account for URC" (custom_urc_receivable_account) to Company, options: Account
+  - Add Check field "URC Temp Credit Revoked" (custom_credit_revoked) to Consolidated Demand
+  - Add Date field "Credit Revoked On" (custom_credit_revoked_on) to Consolidated Demand
+  - Add Check field "URC Credit Revoked" (custom_urc_credit_revoked) to Material Request
+  - Add Date field "URC Credit Revoked On" (custom_urc_credit_revoked_on) to Material Request
+  - Add Link field "URC Credit Reversal Journal" (custom_urc_credit_reversal_reference) to Material Request, options: Journal Entry
+  - Add Check field "Has QD Item" (custom_has_qd_item) to Sales Invoice
+  - Add Currency field "QD Net Amount" (custom_qd_net_amount) to Sales Invoice
+  - Add server script "SI_compute_qd_amount_and_flag" on Sales Invoice (before save)
+  - Create daily scheduled job "SCM revoke URC temp credit daily"
+  - Create report "SCM QD Sales by URC" on Sales Invoice with 5 columns
+  - Create bar chart "QD Sales by URC" on Sales Invoice
+  - Create dashboard "SCM QD Sales Overview" with 1 chart(s) and 0 number card(s)
+
+## Enable URC payment option (stand‑in Payment Request) on URC Payment Advice  (`01M81NWVYMCFDSRQH0TV7B5NJY`, risk medium)
+- Requirement 255: System to enable option for the URC to make payment against the invoice via payment gateway / other modes of payment as applicable.
+  - Add Link field "Payment Gateway Account" (custom_payment_gateway_account) to URC Payment Advice, options: Payment Gateway Account
+  - Add Select field "Payment Status" (custom_payment_status) to URC Payment Advice, options: Draft / Pending / Paid / Failed
+  - Add Link field "Payment Request" (custom_payment_request) to URC Payment Advice, options: Payment Request
+  - Add server script "urc_create_payment_request" on URC Payment Advice (before submit)
+
+## Off-take on PD/FD (Material Request) with Depot Tuning and Weekly Forecast  (`01M81NX4YQ8R0EYESTK2MZBMVR`, risk medium)
+- Requirement 218: System to facilitate for liquor products, off-take calculations which should be based on provisional demand, considering the following indicative factors: Administrative Time (Processing Time) Lead Time Sale Period Reserve
+  - Add Check field "Is Liquor Product" (custom_is_liquor_product) to Item
+  - Add Int field "Off-take Months (Moving Average)" (custom_offtake_months) to Warehouse
+  - Add Int field "Administrative Time (Days)" (custom_admin_time_days) to Warehouse
+  - Add Int field "Lead Time (Days)" (custom_lead_time_days) to Warehouse
+  - Add Int field "Sale Period (Days)" (custom_sale_period_days) to Warehouse
+  - Add Percent field "Reserve (%)" (custom_reserve_percent) to Warehouse
+  - Add Float field "Off-take Avg Monthly Qty" (custom_offtake_avg_monthly_qty) to Material Request Item
+  - Add Float field "Recommended Qty (Off-take)" (custom_offtake_recommended_qty) to Material Request Item
+  - Add Small Text field "Off-take Notes" (custom_offtake_notes) to Material Request Item
+  - Set read_only = 1 on field "custom_offtake_avg_monthly_qty" of Material Request Item
+  - Set read_only = 1 on field "custom_offtake_recommended_qty" of Material Request Item
+  - Set read_only = 1 on field "custom_offtake_notes" of Material Request Item
+  - Add server script "SCM MR - compute_offtake_fields" on Material Request (before save)
+  - Create weekly scheduled job "SCM Offtake Forecaster - Weekly"
+
+## URC Payment Advice — auto-update Payment Request & URC on Depot approval  (`01M81NZGFNJHHF4BBENW40H9K2`, risk medium)
+- Requirement 271: The system to update the URCs' payment details after approval from the Depot Manager.
+  - Add Date field "Last Payment Advice Date" (custom_last_payment_advice_date) to Customer
+  - Add Currency field "Last Payment Advice Amount" (custom_last_payment_advice_amount) to Customer
+  - Add server script "urc_payment_advice_update_payment_request_and_urc" on URC Payment Advice (after submit)
+
+## URC Temporary Credit Request intake (TCR) – workflow, portal, alerts  (`01M81P4FP3WJWR4PR4MBQ13H40`, risk high)
+- Requirement 270: The system should have a provision to receive requests for temporary credit request raised by URCs.
+  - Create DocType "Temporary Credit Request" in module CSD Customizations with 8 fields and 6 role permission(s)
+  - Add server script "TCR_validate_core_fields_and_amount" on Temporary Credit Request (before save)
+  - Create workflow "Temporary Credit Request Approval" on Temporary Credit Request: 5 states, 5 transitions
+  - Create portal web form "Temporary Credit Request" (/temporary-credit-request) on Temporary Credit Request with 6 field(s)
+  - Create report "Temporary Credit Requests - List" on Temporary Credit Request with 7 columns
+  - Create email notification "Temporary Credit Request - New Notify Depot Manager" on Temporary Credit Request (New)
+  - Create email notification "Temporary Credit Request - Notify RM on RM Review" on Temporary Credit Request (Value Change)
+
+## Depot/URC view of Approved Promotion Schemes and Schedules  (`01M81PC5XZGZG6H15HASPTD1Y4`, risk high)
+- Requirement 236: Depot should have access to view approved consumer promotion scheme. Depot and URCs can view the applicable scheme and applicable schedule, index, and Supplier details.
+  - Add Data field "Scheme Index" (custom_scheme_index) to Promotional Scheme
+  - Add Check field "Approved for Depot" (custom_approved_for_depot) to Promotional Scheme
+  - Add Link field "Applicable Schedule" (custom_supplier_fee_schedule) to Promotional Scheme, options: Supplier Fee Schedule
+  - Add Data field "Supplier Name" (custom_supplier_name) to Promotional Scheme
+  - Add Link field "Supplier Group" (custom_supplier_group) to Promotional Scheme, options: Supplier Group
+  - Add Data field "Scheme Index" (custom_scheme_index) to Supplier Fee Schedule
+  - Add Check field "Approved for Depot" (custom_approved_for_depot) to Supplier Fee Schedule
+  - Add client script "Promotional Scheme - List default approved filter" to the Promotional Scheme form
+  - Add client script "Supplier Fee Schedule - List default approved filter" to the Supplier Fee Schedule form
+  - Grant role "Depot User" on Promotional Scheme (level 0): read
+  - Grant role "Depot Manager" on Promotional Scheme (level 0): read
+  - Grant role "URC Demand User" on Promotional Scheme (level 0): read
+  - Grant role "Depot User" on Supplier Fee Schedule (level 0): read
+  - Grant role "Depot Manager" on Supplier Fee Schedule (level 0): read
+  - Grant role "URC Demand User" on Supplier Fee Schedule (level 0): read
+  - Create report "Approved Promotion Schemes" on Promotional Scheme with 9 columns
+  - Create report "Approved Supplier Fee Schedules" on Supplier Fee Schedule with 8 columns
+
+## PD Liquor Demand Forecast (weekly moving-average from Sales Invoices)  (`01M81PRF42ETN47JJPDCGY6VA0`, risk medium)
+- Requirement 209: System to provide PD function which should help to predict the future demands for products based on historical data and current trends. For Liquor only
+  - Create DocType "Liquor Demand Forecast" in module CSD Customizations with 3 fields and 4 role permission(s)
+  - Create DocType "Liquor Forecast Settings" in module CSD Customizations with 2 fields and 2 role permission(s)
+  - Create weekly scheduled job "Compute Liquor Demand Forecast Weekly"
+  - Create report "Liquor Demand Forecast" on Liquor Demand Forecast with 3 columns
+  - Insert 1 starter record(s) into Liquor Forecast Settings
+
+## URC Dependency Request Workflow with Dual-Dependency Notification and NOC  (`01M81PYVPCTWJAWK21HSEH6PRT`, risk high)
+- Requirement 269: System to provide URC - Change of dependency, Dual dependency notification to Depot and further issuances of NOC as per operational requirements of CSD. Any modification in dependency request, dual dependency request and associated activiti
+  - Create DocType "Dependency Request" in module CSD Customizations with 10 fields and 3 role permission(s)
+  - Add server script "Dependency Request - Block Edit if Approved" on Dependency Request (before save)
+  - Add server script "Dependency Request - Auto NOC on Approval" on Dependency Request (after save)
+  - Create workflow "Dependency Request Workflow" on Dependency Request: 4 states, 5 transitions
+  - Create system notification notification "Dependency - Dual Dependency Flagged" on Dependency Request (Value Change)
+  - Create system notification notification "Dependency - Approved" on Dependency Request (Value Change)
+  - Create print format "Dependency Request - NOC Letter" for Dependency Request
+
+## Notify Finance & Accounting on Payment Entry (receipts) submit  (`01M81R39CQBSC2TDWVW581RF46`, risk medium)
+- Requirement 141: System to trigger a notification to Finance & Accounting Branch for payment receipts
+  - Create email notification "Notify Finance on Receipt Payment Entry Submit" on Payment Entry (Submit)
+  - Create system notification notification "Notify Finance on Receipt Payment Entry Submit - System" on Payment Entry (Submit)
+
+## URC Loan Requests, Excise Change Proposals, and Payment Entry Alerts  (`01M81R3T7HDWDPCV198QB6BW26`, risk high)
+- Requirement 102: System to facilitate a workflow-based approval to process the loan to the following – Finance & Accounting IAF/CDA BOA. CS DET
+- Requirement 103: System to process loan amount disbursement via Finance & Accounting process. (Loan management Accounting)
+- Requirement 284: Provision in system for Depots to propose changes in the Excise Master base on the Excise policy changes in the respective State.
+  - Create child table "URC Loan Repayment" in module Custom with 3 fields
+  - Create DocType "URC Loan Request" in module Custom with 8 fields and 3 role permission(s)
+  - Create DocType "Excise Master Change Proposal" in module Custom with 8 fields and 3 role permission(s)
+  - Create workflow "URC Loan Request Workflow" on URC Loan Request: 5 states, 4 transitions
+  - Create workflow "Excise Master Change Proposal Workflow" on Excise Master Change Proposal: 4 states, 4 transitions
+  - Create report "Excise Master Change Proposal Register" on Excise Master Change Proposal with 9 columns
+  - Create email notification "Accounts Alert on Customer Payment Entry Submit" on Payment Entry (Submit)
+
+## Make Customer mandatory only for Customer Provided Material Requests  (`01M81R5RPXBQ7BP2YPCZ9BR122`, risk medium)
+- Requirement 100194: On Material Request the standard Customer field must be mandatory only for Customer Provided requests: set property reqd to 0 on field customer of Material Request and set mandatory_depends_on to eval:doc.material_request_type=="Customer Pr
+  - Set reqd = 0 on field "customer" of Material Request
+  - Set mandatory_depends_on = eval:doc.material_request_type=="Customer Provided" on field "customer" of Material Request
+
+## Seed demo supply-chain data (Material Requests + Purchase Orders + Warehouse)  (`01M81R9RHA9JQK1TB5YDTV4TYD`, risk medium)
+- Requirement 100191: Insert supply chain demo data with seed_records: 6 draft Material Requests (Purchase type, company AI-Test, items SKU001 to SKU008 with quantities, warehouse Stores - A, required by dates in the next 30 days) and 5 draft Purchase Orders, on
+  - Insert 1 starter record(s) into Warehouse
+  - Insert 6 starter record(s) into Material Request
+  - Insert 5 starter record(s) into Purchase Order
+
+## Seed demo records for SCM / related DocTypes  (`01M81RNVY31X6A4WDP4EWTQE3D`, risk medium)
+- Requirement 100192: Insert demand-side demo data with seed_records into the existing SCM DocTypes (Consolidated Demand, Collection Schedule, URC Payment Advice, Supplementary Demand Statement, Transport Claim Waiver, SCM Market Intelligence) using the URC cust
+  - Insert 3 starter record(s) into Temporary Credit Request
+  - Insert 5 starter record(s) into Supplier Fee Schedule
+  - Insert 1 starter record(s) into Excise Master Change Proposal
+  - Insert 3 starter record(s) into URC Loan Request
+  - Insert 3 starter record(s) into Issue
+
+## SCM Executive BI dashboard  (`01M81RRRDTS2FGY14S3X8D0344`, risk low)
+- Requirement 100195: Provide a dashboard named SCM Executive BI that groups the SCM BI charts (SCM Purchase Orders by Supplier, SCM Material Requests by Status, SCM Stock by Warehouse) and number cards (SCM Open Material Requests, SCM Open Purchase Orders, SCM 
+  - Create dashboard "SCM Executive BI" with 3 chart(s) and 4 number card(s)
+
+## SCM BI polish — chart + number cards  (`01M81RXS1WW4HJPQ2EK16X4ZSR`, risk low)
+- Requirement 100196: BI polish in the SRM brand: the Purchase Orders by Supplier chart must include draft orders so the five SRM suppliers appear, and number card figures must be black (#000000) for legibility on white, with EY yellow kept for chart accents.
+  - Create bar chart "SCM Purchase Orders by Supplier" on Purchase Order
+  - Create number card "SCM Open Material Requests": Count on Material Request
+  - Create number card "SCM Purchase Order Value": Sum of grand_total on Purchase Order
 

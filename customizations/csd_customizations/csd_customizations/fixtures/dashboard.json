@@ -63,6 +63,26 @@
  {
   "cards": [
    {
+    "card": "Open Cases"
+   }
+  ],
+  "charts": [
+   {
+    "chart": "Cases by State",
+    "width": "Half"
+   },
+   {
+    "chart": "Cases by Owner",
+    "width": "Half"
+   }
+  ],
+  "dashboard_name": "Case Dashboard",
+  "doctype": "Dashboard",
+  "name": "Case Dashboard"
+ },
+ {
+  "cards": [
+   {
     "card": "Total Suppliers"
    },
    {
@@ -118,5 +138,130 @@
   "dashboard_name": "Supplier Performance Dashboard",
   "doctype": "Dashboard",
   "name": "Supplier Performance Dashboard"
+ },
+ {
+  "cards": [
+   {
+    "card": "SCM Open POs"
+   }
+  ],
+  "charts": [
+   {
+    "chart": "SCM POs by Supplier (Count)",
+    "width": "Half"
+   }
+  ],
+  "dashboard_name": "SCM Procurement",
+  "doctype": "Dashboard",
+  "name": "SCM Procurement"
+ },
+ {
+  "cards": [],
+  "charts": [
+   {
+    "chart": "SCM QD Items by Index (Count)",
+    "width": "Half"
+   },
+   {
+    "chart": "SCM Bins with Stock (Count) by Warehouse",
+    "width": "Half"
+   }
+  ],
+  "dashboard_name": "SCM QD Overview",
+  "doctype": "Dashboard",
+  "name": "SCM QD Overview"
+ },
+ {
+  "cards": [
+   {
+    "card": "SCM Low Stock Bins"
+   }
+  ],
+  "charts": [
+   {
+    "chart": "SCM Depot Stock Levels Chart",
+    "width": "Half"
+   }
+  ],
+  "dashboard_name": "SCM Regional Manager Dashboard",
+  "doctype": "Dashboard",
+  "name": "SCM Regional Manager Dashboard"
+ },
+ {
+  "cards": [],
+  "charts": [
+   {
+    "chart": "Material Requests by Workflow State",
+    "width": "Half"
+   }
+  ],
+  "dashboard_name": "SCM Approvals",
+  "doctype": "Dashboard",
+  "name": "SCM Approvals"
+ },
+ {
+  "cards": [
+   {
+    "card": "Slow Items"
+   }
+  ],
+  "charts": [
+   {
+    "chart": "Slow/Non-moving Items Chart",
+    "width": "Half"
+   },
+   {
+    "chart": "Monthly Expenditure (Sum)",
+    "width": "Half"
+   }
+  ],
+  "dashboard_name": "SCM Regional Manager Overview",
+  "doctype": "Dashboard",
+  "name": "SCM Regional Manager Overview"
+ },
+ {
+  "cards": [],
+  "charts": [
+   {
+    "chart": "QD Sales by URC",
+    "width": "Half"
+   }
+  ],
+  "dashboard_name": "SCM QD Sales Overview",
+  "doctype": "Dashboard",
+  "name": "SCM QD Sales Overview"
+ },
+ {
+  "cards": [
+   {
+    "card": "SCM Open Material Requests"
+   },
+   {
+    "card": "SCM Open Purchase Orders"
+   },
+   {
+    "card": "SCM Purchase Order Value"
+   },
+   {
+    "card": "SCM Pending URC Payment Advices"
+   }
+  ],
+  "charts": [
+   {
+    "chart": "SCM Purchase Orders by Supplier",
+    "width": "Half"
+   },
+   {
+    "chart": "SCM Material Requests by Status",
+    "width": "Half"
+   },
+   {
+    "chart": "SCM Stock by Warehouse",
+    "width": "Half"
+   }
+  ],
+  "dashboard_name": "SCM Executive BI",
+  "doctype": "Dashboard",
+  "name": "SCM Executive BI"
  }
 ]

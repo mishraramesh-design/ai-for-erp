@@ -380,6 +380,16 @@
   "value": "1"
  },
  {
+  "doc_type": "Case",
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "movements",
+  "name": "Case-movements-read_only",
+  "property": "read_only",
+  "property_type": "Check",
+  "value": "1"
+ },
+ {
   "doc_type": "Supplier",
   "doctype": "Property Setter",
   "doctype_or_field": "DocField",
@@ -428,5 +438,255 @@
   "property": "in_standard_filter",
   "property_type": "Check",
   "value": "1"
+ },
+ {
+  "doc_type": "Material Request",
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "customer",
+  "name": "Material Request-customer-reqd",
+  "property": "reqd",
+  "property_type": "Check",
+  "value": "0"
+ },
+ {
+  "doc_type": "Purchase Order",
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "set_warehouse",
+  "name": "Purchase Order-set_warehouse-reqd",
+  "property": "reqd",
+  "property_type": "Check",
+  "value": "1"
+ },
+ {
+  "doc_type": "Material Request",
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "set_warehouse",
+  "name": "Material Request-set_warehouse-reqd",
+  "property": "reqd",
+  "property_type": "Check",
+  "value": "1"
+ },
+ {
+  "doc_type": "Material Request",
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "workflow_state",
+  "name": "Material Request-workflow_state-in_standard_filter",
+  "property": "in_standard_filter",
+  "property_type": "Check",
+  "value": "1"
+ },
+ {
+  "doc_type": "Material Request",
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "custom_utilization_certificate",
+  "name": "Material Request-custom_utilization_certificate-mandatory_depends_on",
+  "property": "mandatory_depends_on",
+  "property_type": "Code",
+  "value": "eval:doc.custom_qd_release_date"
+ },
+ {
+  "doc_type": "Material Request",
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "custom_qd_release_date",
+  "name": "Material Request-custom_qd_release_date-in_standard_filter",
+  "property": "in_standard_filter",
+  "property_type": "Check",
+  "value": "1"
+ },
+ {
+  "doc_type": "Material Request",
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "custom_utilization_certificate_date",
+  "name": "Material Request-custom_utilization_certificate_date-in_standard_filter",
+  "property": "in_standard_filter",
+  "property_type": "Check",
+  "value": "1"
+ },
+ {
+  "doc_type": "Material Request",
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "custom_urc_credit_posted",
+  "name": "Material Request-custom_urc_credit_posted-read_only",
+  "property": "read_only",
+  "property_type": "Check",
+  "value": "1"
+ },
+ {
+  "doc_type": "Purchase Order",
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "custom_depot",
+  "name": "Purchase Order-custom_depot-description",
+  "property": "description",
+  "property_type": "Text",
+  "value": "Depot (Warehouse) selected for this PO. When set, supplier_warehouse is defaulted from this depot if empty."
+ },
+ {
+  "doc_type": "Purchase Order",
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "custom_depot",
+  "name": "Purchase Order-custom_depot-label",
+  "property": "label",
+  "property_type": "Data",
+  "value": "Depot"
+ },
+ {
+  "doc_type": "Material Request",
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "custom_auto_po_supplier",
+  "name": "Material Request-custom_auto_po_supplier-mandatory_depends_on",
+  "property": "mandatory_depends_on",
+  "property_type": "Code",
+  "value": "eval:doc.custom_auto_create_po"
+ },
+ {
+  "doc_type": "Purchase Order",
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "custom_penalty_amount",
+  "name": "Purchase Order-custom_penalty_amount-allow_on_submit",
+  "property": "allow_on_submit",
+  "property_type": "Check",
+  "value": "1"
+ },
+ {
+  "doc_type": "Purchase Order",
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "custom_penalty_journal_entry",
+  "name": "Purchase Order-custom_penalty_journal_entry-allow_on_submit",
+  "property": "allow_on_submit",
+  "property_type": "Check",
+  "value": "1"
+ },
+ {
+  "doc_type": "Material Request",
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "custom_demand_cycle",
+  "name": "Material Request-custom_demand_cycle-in_standard_filter",
+  "property": "in_standard_filter",
+  "property_type": "Check",
+  "value": "1"
+ },
+ {
+  "doc_type": "Material Request",
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "custom_order_category",
+  "name": "Material Request-custom_order_category-in_standard_filter",
+  "property": "in_standard_filter",
+  "property_type": "Check",
+  "value": "1"
+ },
+ {
+  "doc_type": "Material Request",
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "custom_qd_number",
+  "name": "Material Request-custom_qd_number-mandatory_depends_on",
+  "property": "mandatory_depends_on",
+  "property_type": "Code",
+  "value": "eval:doc.custom_demand_cycle=='QD'"
+ },
+ {
+  "doc_type": "Material Request",
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "custom_qd_release_date",
+  "name": "Material Request-custom_qd_release_date-mandatory_depends_on",
+  "property": "mandatory_depends_on",
+  "property_type": "Code",
+  "value": "eval:doc.custom_demand_cycle=='QD'"
+ },
+ {
+  "doc_type": "Material Request",
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "custom_qd_number",
+  "name": "Material Request-custom_qd_number-description",
+  "property": "description",
+  "property_type": "Text",
+  "value": "Required when Demand Cycle is QD"
+ },
+ {
+  "doc_type": "Material Request",
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "custom_demand_cycle",
+  "name": "Material Request-custom_demand_cycle-options",
+  "property": "options",
+  "property_type": "Text",
+  "value": "PD\nFD\nQD"
+ },
+ {
+  "doc_type": "Material Request",
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "custom_beneficiary_designation",
+  "name": "Material Request-custom_beneficiary_designation-mandatory_depends_on",
+  "property": "mandatory_depends_on",
+  "property_type": "Code",
+  "value": "eval:doc.material_request_type=='Material Issue'"
+ },
+ {
+  "doc_type": "Material Request",
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "custom_beneficiary_rank",
+  "name": "Material Request-custom_beneficiary_rank-mandatory_depends_on",
+  "property": "mandatory_depends_on",
+  "property_type": "Code",
+  "value": "eval:doc.material_request_type=='Material Issue'"
+ },
+ {
+  "doc_type": "Material Request Item",
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "custom_offtake_avg_monthly_qty",
+  "name": "Material Request Item-custom_offtake_avg_monthly_qty-read_only",
+  "property": "read_only",
+  "property_type": "Check",
+  "value": "1"
+ },
+ {
+  "doc_type": "Material Request Item",
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "custom_offtake_recommended_qty",
+  "name": "Material Request Item-custom_offtake_recommended_qty-read_only",
+  "property": "read_only",
+  "property_type": "Check",
+  "value": "1"
+ },
+ {
+  "doc_type": "Material Request Item",
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "custom_offtake_notes",
+  "name": "Material Request Item-custom_offtake_notes-read_only",
+  "property": "read_only",
+  "property_type": "Check",
+  "value": "1"
+ },
+ {
+  "doc_type": "Material Request",
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "customer",
+  "name": "Material Request-customer-mandatory_depends_on",
+  "property": "mandatory_depends_on",
+  "property_type": "Code",
+  "value": "eval:doc.material_request_type==\"Customer Provided\""
  }
 ]

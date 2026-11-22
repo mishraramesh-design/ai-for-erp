@@ -76,6 +76,16 @@
  },
  {
   "doctype": "Workflow Action Master",
+  "name": "Escalate",
+  "workflow_action_name": "Escalate"
+ },
+ {
+  "doctype": "Workflow Action Master",
+  "name": "Take Up",
+  "workflow_action_name": "Take Up"
+ },
+ {
+  "doctype": "Workflow Action Master",
   "name": "Start Review",
   "workflow_action_name": "Start Review"
  },
@@ -88,5 +98,120 @@
   "doctype": "Workflow Action Master",
   "name": "Send to PNC",
   "workflow_action_name": "Send to PNC"
+ },
+ {
+  "doctype": "Workflow Action Master",
+  "name": "Convert to FD",
+  "workflow_action_name": "Convert to FD"
+ },
+ {
+  "doctype": "Workflow Action Master",
+  "name": "Forward to HO",
+  "workflow_action_name": "Forward to HO"
+ },
+ {
+  "doctype": "Workflow Action Master",
+  "name": "Submit PD",
+  "workflow_action_name": "Submit PD"
+ },
+ {
+  "doctype": "Workflow Action Master",
+  "name": "Validate",
+  "workflow_action_name": "Validate"
+ },
+ {
+  "doctype": "Workflow Action Master",
+  "name": "Issue Release Order",
+  "workflow_action_name": "Issue Release Order"
+ },
+ {
+  "doctype": "Workflow Action Master",
+  "name": "Amend and Resubmit",
+  "workflow_action_name": "Amend and Resubmit"
+ },
+ {
+  "doctype": "Workflow Action Master",
+  "name": "Approve Waiver",
+  "workflow_action_name": "Approve Waiver"
+ },
+ {
+  "doctype": "Workflow Action Master",
+  "name": "Reject Waiver",
+  "workflow_action_name": "Reject Waiver"
+ },
+ {
+  "doctype": "Workflow Action Master",
+  "name": "Request Waiver",
+  "workflow_action_name": "Request Waiver"
+ },
+ {
+  "doctype": "Workflow Action Master",
+  "name": "Return to URC",
+  "workflow_action_name": "Return to URC"
+ },
+ {
+  "doctype": "Workflow Action Master",
+  "name": "Submit Payment",
+  "workflow_action_name": "Submit Payment"
+ },
+ {
+  "doctype": "Workflow Action Master",
+  "name": "Escalate to RM",
+  "workflow_action_name": "Escalate to RM"
+ },
+ {
+  "doctype": "Workflow Action Master",
+  "name": "Submit for AM Approval",
+  "workflow_action_name": "Submit for AM Approval"
+ },
+ {
+  "doctype": "Workflow Action Master",
+  "name": "Assign to RM",
+  "workflow_action_name": "Assign to RM"
+ },
+ {
+  "doctype": "Workflow Action Master",
+  "name": "Complete Survey",
+  "workflow_action_name": "Complete Survey"
+ },
+ {
+  "doctype": "Workflow Action Master",
+  "name": "Start Survey",
+  "workflow_action_name": "Start Survey"
+ },
+ {
+  "doctype": "Workflow Action Master",
+  "name": "Forward to RM",
+  "workflow_action_name": "Forward to RM"
+ },
+ {
+  "doctype": "Workflow Action Master",
+  "name": "Start Depot Review",
+  "workflow_action_name": "Start Depot Review"
+ },
+ {
+  "doctype": "Workflow Action Master",
+  "name": "Request Change",
+  "workflow_action_name": "Request Change"
+ },
+ {
+  "doctype": "Workflow Action Master",
+  "name": "Disburse",
+  "workflow_action_name": "Disburse"
+ },
+ {
+  "doctype": "Workflow Action Master",
+  "name": "Send to Finance",
+  "workflow_action_name": "Send to Finance"
+ },
+ {
+  "doctype": "Workflow Action Master",
+  "name": "Submit for Depot Review",
+  "workflow_action_name": "Submit for Depot Review"
+ },
+ {
+  "doctype": "Workflow Action Master",
+  "name": "Submit to HO",
+  "workflow_action_name": "Submit to HO"
  }
 ]

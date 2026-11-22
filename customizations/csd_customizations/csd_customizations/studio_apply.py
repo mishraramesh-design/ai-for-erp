@@ -118,6 +118,162 @@ PERMISSIONS = [
    "share"
   ],
   "role": "AGM Secretariat"
+ },
+ {
+  "doctype": "Material Request",
+  "permlevel": 0,
+  "rights": [
+   "read",
+   "write",
+   "create"
+  ],
+  "role": "Customer"
+ },
+ {
+  "doctype": "Supplier Product Registration",
+  "permlevel": 0,
+  "rights": [
+   "read",
+   "write",
+   "create",
+   "print",
+   "email"
+  ],
+  "role": "Depot User"
+ },
+ {
+  "doctype": "Material Request",
+  "permlevel": 0,
+  "rights": [
+   "read",
+   "report",
+   "print",
+   "email"
+  ],
+  "role": "Depot Manager"
+ },
+ {
+  "doctype": "Material Request",
+  "permlevel": 0,
+  "rights": [
+   "read",
+   "write",
+   "report",
+   "print",
+   "email",
+   "share"
+  ],
+  "role": "Depot User"
+ },
+ {
+  "doctype": "Delivery Note",
+  "permlevel": 0,
+  "rights": [
+   "read",
+   "write",
+   "create",
+   "submit",
+   "cancel",
+   "report",
+   "print",
+   "email"
+  ],
+  "role": "Depot Manager"
+ },
+ {
+  "doctype": "Material Request",
+  "permlevel": 0,
+  "rights": [
+   "read",
+   "write",
+   "create"
+  ],
+  "role": "URC Demand User"
+ },
+ {
+  "doctype": "Material Request",
+  "permlevel": 0,
+  "rights": [
+   "read",
+   "write"
+  ],
+  "role": "LIF Reviewer"
+ },
+ {
+  "doctype": "Material Request",
+  "permlevel": 0,
+  "rights": [
+   "read",
+   "write"
+  ],
+  "role": "AGM Secretariat"
+ },
+ {
+  "doctype": "Material Request",
+  "permlevel": 0,
+  "rights": [
+   "read",
+   "write"
+  ],
+  "role": "CS Directorate"
+ },
+ {
+  "doctype": "Promotional Scheme",
+  "permlevel": 0,
+  "rights": [
+   "read"
+  ],
+  "role": "Depot User"
+ },
+ {
+  "doctype": "Promotional Scheme",
+  "permlevel": 0,
+  "rights": [
+   "read"
+  ],
+  "role": "Depot Manager"
+ },
+ {
+  "doctype": "Promotional Scheme",
+  "permlevel": 0,
+  "rights": [
+   "read"
+  ],
+  "role": "URC Demand User"
+ },
+ {
+  "doctype": "Promotional Scheme",
+  "permlevel": 0,
+  "rights": [
+   "read",
+   "report",
+   "print"
+  ],
+  "role": "Regional Manager"
+ },
+ {
+  "doctype": "Supplier Fee Schedule",
+  "permlevel": 0,
+  "rights": [
+   "read"
+  ],
+  "role": "Depot User"
+ },
+ {
+  "doctype": "Supplier Fee Schedule",
+  "permlevel": 0,
+  "rights": [
+   "read"
+  ],
+  "role": "Depot Manager"
+ },
+ {
+  "doctype": "Supplier Fee Schedule",
+  "permlevel": 0,
+  "rights": [
+   "read"
+  ],
+  "role": "URC Demand User"
  }
 ]
 

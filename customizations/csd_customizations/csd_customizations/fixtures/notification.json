@@ -361,6 +361,46 @@
  },
  {
   "channel": "Email",
+  "condition": "doc.workflow_state == \"Under Review\" and not doc.date_closed",
+  "date_changed": "date_opened",
+  "days_in_advance": 3,
+  "doctype": "Notification",
+  "document_type": "Case",
+  "enabled": 1,
+  "event": "Days After",
+  "message": "Case {{ doc.name }} ({{ doc.title }}) has been in state {{ doc.workflow_state }} since {{ doc.date_opened }}.",
+  "message_type": "HTML",
+  "name": "Case Pending Reminder",
+  "recipients": [
+   {
+    "receiver_by_document_field": "current_owner"
+   },
+   {
+    "receiver_by_role": "Department Head"
+   }
+  ],
+  "subject": "Case pending beyond threshold"
+ },
+ {
+  "channel": "Email",
+  "condition": "doc.workflow_state == 'Escalated'",
+  "doctype": "Notification",
+  "document_type": "Case",
+  "enabled": 1,
+  "event": "Value Change",
+  "message": "Case {{ doc.name }} ({{ doc.title }}) has been escalated to {{ doc.current_owner }}. Current state: {{ doc.workflow_state }}.",
+  "message_type": "HTML",
+  "name": "Case Escalated Alert",
+  "recipients": [
+   {
+    "receiver_by_role": "Department Head"
+   }
+  ],
+  "subject": "Case Escalated: {{ doc.name }}",
+  "value_changed": "workflow_state"
+ },
+ {
+  "channel": "Email",
   "condition": "doc.get('custom_supplier') and doc.status!='Closed'",
   "date_changed": "creation",
   "days_in_advance": 7,
@@ -422,5 +462,724 @@
   ],
   "subject": "Supplier Suspended: {{ doc.name }}",
   "value_changed": "custom_suspended"
+ },
+ {
+  "channel": "System Notification",
+  "condition": "doc.custom_demand_cycle == \"PD\"",
+  "doctype": "Notification",
+  "document_type": "Material Request",
+  "enabled": 1,
+  "event": "New",
+  "message": "<p>A new Provisional Demand has been created by {{ doc.customer }}. Please review.</p>",
+  "message_type": "HTML",
+  "name": "SCM New PD",
+  "notification_title": "New PD created by URC {{ doc.customer }}",
+  "notification_type": "Alert",
+  "recipients": [
+   {
+    "receiver_by_role": "Stock Manager"
+   }
+  ],
+  "subject": "New PD created by URC {{ doc.customer }}"
+ },
+ {
+  "channel": "System Notification",
+  "condition": "doc.workflow_state == \"Forwarded to HO\"",
+  "doctype": "Notification",
+  "document_type": "Material Request",
+  "enabled": 1,
+  "event": "Value Change",
+  "message": "<p>Depot has forwarded demand {{ doc.name }} to HO. MSTC Ref: {{ doc.custom_mstc_reference or \"-\" }}</p>",
+  "message_type": "HTML",
+  "name": "SCM Forwarded to HO",
+  "notification_title": "PD/FD forwarded to HO: {{ doc.name }}",
+  "notification_type": "Alert",
+  "recipients": [
+   {
+    "receiver_by_role": "Purchase Manager"
+   }
+  ],
+  "subject": "PD/FD forwarded to HO: {{ doc.name }}",
+  "value_changed": "workflow_state"
+ },
+ {
+  "channel": "System Notification",
+  "condition": "doc.custom_demand_cycle == \"FD\"",
+  "doctype": "Notification",
+  "document_type": "Material Request",
+  "enabled": 1,
+  "event": "Submit",
+  "message": "<p>Firm Demand {{ doc.name }} has been approved. Proceed to create Purchase Order using Material Request items.</p>",
+  "message_type": "HTML",
+  "name": "SCM MR Approved (FD Submitted)",
+  "notification_title": "FD Approved: {{ doc.name }}",
+  "notification_type": "Alert",
+  "recipients": [
+   {
+    "receiver_by_role": "Purchase User"
+   }
+  ],
+  "subject": "FD Approved: {{ doc.name }}"
+ },
+ {
+  "channel": "Email",
+  "condition": "doc.workflow_state == 'Under Review'",
+  "doctype": "Notification",
+  "document_type": "Supplier Product Registration",
+  "enabled": 1,
+  "event": "Value Change",
+  "message": "<p>Depot registration submitted for review.</p><p>Depot: {{ doc.custom_depot }}<br/>Brand: {{ doc.custom_brand }}<br/>Label: {{ doc.custom_label_name or '-' }}</p>",
+  "message_type": "HTML",
+  "name": "Depot Registration Submitted",
+  "recipients": [
+   {
+    "receiver_by_role": "Purchase Manager"
+   }
+  ],
+  "subject": "Depot Registration Submitted: {{ doc.name }}",
+  "value_changed": "workflow_state"
+ },
+ {
+  "channel": "Email",
+  "condition": "doc.party_type == \"Customer\"",
+  "doctype": "Notification",
+  "document_type": "Payment Entry",
+  "enabled": 1,
+  "event": "Submit",
+  "message": "Payment from {{ doc.party }} has been recorded on {{ doc.posting_date }} for {{ doc.company }}. Amount: {{ doc.paid_amount or doc.received_amount }}. The acknowledgement is available as a print from the document.",
+  "message_type": "HTML",
+  "name": "SCM URC Payment Acknowledged",
+  "recipients": [
+   {
+    "receiver_by_role": "Depot Manager"
+   },
+   {
+    "receiver_by_role": "Accounts User"
+   },
+   {
+    "receiver_by_role": "Accounts Manager"
+   },
+   {
+    "receiver_by_role": "Branch User"
+   }
+  ],
+  "subject": "Payment Acknowledgement {{ doc.name }}"
+ },
+ {
+  "channel": "System Notification",
+  "condition": "doc.workflow_state == \"Approved by Branch\"",
+  "doctype": "Notification",
+  "document_type": "Material Request",
+  "enabled": 1,
+  "event": "Value Change",
+  "message": "Material Request {{ doc.name }} for {{ doc.customer or doc.title }} is now approved and ready for depot processing.",
+  "message_type": "HTML",
+  "name": "SCM MR Approved - Notify Depot",
+  "notification_title": "Material Request {{ doc.name }} approved by branch",
+  "notification_type": "Alert",
+  "recipients": [
+   {
+    "receiver_by_role": "Depot Manager"
+   },
+   {
+    "receiver_by_role": "Depot User"
+   }
+  ],
+  "subject": "Material Request {{ doc.name }} approved by branch",
+  "value_changed": "workflow_state"
+ },
+ {
+  "channel": "System Notification",
+  "condition": "doc.custom_is_urc == 1",
+  "doctype": "Notification",
+  "document_type": "Customer",
+  "enabled": 1,
+  "event": "New",
+  "message": "A new URC has been created: {{ doc.customer_name or doc.name }}. Default Depot Warehouse: {{ doc.custom_depot_warehouse or '-' }}.",
+  "message_type": "HTML",
+  "name": "SCM New URC Created",
+  "notification_title": "New URC Created: {{ doc.customer_name or doc.name }}",
+  "notification_type": "Alert",
+  "recipients": [
+   {
+    "receiver_by_role": "Depot Manager"
+   },
+   {
+    "receiver_by_role": "Accounts User"
+   },
+   {
+    "receiver_by_role": "Accounts Manager"
+   }
+  ],
+  "subject": "New URC Created: {{ doc.customer_name or doc.name }}"
+ },
+ {
+  "channel": "Email",
+  "doctype": "Notification",
+  "document_type": "Material Request",
+  "enabled": 1,
+  "event": "Value Change",
+  "message": "A Utilization Certificate has been attached for Material Request {{ doc.name }} (Customer: {{ doc.customer }}).<br>QD No: {{ doc.custom_qd_number }} | QD Date: {{ doc.custom_qd_release_date }} | UC Date: {{ doc.custom_utilization_certificate_date }} | UC Amount: {{ doc.custom_utilization_certificate_amount }}",
+  "message_type": "HTML",
+  "name": "SCM Utilization Certificate Received",
+  "recipients": [
+   {
+    "receiver_by_role": "Accounts Manager"
+   }
+  ],
+  "subject": "Utilization Certificate received for MR {{ doc.name }}",
+  "value_changed": "custom_utilization_certificate"
+ },
+ {
+  "channel": "Email",
+  "condition": "doc.get('custom_utilization_certificate') and doc.get('custom_qd_release_date')",
+  "date_changed": "custom_utilization_certificate_date",
+  "days_in_advance": 0,
+  "doctype": "Notification",
+  "document_type": "Material Request",
+  "enabled": 1,
+  "event": "Days After",
+  "message": "<p>Dear F&amp;A Team,</p><p>Please find attached the Utilization Certificate for {{ doc.customer or \"URC\" }} (MR: {{ doc.name }}).</p><p>QD Released On: {{ doc.custom_qd_release_date or \"-\" }}<br>UC Date: {{ doc.custom_utilization_certificate_date or \"-\" }}<br>UC Amount: {{ doc.custom_utilization_certificate_amount or 0 }}</p><p>Regards,<br>SCM</p>",
+  "message_type": "HTML",
+  "name": "SCM Forward UC to F&A",
+  "recipients": [
+   {
+    "receiver_by_role": "Accounts Manager"
+   },
+   {
+    "receiver_by_role": "Accounts User"
+   }
+  ],
+  "subject": "Utilization Certificate for {{ doc.customer or \"URC\" }} - {{ doc.name }}"
+ },
+ {
+  "channel": "Email",
+  "doctype": "Notification",
+  "document_type": "Purchase Order",
+  "enabled": 1,
+  "event": "Submit",
+  "message": "Purchase Order {{ doc.name }} has been submitted. Please review it in the supplier portal or contact procurement.",
+  "message_type": "HTML",
+  "name": "SCM PO Submitted - Notify Supplier",
+  "recipients": [
+   {
+    "receiver_by_role": "Supplier"
+   }
+  ],
+  "subject": "Purchase Order {{ doc.name }} created"
+ },
+ {
+  "channel": "Email",
+  "doctype": "Notification",
+  "document_type": "Purchase Order",
+  "enabled": 1,
+  "event": "Submit",
+  "message": "A Purchase Order {{ doc.name }} has been submitted referencing Depot {{ doc.custom_depot }}. Please take any required actions.",
+  "message_type": "HTML",
+  "name": "SCM PO Submitted - Notify Depot",
+  "recipients": [
+   {
+    "receiver_by_role": "Depot User"
+   }
+  ],
+  "subject": "Purchase Order {{ doc.name }} submitted for Depot {{ doc.custom_depot }}"
+ },
+ {
+  "channel": "Email",
+  "condition": "doc.workflow_state == 'TNA' or doc.workflow_state == 'Denied'",
+  "doctype": "Notification",
+  "document_type": "Purchase Order",
+  "enabled": 1,
+  "event": "Value Change",
+  "message": "Purchase Order {{ doc.name }} has changed status to {{ doc.workflow_state }}. Please review and take required action.",
+  "message_type": "HTML",
+  "name": "SCM PO WorkflowState TNA or Denied - Notify SCM and Depot",
+  "recipients": [
+   {
+    "receiver_by_role": "Depot User"
+   },
+   {
+    "receiver_by_role": "Stock Manager"
+   }
+  ],
+  "subject": "PO {{ doc.name }} status changed to {{ doc.workflow_state }}",
+  "value_changed": "workflow_state"
+ },
+ {
+  "channel": "Email",
+  "condition": "doc.workflow_state == 'TNA' or doc.workflow_state == 'Denied'",
+  "doctype": "Notification",
+  "document_type": "Material Request",
+  "enabled": 1,
+  "event": "Value Change",
+  "message": "Material Request {{ doc.name }} has changed status to {{ doc.workflow_state }}. Please review and take required action.",
+  "message_type": "HTML",
+  "name": "SCM MR WorkflowState TNA or Denied - Notify SCM and Depot",
+  "recipients": [
+   {
+    "receiver_by_role": "Depot User"
+   },
+   {
+    "receiver_by_role": "Stock Manager"
+   }
+  ],
+  "subject": "Material Request {{ doc.name }} status changed to {{ doc.workflow_state }}",
+  "value_changed": "workflow_state"
+ },
+ {
+  "channel": "Email",
+  "condition": "doc.customer and not doc.custom_lif_reviewed",
+  "doctype": "Notification",
+  "document_type": "Material Request",
+  "enabled": 1,
+  "event": "New",
+  "message": "A new URC demand {{ doc.name }} is awaiting LIF review. Open: <a href='/app/material-request/{{ doc.name }}'>{{ doc.name }}</a>",
+  "message_type": "HTML",
+  "name": "SCM MR - Notify LIF Reviewer",
+  "recipients": [
+   {
+    "receiver_by_document_field": "custom_lif_reviewer_user"
+   },
+   {
+    "receiver_by_role": "LIF Reviewer"
+   }
+  ],
+  "subject": "Material Request {{ doc.name }} awaiting LIF review"
+ },
+ {
+  "channel": "Email",
+  "condition": "doc.custom_lif_reviewed == 1",
+  "doctype": "Notification",
+  "document_type": "Material Request",
+  "enabled": 1,
+  "event": "Value Change",
+  "message": "Material Request {{ doc.name }} has been reviewed by LIF and awaits AGM Secretariat review. Open: <a href='/app/material-request/{{ doc.name }}'>{{ doc.name }}</a>",
+  "message_type": "HTML",
+  "name": "SCM MR - Notify AGM Secretariat",
+  "recipients": [
+   {
+    "receiver_by_document_field": "custom_agm_secy_user"
+   },
+   {
+    "receiver_by_role": "AGM Secretariat"
+   }
+  ],
+  "subject": "Material Request {{ doc.name }} awaiting AGM Secretariat review",
+  "value_changed": "custom_lif_reviewed"
+ },
+ {
+  "channel": "Email",
+  "condition": "doc.custom_agm_secy_reviewed == 1",
+  "doctype": "Notification",
+  "document_type": "Material Request",
+  "enabled": 1,
+  "event": "Value Change",
+  "message": "Material Request {{ doc.name }} has been reviewed by AGM Secretariat and awaits CS Directorate review. Open: <a href='/app/material-request/{{ doc.name }}'>{{ doc.name }}</a>",
+  "message_type": "HTML",
+  "name": "SCM MR - Notify CS Directorate",
+  "recipients": [
+   {
+    "receiver_by_document_field": "custom_cs_dir_user"
+   },
+   {
+    "receiver_by_role": "CS Directorate"
+   }
+  ],
+  "subject": "Material Request {{ doc.name }} awaiting CS Directorate review",
+  "value_changed": "custom_agm_secy_reviewed"
+ },
+ {
+  "channel": "Email",
+  "condition": "doc.custom_cs_dir_reviewed == 1",
+  "doctype": "Notification",
+  "document_type": "Material Request",
+  "enabled": 1,
+  "event": "Value Change",
+  "message": "All reviews for Material Request {{ doc.name }} are complete. Open: <a href='/app/material-request/{{ doc.name }}'>{{ doc.name }}</a>",
+  "message_type": "HTML",
+  "name": "SCM MR - Reviewer Chain Complete (Notify URC)",
+  "recipients": [
+   {
+    "receiver_by_document_field": "custom_urc_requester"
+   },
+   {
+    "receiver_by_role": "URC Demand User"
+   }
+  ],
+  "subject": "Material Request {{ doc.name }} reviews completed",
+  "value_changed": "custom_cs_dir_reviewed"
+ },
+ {
+  "channel": "Email",
+  "doctype": "Notification",
+  "document_type": "Material Request",
+  "enabled": 1,
+  "event": "Submit",
+  "message": "Material Request {{ doc.name }} has been submitted. Please review and action. If Auto Create Purchase Order is enabled and MR is Approved, a draft PO will be created.",
+  "message_type": "HTML",
+  "name": "SCM MR Submitted Notify Purchase",
+  "recipients": [
+   {
+    "receiver_by_role": "Purchase Manager"
+   }
+  ],
+  "subject": "Material Request Submitted: {{ doc.name }}"
+ },
+ {
+  "channel": "Email",
+  "doctype": "Notification",
+  "document_type": "Promotional Scheme",
+  "enabled": 1,
+  "event": "New",
+  "message": "A new promotional scheme is available. Valid from {{ doc.valid_from }} to {{ doc.valid_upto }}. Supplier: {{ doc.custom_supplier or 'N/A' }}. Applicable For: {{ doc.applicable_for or '' }}",
+  "message_type": "HTML",
+  "name": "SCM Promotional Scheme - New Notify Depot and RM",
+  "recipients": [
+   {
+    "receiver_by_role": "Depot Manager"
+   },
+   {
+    "receiver_by_role": "Depot User"
+   },
+   {
+    "receiver_by_role": "Regional Manager"
+   }
+  ],
+  "subject": "New Promotional Scheme: {{ doc.name }}"
+ },
+ {
+  "channel": "Email",
+  "date_changed": "schedule_date",
+  "days_in_advance": 1,
+  "doctype": "Notification",
+  "document_type": "Collection Schedule",
+  "enabled": 1,
+  "event": "Days Before",
+  "message": "Reminder: collection is scheduled by {{ doc.depot }} on {{ doc.schedule_date }} for URC {{ doc.custom_urc }}. Please be ready.",
+  "message_type": "HTML",
+  "name": "SCM Collection Schedule - Notify URC Days Before",
+  "recipients": [
+   {
+    "receiver_by_document_field": "custom_recipient_email"
+   }
+  ],
+  "subject": "Upcoming Depot Collection scheduled on {{ doc.schedule_date }}"
+ },
+ {
+  "channel": "System Notification",
+  "condition": "doc.workflow_state == 'Pending Regional Approval'",
+  "doctype": "Notification",
+  "document_type": "Supplementary Demand Statement",
+  "enabled": 1,
+  "event": "Value Change",
+  "message": "Please review and take action on Supplementary Demand Statement {{ doc.name }}.",
+  "message_type": "HTML",
+  "name": "SDS - Pending RM Approval",
+  "notification_title": "Supplementary Demand Statement {{ doc.name }} pending Regional Manager approval",
+  "notification_type": "Alert",
+  "recipients": [
+   {
+    "receiver_by_role": "Regional Manager"
+   }
+  ],
+  "subject": "Supplementary Demand Statement {{ doc.name }} pending Regional Manager approval",
+  "value_changed": "workflow_state"
+ },
+ {
+  "channel": "System Notification",
+  "condition": "doc.workflow_state == 'Pending RM Approval'",
+  "doctype": "Notification",
+  "document_type": "Transport Claim Waiver",
+  "enabled": 1,
+  "event": "Value Change",
+  "message": "Please review and take action on Transport Claim Waiver {{ doc.name }}.",
+  "message_type": "HTML",
+  "name": "TCW - Pending RM Approval",
+  "notification_title": "Transport Claim Waiver {{ doc.name }} pending Regional Manager approval",
+  "notification_type": "Alert",
+  "recipients": [
+   {
+    "receiver_by_role": "Regional Manager"
+   }
+  ],
+  "subject": "Transport Claim Waiver {{ doc.name }} pending Regional Manager approval",
+  "value_changed": "workflow_state"
+ },
+ {
+  "channel": "System Notification",
+  "condition": "doc.workflow_state == \"Under Review\"",
+  "doctype": "Notification",
+  "document_type": "URC Payment Advice",
+  "enabled": 1,
+  "event": "Save",
+  "message": "<p>Payment Advice {{ doc.name }} is submitted for review.</p><p>URC: {{ doc.urc }}<br>Invoice: {{ doc.sales_invoice }}<br>Amount: {{ doc.amount }}<br>Date: {{ doc.payment_date }}</p>",
+  "message_type": "HTML",
+  "name": "URC Payment Advice Submitted - Notify Depot Manager",
+  "notification_title": "URC Payment Advice Submitted {{ doc.name }}",
+  "notification_type": "Alert",
+  "recipients": [
+   {
+    "receiver_by_role": "Depot Manager"
+   }
+  ],
+  "subject": "URC Payment Advice Submitted {{ doc.name }}"
+ },
+ {
+  "channel": "Email",
+  "condition": "not doc.custom_is_acknowledged",
+  "date_changed": "transaction_date",
+  "days_in_advance": 3,
+  "doctype": "Notification",
+  "document_type": "Purchase Order",
+  "enabled": 1,
+  "event": "Days After",
+  "message": "<p>Purchase Order {{ doc.name }} has not been acknowledged within 3 days of issue.</p><p>Supplier: {{ doc.supplier }}<br>Transaction Date: {{ doc.transaction_date }}</p><p>Please record applicable penalty (fields on PO) and proceed as per policy.</p>",
+  "message_type": "HTML",
+  "name": "PO Acknowledgement SLA Breach - Action Penalty",
+  "recipients": [
+   {
+    "receiver_by_role": "Purchase Manager"
+   },
+   {
+    "receiver_by_role": "Accounts Manager"
+   }
+  ],
+  "subject": "PO not acknowledged within 3 days: {{ doc.name }}"
+ },
+ {
+  "channel": "Email",
+  "doctype": "Notification",
+  "document_type": "Consolidated Demand",
+  "enabled": 1,
+  "event": "New",
+  "message": "A consolidated demand ({{ doc.name }}) has been created for depot {{ doc.depot }} and is pending Regional Manager approval.",
+  "message_type": "HTML",
+  "name": "Consolidated Demand - Pending RM Approval",
+  "recipients": [
+   {
+    "receiver_by_role": "Regional Manager"
+   }
+  ],
+  "subject": "Consolidated Demand created: {{ doc.title }}"
+ },
+ {
+  "channel": "Email",
+  "doctype": "Notification",
+  "document_type": "Consolidated Demand",
+  "enabled": 1,
+  "event": "Save",
+  "message": "Consolidated Demand {{ doc.name }} was approved by RM ({{ doc.custom_rm_approver }}). Please review for HO approval.",
+  "message_type": "HTML",
+  "name": "Consolidated Demand - RM Approved - Notify HO",
+  "recipients": [
+   {
+    "receiver_by_document_field": "custom_ho_approver"
+   }
+  ],
+  "subject": "Consolidated Demand awaiting HO approval: {{ doc.title }}"
+ },
+ {
+  "channel": "Email",
+  "doctype": "Notification",
+  "document_type": "URC Payment Advice",
+  "enabled": 1,
+  "event": "Submit",
+  "message": "URC Payment Advice {{ doc.name }} for URC {{ doc.urc }} has been submitted. Depot Manager, please review authentication and proof.",
+  "message_type": "HTML",
+  "name": "URC Payment Advice - Submitted - Notify Depot Manager",
+  "recipients": [
+   {
+    "receiver_by_role": "Depot Manager"
+   }
+  ],
+  "subject": "URC Payment Advice submitted: {{ doc.name }}"
+ },
+ {
+  "channel": "Email",
+  "condition": "doc.custom_case_type == 'Expenditure Variance'",
+  "doctype": "Notification",
+  "document_type": "Case",
+  "enabled": 1,
+  "event": "New",
+  "message": "A new Expenditure Variance case has been created for {{ doc.custom_related_depot }}. Please review and act.",
+  "message_type": "HTML",
+  "name": "Case - New Expenditure Variance - Notify Depot Manager",
+  "recipients": [
+   {
+    "receiver_by_role": "Depot Manager"
+   }
+  ],
+  "subject": "Expenditure variance detected: {{ doc.name }}"
+ },
+ {
+  "channel": "Email",
+  "condition": "doc.custom_case_type == 'Waiver of Penal Interest'",
+  "doctype": "Notification",
+  "document_type": "Case",
+  "enabled": 1,
+  "event": "New",
+  "message": "A waiver of penal interest has been requested for URC {{ doc.custom_related_urc }}. Regional Manager please review.",
+  "message_type": "HTML",
+  "name": "Case - New Waiver of Penal Interest - Notify Regional Manager",
+  "recipients": [
+   {
+    "receiver_by_role": "Regional Manager"
+   }
+  ],
+  "subject": "Waiver request created: {{ doc.name }}"
+ },
+ {
+  "channel": "Email",
+  "condition": "doc.custom_is_slow_moving == 1",
+  "doctype": "Notification",
+  "document_type": "Item",
+  "enabled": 1,
+  "event": "Value Change",
+  "message": "Item {{ doc.name }} has been flagged as slow/non-moving. Avg offtake: {{ doc.custom_avg_offtake }}. Please review for corrective action.",
+  "message_type": "HTML",
+  "name": "Item Flagged Slow Moving - Notify Regional Manager",
+  "recipients": [
+   {
+    "receiver_by_role": "Regional Manager"
+   }
+  ],
+  "subject": "Item flagged slow-moving: {{ doc.name }}",
+  "value_changed": "custom_is_slow_moving"
+ },
+ {
+  "channel": "Email",
+  "doctype": "Notification",
+  "document_type": "Temporary Credit Request",
+  "enabled": 1,
+  "event": "New",
+  "message": "<p>A new Temporary Credit Request has been submitted by {{ doc.urc }} for amount {{ doc.amount }} on {{ doc.request_date }}. Please review.</p>",
+  "message_type": "HTML",
+  "name": "Temporary Credit Request - New Notify Depot Manager",
+  "recipients": [
+   {
+    "receiver_by_role": "Depot Manager"
+   }
+  ],
+  "subject": "New Temporary Credit Request: {{ doc.title }}"
+ },
+ {
+  "channel": "Email",
+  "condition": "doc.workflow_state == \"RM Review\"",
+  "doctype": "Notification",
+  "document_type": "Temporary Credit Request",
+  "enabled": 1,
+  "event": "Value Change",
+  "message": "<p>Temporary Credit Request {{ doc.name }} ({{ doc.urc }}) is awaiting your approval.</p>",
+  "message_type": "HTML",
+  "name": "Temporary Credit Request - Notify RM on RM Review",
+  "recipients": [
+   {
+    "receiver_by_role": "Regional Manager"
+   }
+  ],
+  "subject": "TCR moved to RM Review: {{ doc.name }}",
+  "value_changed": "workflow_state"
+ },
+ {
+  "channel": "System Notification",
+  "condition": "doc.dual_dependency == 1",
+  "doctype": "Notification",
+  "document_type": "Dependency Request",
+  "enabled": 1,
+  "event": "Value Change",
+  "message": "<p>Dependency Request {{ doc.name }} for Supplier {{ doc.supplier }} has been marked as <b>Dual Dependency</b> for Depot {{ doc.depot }}. Please review.</p>",
+  "message_type": "HTML",
+  "name": "Dependency - Dual Dependency Flagged",
+  "notification_title": "Dual Dependency flagged on {{ doc.name }}",
+  "notification_type": "Alert",
+  "recipients": [
+   {
+    "receiver_by_role": "Depot Manager"
+   }
+  ],
+  "subject": "Dual Dependency flagged on {{ doc.name }}",
+  "value_changed": "dual_dependency"
+ },
+ {
+  "channel": "System Notification",
+  "condition": "doc.workflow_state == 'Approved'",
+  "doctype": "Notification",
+  "document_type": "Dependency Request",
+  "enabled": 1,
+  "event": "Value Change",
+  "message": "<p>Dependency Request {{ doc.name }} has been <b>Approved</b>. {% if doc.dual_dependency %}NOC has been issued on {{ doc.noc_issue_date }}.{% endif %}</p>",
+  "message_type": "HTML",
+  "name": "Dependency - Approved",
+  "notification_title": "Dependency Request {{ doc.name }} Approved",
+  "notification_type": "Alert",
+  "recipients": [
+   {
+    "receiver_by_role": "Depot Manager"
+   },
+   {
+    "receiver_by_role": "URC Demand User"
+   }
+  ],
+  "subject": "Dependency Request {{ doc.name }} Approved",
+  "value_changed": "workflow_state"
+ },
+ {
+  "channel": "Email",
+  "condition": "doc.payment_type == \"Receive\"",
+  "doctype": "Notification",
+  "document_type": "Payment Entry",
+  "enabled": 1,
+  "event": "Submit",
+  "message": "A payment receipt (Payment Entry {{ doc.name }}) has been submitted for {{ doc.party }} of amount {{ doc.paid_amount }}. Please review in Accounts.",
+  "message_type": "HTML",
+  "name": "Notify Finance on Receipt Payment Entry Submit",
+  "recipients": [
+   {
+    "receiver_by_role": "Accounts User"
+   },
+   {
+    "receiver_by_role": "Accounts Manager"
+   }
+  ],
+  "subject": "Payment Receipt submitted: {{ doc.name }}"
+ },
+ {
+  "channel": "System Notification",
+  "condition": "doc.payment_type == \"Receive\"",
+  "doctype": "Notification",
+  "document_type": "Payment Entry",
+  "enabled": 1,
+  "event": "Submit",
+  "message": "Payment receipt {{ doc.name }} submitted for {{ doc.party }} ({{ doc.paid_amount }}).",
+  "message_type": "HTML",
+  "name": "Notify Finance on Receipt Payment Entry Submit - System",
+  "notification_title": "Payment Receipt submitted: {{ doc.name }}",
+  "notification_type": "Alert",
+  "recipients": [
+   {
+    "receiver_by_role": "Accounts User"
+   },
+   {
+    "receiver_by_role": "Accounts Manager"
+   }
+  ],
+  "subject": "Payment Receipt submitted: {{ doc.name }}"
+ },
+ {
+  "channel": "Email",
+  "condition": "doc.party_type == 'Customer'",
+  "doctype": "Notification",
+  "document_type": "Payment Entry",
+  "enabled": 1,
+  "event": "Submit",
+  "message": "Payment Entry {{ doc.name }} has been submitted for Customer {{ doc.party }} for amount {{ doc.paid_amount }}.",
+  "message_type": "HTML",
+  "name": "Accounts Alert on Customer Payment Entry Submit",
+  "recipients": [
+   {
+    "receiver_by_role": "Accounts User"
+   }
+  ],
+  "subject": "Payment Entry Submitted: {{ doc.name }}"
  }
 ]

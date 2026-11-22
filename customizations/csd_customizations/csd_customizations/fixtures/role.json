@@ -8,6 +8,18 @@
  {
   "desk_access": 1,
   "doctype": "Role",
+  "name": "HR Reviewer",
+  "role_name": "HR Reviewer"
+ },
+ {
+  "desk_access": 1,
+  "doctype": "Role",
+  "name": "Department Head",
+  "role_name": "Department Head"
+ },
+ {
+  "desk_access": 1,
+  "doctype": "Role",
   "name": "AGM Secretariat",
   "role_name": "AGM Secretariat"
  },
@@ -16,5 +28,41 @@
   "doctype": "Role",
   "name": "CSD Portal User",
   "role_name": "CSD Portal User"
+ },
+ {
+  "desk_access": 1,
+  "doctype": "Role",
+  "name": "Depot User",
+  "role_name": "Depot User"
+ },
+ {
+  "desk_access": 1,
+  "doctype": "Role",
+  "name": "Depot Manager",
+  "role_name": "Depot Manager"
+ },
+ {
+  "desk_access": 1,
+  "doctype": "Role",
+  "name": "URC Demand User",
+  "role_name": "URC Demand User"
+ },
+ {
+  "desk_access": 1,
+  "doctype": "Role",
+  "name": "LIF Reviewer",
+  "role_name": "LIF Reviewer"
+ },
+ {
+  "desk_access": 1,
+  "doctype": "Role",
+  "name": "CS Directorate",
+  "role_name": "CS Directorate"
+ },
+ {
+  "desk_access": 1,
+  "doctype": "Role",
+  "name": "Regional Manager",
+  "role_name": "Regional Manager"
  }
 ]

@@ -169,6 +169,26 @@
  {
   "doctype": "Report",
   "is_standard": "No",
+  "json": "{\"filters\": [], \"fields\": [[\"name\", \"Case\"], [\"title\", \"Case\"], [\"category\", \"Case\"], [\"priority\", \"Case\"], [\"workflow_state\", \"Case\"], [\"current_owner\", \"Case\"], [\"date_opened\", \"Case\"], [\"date_closed\", \"Case\"], [\"modified\", \"Case\"]], \"order_by\": \"`tabCase`.`modified` desc\", \"add_totals_row\": 0, \"page_length\": 20, \"column_widths\": {}, \"group_by\": null}",
+  "name": "Case Lifecycle",
+  "ref_doctype": "Case",
+  "report_name": "Case Lifecycle",
+  "report_type": "Report Builder",
+  "roles": []
+ },
+ {
+  "doctype": "Report",
+  "is_standard": "No",
+  "json": "{\"filters\": [], \"fields\": [[\"name\", \"Case\"], [\"title\", \"Case\"], [\"current_owner\", \"Case\"], [\"workflow_state\", \"Case\"], [\"date_opened\", \"Case\"], [\"date_closed\", \"Case\"], [\"custom_days_open\", \"Case\"]], \"order_by\": \"`tabCase`.`modified` desc\", \"add_totals_row\": 0, \"page_length\": 20, \"column_widths\": {}, \"group_by\": null}",
+  "name": "Case Ageing",
+  "ref_doctype": "Case",
+  "report_name": "Case Ageing",
+  "report_type": "Report Builder",
+  "roles": []
+ },
+ {
+  "doctype": "Report",
+  "is_standard": "No",
   "json": "{\"filters\": [[\"Supplier\", \"custom_classification\", \"!=\", \"\", false]], \"fields\": [[\"name\", \"Supplier\"], [\"supplier_name\", \"Supplier\"], [\"supplier_group\", \"Supplier\"], [\"custom_classification\", \"Supplier\"], [\"custom_suspended\", \"Supplier\"], [\"custom_pnc_status\", \"Supplier\"], [\"supplier_type\", \"Supplier\"], [\"supplier_primary_contact\", \"Supplier\"]], \"order_by\": \"`tabSupplier`.`modified` desc\", \"add_totals_row\": 0, \"page_length\": 20, \"column_widths\": {}, \"group_by\": null}",
   "name": "Supplier Directory - searchable",
   "ref_doctype": "Supplier",
@@ -223,6 +243,452 @@
    },
    {
     "role": "AGM Secretariat"
+   }
+  ]
+ },
+ {
+  "doctype": "Report",
+  "is_standard": "No",
+  "json": "{\"filters\": [], \"fields\": [[\"supplier\", \"Purchase Order\"], [\"transaction_date\", \"Purchase Order\"], [\"schedule_date\", \"Purchase Order\"], [\"grand_total\", \"Purchase Order\"], [\"status\", \"Purchase Order\"]], \"order_by\": \"`tabPurchase Order`.`transaction_date` desc\", \"add_totals_row\": 0, \"page_length\": 20, \"column_widths\": {}, \"group_by\": null}",
+  "name": "SCM Purchase Orders by Supplier and Period",
+  "ref_doctype": "Purchase Order",
+  "report_name": "SCM Purchase Orders by Supplier and Period",
+  "report_type": "Report Builder",
+  "roles": [
+   {
+    "role": "Purchase User"
+   },
+   {
+    "role": "Purchase Manager"
+   },
+   {
+    "role": "Stock Manager"
+   }
+  ]
+ },
+ {
+  "doctype": "Report",
+  "is_standard": "No",
+  "json": "{\"filters\": [], \"fields\": [[\"name\", \"Material Request\"], [\"customer\", \"Material Request\"], [\"company\", \"Material Request\"], [\"transaction_date\", \"Material Request\"], [\"schedule_date\", \"Material Request\"], [\"workflow_state\", \"Material Request\"], [\"status\", \"Material Request\"], [\"per_ordered\", \"Material Request\"]], \"order_by\": \"`tabMaterial Request`.`transaction_date` desc\", \"add_totals_row\": 0, \"page_length\": 20, \"column_widths\": {}, \"group_by\": null}",
+  "name": "SCM URC Requests",
+  "ref_doctype": "Material Request",
+  "report_name": "SCM URC Requests",
+  "report_type": "Report Builder",
+  "roles": [
+   {
+    "role": "Depot Manager"
+   },
+   {
+    "role": "Depot User"
+   },
+   {
+    "role": "Accounts User"
+   }
+  ]
+ },
+ {
+  "doctype": "Report",
+  "is_standard": "No",
+  "json": "{\"filters\": [], \"fields\": [[\"name\", \"Material Request\"], [\"customer\", \"Material Request\"], [\"transaction_date\", \"Material Request\"], [\"custom_qd_number\", \"Material Request\"], [\"custom_qd_release_date\", \"Material Request\"], [\"custom_utilization_certificate_date\", \"Material Request\"], [\"custom_utilization_certificate_amount\", \"Material Request\"], [\"workflow_state\", \"Material Request\"], [\"status\", \"Material Request\"]], \"order_by\": \"`tabMaterial Request`.`custom_qd_release_date` desc\", \"add_totals_row\": 0, \"page_length\": 20, \"column_widths\": {}, \"group_by\": null}",
+  "name": "SCM QD Tracker",
+  "ref_doctype": "Material Request",
+  "report_name": "SCM QD Tracker",
+  "report_type": "Report Builder",
+  "roles": [
+   {
+    "role": "Purchase Manager"
+   },
+   {
+    "role": "Stock Manager"
+   },
+   {
+    "role": "Accounts Manager"
+   },
+   {
+    "role": "Depot User"
+   }
+  ]
+ },
+ {
+  "doctype": "Report",
+  "is_standard": "No",
+  "json": "{\"filters\": [[\"Item\", \"custom_is_qd\", \"=\", 1, false]], \"fields\": [[\"item_code\", \"Item\"], [\"item_name\", \"Item\"], [\"custom_csd_index_code\", \"Item\"], [\"custom_is_qd\", \"Item\"], [\"item_group\", \"Item\"], [\"stock_uom\", \"Item\"]], \"order_by\": \"`tabItem`.`modified` desc\", \"add_totals_row\": 0, \"page_length\": 20, \"column_widths\": {}, \"group_by\": null}",
+  "name": "SCM QD Items Master",
+  "ref_doctype": "Item",
+  "report_name": "SCM QD Items Master",
+  "report_type": "Report Builder",
+  "roles": [
+   {
+    "role": "Depot Manager"
+   },
+   {
+    "role": "Depot User"
+   },
+   {
+    "role": "Purchase Manager"
+   },
+   {
+    "role": "Stock Manager"
+   },
+   {
+    "role": "Sales Manager"
+   },
+   {
+    "role": "System Manager"
+   }
+  ]
+ },
+ {
+  "doctype": "Report",
+  "is_standard": "No",
+  "json": "{\"filters\": [[\"Bin\", \"actual_qty\", \">\", 0, false]], \"fields\": [[\"item_code\", \"Bin\"], [\"warehouse\", \"Bin\"], [\"actual_qty\", \"Bin\"]], \"order_by\": \"`tabBin`.`modified` desc\", \"add_totals_row\": 0, \"page_length\": 20, \"column_widths\": {}, \"group_by\": null}",
+  "name": "SCM Available Stock by Warehouse",
+  "ref_doctype": "Bin",
+  "report_name": "SCM Available Stock by Warehouse",
+  "report_type": "Report Builder",
+  "roles": [
+   {
+    "role": "Depot Manager"
+   },
+   {
+    "role": "Depot User"
+   },
+   {
+    "role": "Stock Manager"
+   },
+   {
+    "role": "Sales Manager"
+   },
+   {
+    "role": "System Manager"
+   }
+  ]
+ },
+ {
+  "doctype": "Report",
+  "is_standard": "No",
+  "json": "{\"filters\": [], \"fields\": [[\"name\", \"Purchase Order\"], [\"supplier\", \"Purchase Order\"], [\"transaction_date\", \"Purchase Order\"], [\"status\", \"Purchase Order\"], [\"company\", \"Purchase Order\"]], \"order_by\": \"`tabPurchase Order`.`modified` desc\", \"add_totals_row\": 0, \"page_length\": 20, \"column_widths\": {}, \"group_by\": null}",
+  "name": "SCM Auto Generated POs",
+  "ref_doctype": "Purchase Order",
+  "report_name": "SCM Auto Generated POs",
+  "report_type": "Report Builder",
+  "roles": []
+ },
+ {
+  "doctype": "Report",
+  "is_standard": "No",
+  "json": "{\"filters\": [], \"fields\": [[\"name\", \"Promotional Scheme\"], [\"valid_from\", \"Promotional Scheme\"], [\"valid_upto\", \"Promotional Scheme\"], [\"applicable_for\", \"Promotional Scheme\"], [\"custom_supplier\", \"Promotional Scheme\"]], \"order_by\": \"`tabPromotional Scheme`.`modified` desc\", \"add_totals_row\": 0, \"page_length\": 20, \"column_widths\": {}, \"group_by\": null}",
+  "name": "SCM Promotional Schemes",
+  "ref_doctype": "Promotional Scheme",
+  "report_name": "SCM Promotional Schemes",
+  "report_type": "Report Builder",
+  "roles": [
+   {
+    "role": "Depot Manager"
+   },
+   {
+    "role": "Depot User"
+   },
+   {
+    "role": "URC Demand User"
+   }
+  ]
+ },
+ {
+  "doctype": "Report",
+  "is_standard": "No",
+  "json": "{\"filters\": [], \"fields\": [[\"warehouse\", \"Bin\"], [\"item_code\", \"Bin\"], [\"actual_qty\", \"Bin\"], [\"reserved_qty\", \"Bin\"], [\"planned_qty\", \"Bin\"]], \"order_by\": \"`tabBin`.`modified` desc\", \"add_totals_row\": 0, \"page_length\": 20, \"column_widths\": {}, \"group_by\": null}",
+  "name": "SCM Depot Stock Overview",
+  "ref_doctype": "Bin",
+  "report_name": "SCM Depot Stock Overview",
+  "report_type": "Report Builder",
+  "roles": [
+   {
+    "role": "Regional Manager"
+   },
+   {
+    "role": "Depot Manager"
+   },
+   {
+    "role": "Stock Manager"
+   },
+   {
+    "role": "System Manager"
+   }
+  ]
+ },
+ {
+  "doctype": "Report",
+  "is_standard": "No",
+  "json": "{\"filters\": [], \"fields\": [[\"name\", \"Supplementary Demand Statement\"], [\"title\", \"Supplementary Demand Statement\"], [\"statement_type\", \"Supplementary Demand Statement\"], [\"reference_material_request\", \"Supplementary Demand Statement\"], [\"requested_by\", \"Supplementary Demand Statement\"], [\"requested_on\", \"Supplementary Demand Statement\"], [\"workflow_state\", \"Supplementary Demand Statement\"]], \"order_by\": \"`tabSupplementary Demand Statement`.`modified` desc\", \"add_totals_row\": 0, \"page_length\": 20, \"column_widths\": {}, \"group_by\": null}",
+  "name": "SCM Supplementary Statements",
+  "ref_doctype": "Supplementary Demand Statement",
+  "report_name": "SCM Supplementary Statements",
+  "report_type": "Report Builder",
+  "roles": [
+   {
+    "role": "Regional Manager"
+   },
+   {
+    "role": "URC Demand User"
+   },
+   {
+    "role": "Depot Manager"
+   },
+   {
+    "role": "System Manager"
+   }
+  ]
+ },
+ {
+  "doctype": "Report",
+  "is_standard": "No",
+  "json": "{\"filters\": [], \"fields\": [[\"name\", \"SCM Market Intelligence\"], [\"title\", \"SCM Market Intelligence\"], [\"item\", \"SCM Market Intelligence\"], [\"observed_rate\", \"SCM Market Intelligence\"], [\"promotion_details\", \"SCM Market Intelligence\"], [\"surveyed_on\", \"SCM Market Intelligence\"], [\"submitted_by\", \"SCM Market Intelligence\"]], \"order_by\": \"`tabSCM Market Intelligence`.`modified` desc\", \"add_totals_row\": 0, \"page_length\": 20, \"column_widths\": {}, \"group_by\": null}",
+  "name": "SCM Market Intelligence Report",
+  "ref_doctype": "SCM Market Intelligence",
+  "report_name": "SCM Market Intelligence Report",
+  "report_type": "Report Builder",
+  "roles": [
+   {
+    "role": "Regional Manager"
+   },
+   {
+    "role": "Depot User"
+   },
+   {
+    "role": "System Manager"
+   }
+  ]
+ },
+ {
+  "doctype": "Report",
+  "is_standard": "No",
+  "json": "{\"filters\": [[\"Material Request\", \"status\", \"!=\", \"Approved\", false]], \"fields\": [[\"name\", \"Material Request\"], [\"custom_order_category\", \"Material Request\"], [\"custom_demand_cycle\", \"Material Request\"], [\"transaction_date\", \"Material Request\"], [\"schedule_date\", \"Material Request\"], [\"status\", \"Material Request\"], [\"company\", \"Material Request\"], [\"set_warehouse\", \"Material Request\"]], \"order_by\": \"`tabMaterial Request`.`transaction_date` desc\", \"add_totals_row\": 0, \"page_length\": 20, \"column_widths\": {}, \"group_by\": null}",
+  "name": "SCM Store Orders - Pending Approval",
+  "ref_doctype": "Material Request",
+  "report_name": "SCM Store Orders - Pending Approval",
+  "report_type": "Report Builder",
+  "roles": [
+   {
+    "role": "Purchase User"
+   },
+   {
+    "role": "Depot Manager"
+   }
+  ]
+ },
+ {
+  "doctype": "Report",
+  "is_standard": "No",
+  "json": "{\"filters\": [], \"fields\": [[\"item_code\", \"Bin\"], [\"warehouse\", \"Bin\"], [\"actual_qty\", \"Bin\"], [\"reserved_qty\", \"Bin\"], [\"projected_qty\", \"Bin\"]], \"order_by\": \"`tabBin`.`modified` desc\", \"add_totals_row\": 0, \"page_length\": 20, \"column_widths\": {}, \"group_by\": null}",
+  "name": "SCM QD Index Availability",
+  "ref_doctype": "Bin",
+  "report_name": "SCM QD Index Availability",
+  "report_type": "Report Builder",
+  "roles": [
+   {
+    "role": "Depot Manager"
+   },
+   {
+    "role": "Depot User"
+   },
+   {
+    "role": "Purchase User"
+   }
+  ]
+ },
+ {
+  "doctype": "Report",
+  "is_standard": "No",
+  "json": "{\"filters\": [], \"fields\": [[\"name\", \"Material Request\"], [\"custom_demand_cycle\", \"Material Request\"], [\"workflow_state\", \"Material Request\"], [\"company\", \"Material Request\"], [\"set_warehouse\", \"Material Request\"], [\"transaction_date\", \"Material Request\"], [\"schedule_date\", \"Material Request\"], [\"status\", \"Material Request\"], [\"per_ordered\", \"Material Request\"]], \"order_by\": \"`tabMaterial Request`.`modified` desc\", \"add_totals_row\": 0, \"page_length\": 20, \"column_widths\": {}, \"group_by\": null}",
+  "name": "SCM Depot Demands",
+  "ref_doctype": "Material Request",
+  "report_name": "SCM Depot Demands",
+  "report_type": "Report Builder",
+  "roles": [
+   {
+    "role": "Depot Manager"
+   },
+   {
+    "role": "Purchase Manager"
+   },
+   {
+    "role": "Purchase User"
+   }
+  ]
+ },
+ {
+  "doctype": "Report",
+  "is_standard": "No",
+  "json": "{\"filters\": [], \"fields\": [[\"name\", \"Material Request\"], [\"customer\", \"Material Request\"], [\"material_request_type\", \"Material Request\"], [\"workflow_state\", \"Material Request\"], [\"status\", \"Material Request\"], [\"transaction_date\", \"Material Request\"], [\"company\", \"Material Request\"], [\"per_ordered\", \"Material Request\"]], \"order_by\": \"`tabMaterial Request`.`transaction_date` desc\", \"add_totals_row\": 0, \"page_length\": 20, \"column_widths\": {}, \"group_by\": null}",
+  "name": "SCM - Material Requests by Workflow State",
+  "ref_doctype": "Material Request",
+  "report_name": "SCM - Material Requests by Workflow State",
+  "report_type": "Report Builder",
+  "roles": [
+   {
+    "role": "Depot Manager"
+   },
+   {
+    "role": "Purchase Manager"
+   },
+   {
+    "role": "Stock Manager"
+   },
+   {
+    "role": "System Manager"
+   }
+  ]
+ },
+ {
+  "doctype": "Report",
+  "is_standard": "No",
+  "json": "{\"filters\": [], \"fields\": [[\"item_code\", \"Item\"], [\"item_name\", \"Item\"], [\"custom_offtake_months\", \"Item\"], [\"custom_avg_offtake\", \"Item\"], [\"custom_is_slow_moving\", \"Item\"], [\"standard_rate\", \"Item\"], [\"item_group\", \"Item\"]], \"order_by\": \"`tabItem`.`modified` desc\", \"add_totals_row\": 0, \"page_length\": 20, \"column_widths\": {}, \"group_by\": null}",
+  "name": "Slow and Non-moving Items Report",
+  "ref_doctype": "Item",
+  "report_name": "Slow and Non-moving Items Report",
+  "report_type": "Report Builder",
+  "roles": []
+ },
+ {
+  "doctype": "Report",
+  "is_standard": "No",
+  "json": "{\"filters\": [], \"fields\": [[\"name\", \"Purchase Invoice\"], [\"posting_date\", \"Purchase Invoice\"], [\"company\", \"Purchase Invoice\"], [\"supplier\", \"Purchase Invoice\"], [\"grand_total\", \"Purchase Invoice\"], [\"rounded_total\", \"Purchase Invoice\"], [\"status\", \"Purchase Invoice\"]], \"order_by\": \"`tabPurchase Invoice`.`modified` desc\", \"add_totals_row\": 0, \"page_length\": 20, \"column_widths\": {}, \"group_by\": null}",
+  "name": "Expenditure Trend Report",
+  "ref_doctype": "Purchase Invoice",
+  "report_name": "Expenditure Trend Report",
+  "report_type": "Report Builder",
+  "roles": []
+ },
+ {
+  "doctype": "Report",
+  "is_standard": "No",
+  "json": "{\"filters\": [[\"Sales Invoice\", \"custom_qd_net_amount\", \">\", 0, false]], \"fields\": [[\"name\", \"Sales Invoice\"], [\"posting_date\", \"Sales Invoice\"], [\"customer\", \"Sales Invoice\"], [\"company\", \"Sales Invoice\"], [\"custom_qd_net_amount\", \"Sales Invoice\"]], \"order_by\": \"`tabSales Invoice`.`posting_date` desc\", \"add_totals_row\": 0, \"page_length\": 20, \"column_widths\": {}, \"group_by\": null}",
+  "name": "SCM QD Sales by URC",
+  "ref_doctype": "Sales Invoice",
+  "report_name": "SCM QD Sales by URC",
+  "report_type": "Report Builder",
+  "roles": [
+   {
+    "role": "Depot Manager"
+   },
+   {
+    "role": "Depot User"
+   },
+   {
+    "role": "Regional Manager"
+   },
+   {
+    "role": "Accounts Manager"
+   },
+   {
+    "role": "Sales Manager"
+   },
+   {
+    "role": "Stock Manager"
+   }
+  ]
+ },
+ {
+  "doctype": "Report",
+  "is_standard": "No",
+  "json": "{\"filters\": [[\"Temporary Credit Request\", \"workflow_state\", \"!=\", \"Approved\", false]], \"fields\": [[\"name\", \"Temporary Credit Request\"], [\"title\", \"Temporary Credit Request\"], [\"urc\", \"Temporary Credit Request\"], [\"depot\", \"Temporary Credit Request\"], [\"amount\", \"Temporary Credit Request\"], [\"request_date\", \"Temporary Credit Request\"], [\"workflow_state\", \"Temporary Credit Request\"]], \"order_by\": \"`tabTemporary Credit Request`.`request_date` desc\", \"add_totals_row\": 0, \"page_length\": 20, \"column_widths\": {}, \"group_by\": null}",
+  "name": "Temporary Credit Requests - List",
+  "ref_doctype": "Temporary Credit Request",
+  "report_name": "Temporary Credit Requests - List",
+  "report_type": "Report Builder",
+  "roles": [
+   {
+    "role": "Depot Manager"
+   },
+   {
+    "role": "Regional Manager"
+   },
+   {
+    "role": "Depot User"
+   }
+  ]
+ },
+ {
+  "doctype": "Report",
+  "is_standard": "No",
+  "json": "{\"filters\": [[\"Promotional Scheme\", \"custom_approved_for_depot\", \"=\", 1, false], [\"Promotional Scheme\", \"disable\", \"=\", 0, false]], \"fields\": [[\"name\", \"Promotional Scheme\"], [\"custom_scheme_index\", \"Promotional Scheme\"], [\"custom_supplier\", \"Promotional Scheme\"], [\"custom_supplier_name\", \"Promotional Scheme\"], [\"custom_supplier_group\", \"Promotional Scheme\"], [\"valid_from\", \"Promotional Scheme\"], [\"valid_upto\", \"Promotional Scheme\"], [\"custom_approved_for_depot\", \"Promotional Scheme\"], [\"disable\", \"Promotional Scheme\"]], \"order_by\": \"`tabPromotional Scheme`.`valid_from` desc\", \"add_totals_row\": 0, \"page_length\": 20, \"column_widths\": {}, \"group_by\": null}",
+  "name": "Approved Promotion Schemes",
+  "ref_doctype": "Promotional Scheme",
+  "report_name": "Approved Promotion Schemes",
+  "report_type": "Report Builder",
+  "roles": [
+   {
+    "role": "Depot User"
+   },
+   {
+    "role": "Depot Manager"
+   },
+   {
+    "role": "URC Demand User"
+   }
+  ]
+ },
+ {
+  "doctype": "Report",
+  "is_standard": "No",
+  "json": "{\"filters\": [[\"Supplier Fee Schedule\", \"custom_approved_for_depot\", \"=\", 1, false]], \"fields\": [[\"name\", \"Supplier Fee Schedule\"], [\"supplier\", \"Supplier Fee Schedule\"], [\"fee_stage\", \"Supplier Fee Schedule\"], [\"amount\", \"Supplier Fee Schedule\"], [\"due_date\", \"Supplier Fee Schedule\"], [\"status\", \"Supplier Fee Schedule\"], [\"custom_scheme_index\", \"Supplier Fee Schedule\"], [\"custom_approved_for_depot\", \"Supplier Fee Schedule\"]], \"order_by\": \"`tabSupplier Fee Schedule`.`due_date` asc\", \"add_totals_row\": 0, \"page_length\": 20, \"column_widths\": {}, \"group_by\": null}",
+  "name": "Approved Supplier Fee Schedules",
+  "ref_doctype": "Supplier Fee Schedule",
+  "report_name": "Approved Supplier Fee Schedules",
+  "report_type": "Report Builder",
+  "roles": [
+   {
+    "role": "Depot User"
+   },
+   {
+    "role": "Depot Manager"
+   },
+   {
+    "role": "URC Demand User"
+   }
+  ]
+ },
+ {
+  "doctype": "Report",
+  "is_standard": "No",
+  "json": "{\"filters\": [], \"fields\": [[\"item\", \"Liquor Demand Forecast\"], [\"month\", \"Liquor Demand Forecast\"], [\"forecast_qty\", \"Liquor Demand Forecast\"]], \"order_by\": \"`tabLiquor Demand Forecast`.`item` asc\", \"add_totals_row\": 0, \"page_length\": 20, \"column_widths\": {}, \"group_by\": null}",
+  "name": "Liquor Demand Forecast",
+  "ref_doctype": "Liquor Demand Forecast",
+  "report_name": "Liquor Demand Forecast",
+  "report_type": "Report Builder",
+  "roles": [
+   {
+    "role": "Depot Manager"
+   },
+   {
+    "role": "Depot User"
+   },
+   {
+    "role": "URC Demand User"
+   },
+   {
+    "role": "System Manager"
+   }
+  ]
+ },
+ {
+  "doctype": "Report",
+  "is_standard": "No",
+  "json": "{\"filters\": [], \"fields\": [[\"depot\", \"Excise Master Change Proposal\"], [\"state\", \"Excise Master Change Proposal\"], [\"excise_item\", \"Excise Master Change Proposal\"], [\"current_rate\", \"Excise Master Change Proposal\"], [\"proposed_rate\", \"Excise Master Change Proposal\"], [\"policy_reference\", \"Excise Master Change Proposal\"], [\"status\", \"Excise Master Change Proposal\"], [\"owner\", \"Excise Master Change Proposal\"], [\"creation\", \"Excise Master Change Proposal\"]], \"order_by\": \"`tabExcise Master Change Proposal`.`creation` desc\", \"add_totals_row\": 0, \"page_length\": 20, \"column_widths\": {}, \"group_by\": null}",
+  "name": "Excise Master Change Proposal Register",
+  "ref_doctype": "Excise Master Change Proposal",
+  "report_name": "Excise Master Change Proposal Register",
+  "report_type": "Report Builder",
+  "roles": [
+   {
+    "role": "Depot Manager"
+   },
+   {
+    "role": "Accounts Manager"
+   },
+   {
+    "role": "System Manager"
    }
   ]
  }

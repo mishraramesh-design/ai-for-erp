@@ -395,6 +395,92 @@
  },
  {
   "doctype": "Workflow",
+  "document_type": "Case",
+  "is_active": 1,
+  "name": "Case Approval",
+  "override_status": 0,
+  "send_email_alert": 0,
+  "states": [
+   {
+    "allow_edit": "HR Reviewer",
+    "doc_status": "0",
+    "state": "Draft"
+   },
+   {
+    "allow_edit": "HR Reviewer",
+    "doc_status": "0",
+    "state": "Submitted"
+   },
+   {
+    "allow_edit": "HR Reviewer",
+    "doc_status": "0",
+    "state": "Under Review"
+   },
+   {
+    "allow_edit": "Department Head",
+    "doc_status": "0",
+    "state": "Escalated"
+   },
+   {
+    "allow_edit": "HR Reviewer",
+    "doc_status": "0",
+    "state": "Resolved"
+   },
+   {
+    "allow_edit": "HR Reviewer",
+    "doc_status": "0",
+    "state": "Closed"
+   }
+  ],
+  "transitions": [
+   {
+    "action": "Submit",
+    "allow_self_approval": 1,
+    "allowed": "HR Reviewer",
+    "next_state": "Submitted",
+    "state": "Draft"
+   },
+   {
+    "action": "Take Up",
+    "allow_self_approval": 1,
+    "allowed": "HR Reviewer",
+    "next_state": "Under Review",
+    "state": "Submitted"
+   },
+   {
+    "action": "Escalate",
+    "allow_self_approval": 1,
+    "allowed": "HR Reviewer",
+    "next_state": "Escalated",
+    "state": "Under Review"
+   },
+   {
+    "action": "Resolve",
+    "allow_self_approval": 1,
+    "allowed": "HR Reviewer",
+    "next_state": "Resolved",
+    "state": "Under Review"
+   },
+   {
+    "action": "Resolve",
+    "allow_self_approval": 1,
+    "allowed": "Department Head",
+    "next_state": "Resolved",
+    "state": "Escalated"
+   },
+   {
+    "action": "Close",
+    "allow_self_approval": 1,
+    "allowed": "HR Reviewer",
+    "next_state": "Closed",
+    "state": "Resolved"
+   }
+  ],
+  "workflow_name": "Case Approval",
+  "workflow_state_field": "workflow_state"
+ },
+ {
+  "doctype": "Workflow",
   "document_type": "Issue",
   "is_active": 1,
   "name": "Supplier Issue Workflow",
@@ -527,6 +613,857 @@
    }
   ],
   "workflow_name": "Supplier Quotation PNC BoA Workflow",
+  "workflow_state_field": "workflow_state"
+ },
+ {
+  "doctype": "Workflow",
+  "document_type": "Material Request",
+  "is_active": 1,
+  "name": "SCM PD FD Cycle",
+  "override_status": 0,
+  "send_email_alert": 0,
+  "states": [
+   {
+    "allow_edit": "Customer",
+    "doc_status": "0",
+    "state": "PD Draft"
+   },
+   {
+    "allow_edit": "Stock Manager",
+    "doc_status": "0",
+    "state": "PD Submitted to Depot"
+   },
+   {
+    "allow_edit": "Stock Manager",
+    "doc_status": "0",
+    "state": "Depot Validated"
+   },
+   {
+    "allow_edit": "Stock Manager",
+    "doc_status": "0",
+    "state": "FD Ready"
+   },
+   {
+    "allow_edit": "Purchase Manager",
+    "doc_status": "0",
+    "state": "Forwarded to HO"
+   },
+   {
+    "allow_edit": "Purchase Manager",
+    "doc_status": "1",
+    "state": "HO Approved"
+   }
+  ],
+  "transitions": [
+   {
+    "action": "Submit PD",
+    "allow_self_approval": 1,
+    "allowed": "Stock Manager",
+    "next_state": "PD Submitted to Depot",
+    "state": "PD Draft"
+   },
+   {
+    "action": "Validate",
+    "allow_self_approval": 1,
+    "allowed": "Stock Manager",
+    "next_state": "Depot Validated",
+    "state": "PD Submitted to Depot"
+   },
+   {
+    "action": "Convert to FD",
+    "allow_self_approval": 1,
+    "allowed": "Stock Manager",
+    "next_state": "FD Ready",
+    "state": "Depot Validated"
+   },
+   {
+    "action": "Forward to HO",
+    "allow_self_approval": 1,
+    "allowed": "Stock Manager",
+    "next_state": "Forwarded to HO",
+    "state": "Depot Validated"
+   },
+   {
+    "action": "Forward to HO",
+    "allow_self_approval": 1,
+    "allowed": "Stock Manager",
+    "next_state": "Forwarded to HO",
+    "state": "FD Ready"
+   },
+   {
+    "action": "Approve",
+    "allow_self_approval": 1,
+    "allowed": "Purchase Manager",
+    "next_state": "HO Approved",
+    "state": "Forwarded to HO"
+   }
+  ],
+  "workflow_name": "SCM PD FD Cycle",
+  "workflow_state_field": "workflow_state"
+ },
+ {
+  "doctype": "Workflow",
+  "document_type": "Supplier Product Registration",
+  "is_active": 1,
+  "name": "Depot Registration Workflow",
+  "override_status": 0,
+  "send_email_alert": 0,
+  "states": [
+   {
+    "allow_edit": "Depot User",
+    "doc_status": "0",
+    "state": "Draft"
+   },
+   {
+    "allow_edit": "Purchase Manager",
+    "doc_status": "0",
+    "state": "Under Review"
+   },
+   {
+    "allow_edit": "Purchase Manager",
+    "doc_status": "0",
+    "state": "Approved"
+   },
+   {
+    "allow_edit": "Purchase Manager",
+    "doc_status": "0",
+    "state": "Rejected"
+   }
+  ],
+  "transitions": [
+   {
+    "action": "Submit for Review",
+    "allow_self_approval": 1,
+    "allowed": "Depot User",
+    "next_state": "Under Review",
+    "state": "Draft"
+   },
+   {
+    "action": "Approve",
+    "allow_self_approval": 1,
+    "allowed": "Purchase Manager",
+    "next_state": "Approved",
+    "state": "Under Review"
+   },
+   {
+    "action": "Reject",
+    "allow_self_approval": 1,
+    "allowed": "Purchase Manager",
+    "next_state": "Rejected",
+    "state": "Under Review"
+   },
+   {
+    "action": "Reopen",
+    "allow_self_approval": 1,
+    "allowed": "Depot User",
+    "next_state": "Under Review",
+    "state": "Rejected"
+   }
+  ],
+  "workflow_name": "Depot Registration Workflow",
+  "workflow_state_field": "workflow_state"
+ },
+ {
+  "doctype": "Workflow",
+  "document_type": "Delivery Note",
+  "is_active": 1,
+  "name": "SCM Release Order",
+  "override_status": 0,
+  "send_email_alert": 0,
+  "states": [
+   {
+    "allow_edit": "Depot User",
+    "doc_status": "0",
+    "state": "Draft"
+   },
+   {
+    "allow_edit": "Depot Manager",
+    "doc_status": "1",
+    "state": "Release Order Issued"
+   }
+  ],
+  "transitions": [
+   {
+    "action": "Issue Release Order",
+    "allow_self_approval": 1,
+    "allowed": "Depot Manager",
+    "next_state": "Release Order Issued",
+    "state": "Draft"
+   }
+  ],
+  "workflow_name": "SCM Release Order",
+  "workflow_state_field": "workflow_state"
+ },
+ {
+  "doctype": "Workflow",
+  "document_type": "Supplementary Demand Statement",
+  "is_active": 1,
+  "name": "Supplementary Demand Statement Workflow",
+  "override_status": 0,
+  "send_email_alert": 0,
+  "states": [
+   {
+    "allow_edit": "URC Demand User",
+    "doc_status": "0",
+    "state": "Draft"
+   },
+   {
+    "allow_edit": "Regional Manager",
+    "doc_status": "0",
+    "state": "Pending Regional Approval"
+   },
+   {
+    "allow_edit": "Regional Manager",
+    "doc_status": "1",
+    "state": "Approved"
+   },
+   {
+    "allow_edit": "Regional Manager",
+    "doc_status": "0",
+    "state": "Rejected"
+   }
+  ],
+  "transitions": [
+   {
+    "action": "Submit for Approval",
+    "allow_self_approval": 1,
+    "allowed": "URC Demand User",
+    "next_state": "Pending Regional Approval",
+    "state": "Draft"
+   },
+   {
+    "action": "Approve",
+    "allow_self_approval": 1,
+    "allowed": "Regional Manager",
+    "next_state": "Approved",
+    "state": "Pending Regional Approval"
+   },
+   {
+    "action": "Reject",
+    "allow_self_approval": 1,
+    "allowed": "Regional Manager",
+    "next_state": "Rejected",
+    "state": "Pending Regional Approval"
+   },
+   {
+    "action": "Amend and Resubmit",
+    "allow_self_approval": 1,
+    "allowed": "URC Demand User",
+    "next_state": "Pending Regional Approval",
+    "state": "Rejected"
+   }
+  ],
+  "workflow_name": "Supplementary Demand Statement Workflow",
+  "workflow_state_field": "workflow_state"
+ },
+ {
+  "doctype": "Workflow",
+  "document_type": "Transport Claim Waiver",
+  "is_active": 1,
+  "name": "Transport Claim Waiver Workflow",
+  "override_status": 0,
+  "send_email_alert": 0,
+  "states": [
+   {
+    "allow_edit": "URC Demand User",
+    "doc_status": "0",
+    "state": "Draft"
+   },
+   {
+    "allow_edit": "Regional Manager",
+    "doc_status": "0",
+    "state": "Pending RM Approval"
+   },
+   {
+    "allow_edit": "Regional Manager",
+    "doc_status": "1",
+    "state": "Approved"
+   },
+   {
+    "allow_edit": "Regional Manager",
+    "doc_status": "0",
+    "state": "Rejected"
+   }
+  ],
+  "transitions": [
+   {
+    "action": "Request Waiver",
+    "allow_self_approval": 1,
+    "allowed": "URC Demand User",
+    "next_state": "Pending RM Approval",
+    "state": "Draft"
+   },
+   {
+    "action": "Approve Waiver",
+    "allow_self_approval": 1,
+    "allowed": "Regional Manager",
+    "next_state": "Approved",
+    "state": "Pending RM Approval"
+   },
+   {
+    "action": "Reject Waiver",
+    "allow_self_approval": 1,
+    "allowed": "Regional Manager",
+    "next_state": "Rejected",
+    "state": "Pending RM Approval"
+   }
+  ],
+  "workflow_name": "Transport Claim Waiver Workflow",
+  "workflow_state_field": "workflow_state"
+ },
+ {
+  "doctype": "Workflow",
+  "document_type": "URC Payment Advice",
+  "is_active": 1,
+  "name": "URC Payment Advice Approval",
+  "override_status": 0,
+  "send_email_alert": 0,
+  "states": [
+   {
+    "allow_edit": "URC Demand User",
+    "doc_status": "0",
+    "state": "Draft"
+   },
+   {
+    "allow_edit": "Depot Manager",
+    "doc_status": "0",
+    "state": "Under Review"
+   },
+   {
+    "allow_edit": "Depot Manager",
+    "doc_status": "1",
+    "state": "Approved"
+   }
+  ],
+  "transitions": [
+   {
+    "action": "Submit Payment",
+    "allow_self_approval": 0,
+    "allowed": "URC Demand User",
+    "next_state": "Under Review",
+    "state": "Draft"
+   },
+   {
+    "action": "Approve",
+    "allow_self_approval": 1,
+    "allowed": "Depot Manager",
+    "next_state": "Approved",
+    "state": "Under Review"
+   },
+   {
+    "action": "Return to URC",
+    "allow_self_approval": 1,
+    "allowed": "Depot Manager",
+    "next_state": "Draft",
+    "state": "Under Review"
+   }
+  ],
+  "workflow_name": "URC Payment Advice Approval",
+  "workflow_state_field": "workflow_state"
+ },
+ {
+  "doctype": "Workflow",
+  "document_type": "Project",
+  "is_active": 1,
+  "name": "Project Delegation Approval",
+  "override_status": 0,
+  "send_email_alert": 0,
+  "states": [
+   {
+    "allow_edit": "Depot User",
+    "doc_status": "0",
+    "state": "Draft"
+   },
+   {
+    "allow_edit": "Depot Manager",
+    "doc_status": "0",
+    "state": "Pending Depot Manager Approval"
+   },
+   {
+    "allow_edit": "Regional Manager",
+    "doc_status": "0",
+    "state": "Pending Regional Manager Approval"
+   },
+   {
+    "allow_edit": "Regional Manager",
+    "doc_status": "0",
+    "state": "Approved"
+   },
+   {
+    "allow_edit": "Depot Manager",
+    "doc_status": "0",
+    "state": "Rejected"
+   }
+  ],
+  "transitions": [
+   {
+    "action": "Submit for Approval",
+    "allow_self_approval": 1,
+    "allowed": "Depot User",
+    "next_state": "Pending Depot Manager Approval",
+    "state": "Draft"
+   },
+   {
+    "action": "Approve",
+    "allow_self_approval": 1,
+    "allowed": "Depot Manager",
+    "condition": "flt(doc.get('custom_estimated_cost') or 0) <= flt(doc.get('custom_depot_manager_limit') or 0)",
+    "next_state": "Approved",
+    "state": "Pending Depot Manager Approval"
+   },
+   {
+    "action": "Escalate to RM",
+    "allow_self_approval": 1,
+    "allowed": "Depot Manager",
+    "condition": "flt(doc.get('custom_estimated_cost') or 0) > flt(doc.get('custom_depot_manager_limit') or 0)",
+    "next_state": "Pending Regional Manager Approval",
+    "state": "Pending Depot Manager Approval"
+   },
+   {
+    "action": "Approve",
+    "allow_self_approval": 1,
+    "allowed": "Regional Manager",
+    "next_state": "Approved",
+    "state": "Pending Regional Manager Approval"
+   },
+   {
+    "action": "Reject",
+    "allow_self_approval": 1,
+    "allowed": "Depot Manager",
+    "next_state": "Rejected",
+    "state": "Pending Depot Manager Approval"
+   },
+   {
+    "action": "Reject",
+    "allow_self_approval": 1,
+    "allowed": "Regional Manager",
+    "next_state": "Rejected",
+    "state": "Pending Regional Manager Approval"
+   }
+  ],
+  "workflow_name": "Project Delegation Approval",
+  "workflow_state_field": "workflow_state"
+ },
+ {
+  "doctype": "Workflow",
+  "document_type": "Purchase Invoice",
+  "is_active": 1,
+  "name": "Expense Approval Workflow",
+  "override_status": 0,
+  "send_email_alert": 0,
+  "states": [
+   {
+    "allow_edit": "Accounts User",
+    "doc_status": "0",
+    "state": "Draft"
+   },
+   {
+    "allow_edit": "Accounts Manager",
+    "doc_status": "0",
+    "state": "Pending AM Approval"
+   },
+   {
+    "allow_edit": "Regional Manager",
+    "doc_status": "0",
+    "state": "Pending Regional Manager Approval"
+   },
+   {
+    "allow_edit": "Accounts Manager",
+    "doc_status": "0",
+    "state": "Approved"
+   },
+   {
+    "allow_edit": "Accounts Manager",
+    "doc_status": "0",
+    "state": "Rejected"
+   }
+  ],
+  "transitions": [
+   {
+    "action": "Submit for AM Approval",
+    "allow_self_approval": 1,
+    "allowed": "Accounts User",
+    "next_state": "Pending AM Approval",
+    "state": "Draft"
+   },
+   {
+    "action": "Approve",
+    "allow_self_approval": 1,
+    "allowed": "Accounts Manager",
+    "condition": "flt(doc.get('grand_total') or 0) <= flt(doc.get('custom_regional_manager_threshold') or 0) or flt(doc.get('custom_regional_manager_threshold') or 0) == 0",
+    "next_state": "Approved",
+    "state": "Pending AM Approval"
+   },
+   {
+    "action": "Escalate to RM",
+    "allow_self_approval": 1,
+    "allowed": "Accounts Manager",
+    "condition": "flt(doc.get('grand_total') or 0) > flt(doc.get('custom_regional_manager_threshold') or 0)",
+    "next_state": "Pending Regional Manager Approval",
+    "state": "Pending AM Approval"
+   },
+   {
+    "action": "Approve",
+    "allow_self_approval": 1,
+    "allowed": "Regional Manager",
+    "next_state": "Approved",
+    "state": "Pending Regional Manager Approval"
+   },
+   {
+    "action": "Reject",
+    "allow_self_approval": 1,
+    "allowed": "Accounts Manager",
+    "next_state": "Rejected",
+    "state": "Pending AM Approval"
+   },
+   {
+    "action": "Reject",
+    "allow_self_approval": 1,
+    "allowed": "Regional Manager",
+    "next_state": "Rejected",
+    "state": "Pending Regional Manager Approval"
+   }
+  ],
+  "workflow_name": "Expense Approval Workflow",
+  "workflow_state_field": "workflow_state"
+ },
+ {
+  "doctype": "Workflow",
+  "document_type": "SCM Market Intelligence",
+  "is_active": 1,
+  "name": "SCM Market Survey Workflow",
+  "override_status": 0,
+  "send_email_alert": 0,
+  "states": [
+   {
+    "allow_edit": "Regional Manager",
+    "doc_status": "0",
+    "state": "Issued by HO"
+   },
+   {
+    "allow_edit": "Regional Manager",
+    "doc_status": "0",
+    "state": "Assigned to RM"
+   },
+   {
+    "allow_edit": "Regional Manager",
+    "doc_status": "0",
+    "state": "In Progress"
+   },
+   {
+    "allow_edit": "Regional Manager",
+    "doc_status": "0",
+    "state": "Completed"
+   },
+   {
+    "allow_edit": "Regional Manager",
+    "doc_status": "0",
+    "state": "Closed"
+   }
+  ],
+  "transitions": [
+   {
+    "action": "Assign to RM",
+    "allow_self_approval": 1,
+    "allowed": "Regional Manager",
+    "next_state": "Assigned to RM",
+    "state": "Issued by HO"
+   },
+   {
+    "action": "Start Survey",
+    "allow_self_approval": 1,
+    "allowed": "Regional Manager",
+    "next_state": "In Progress",
+    "state": "Assigned to RM"
+   },
+   {
+    "action": "Complete Survey",
+    "allow_self_approval": 1,
+    "allowed": "Regional Manager",
+    "next_state": "Completed",
+    "state": "In Progress"
+   },
+   {
+    "action": "Close",
+    "allow_self_approval": 1,
+    "allowed": "Regional Manager",
+    "next_state": "Closed",
+    "state": "Completed"
+   }
+  ],
+  "workflow_name": "SCM Market Survey Workflow",
+  "workflow_state_field": "workflow_state"
+ },
+ {
+  "doctype": "Workflow",
+  "document_type": "Temporary Credit Request",
+  "is_active": 1,
+  "name": "Temporary Credit Request Approval",
+  "override_status": 0,
+  "send_email_alert": 0,
+  "states": [
+   {
+    "allow_edit": "URC Demand User",
+    "doc_status": "0",
+    "state": "URC Submitted"
+   },
+   {
+    "allow_edit": "Depot Manager",
+    "doc_status": "0",
+    "state": "Depot Review"
+   },
+   {
+    "allow_edit": "Regional Manager",
+    "doc_status": "0",
+    "state": "RM Review"
+   },
+   {
+    "allow_edit": "Regional Manager",
+    "doc_status": "1",
+    "state": "Approved"
+   },
+   {
+    "allow_edit": "Regional Manager",
+    "doc_status": "0",
+    "state": "Rejected"
+   }
+  ],
+  "transitions": [
+   {
+    "action": "Start Depot Review",
+    "allow_self_approval": 1,
+    "allowed": "Depot Manager",
+    "next_state": "Depot Review",
+    "state": "URC Submitted"
+   },
+   {
+    "action": "Forward to RM",
+    "allow_self_approval": 1,
+    "allowed": "Depot Manager",
+    "next_state": "RM Review",
+    "state": "Depot Review"
+   },
+   {
+    "action": "Reject",
+    "allow_self_approval": 1,
+    "allowed": "Depot Manager",
+    "next_state": "Rejected",
+    "state": "Depot Review"
+   },
+   {
+    "action": "Approve",
+    "allow_self_approval": 1,
+    "allowed": "Regional Manager",
+    "next_state": "Approved",
+    "state": "RM Review"
+   },
+   {
+    "action": "Reject",
+    "allow_self_approval": 1,
+    "allowed": "Regional Manager",
+    "next_state": "Rejected",
+    "state": "RM Review"
+   }
+  ],
+  "workflow_name": "Temporary Credit Request Approval",
+  "workflow_state_field": "workflow_state"
+ },
+ {
+  "doctype": "Workflow",
+  "document_type": "Dependency Request",
+  "is_active": 1,
+  "name": "Dependency Request Workflow",
+  "override_status": 0,
+  "send_email_alert": 0,
+  "states": [
+   {
+    "allow_edit": "Depot User",
+    "doc_status": "0",
+    "state": "Draft"
+   },
+   {
+    "allow_edit": "Depot Manager",
+    "doc_status": "0",
+    "state": "Under Review"
+   },
+   {
+    "allow_edit": "Depot Manager",
+    "doc_status": "0",
+    "state": "Approved"
+   },
+   {
+    "allow_edit": "Depot Manager",
+    "doc_status": "0",
+    "state": "Rejected"
+   }
+  ],
+  "transitions": [
+   {
+    "action": "Submit for Review",
+    "allow_self_approval": 0,
+    "allowed": "Depot User",
+    "next_state": "Under Review",
+    "state": "Draft"
+   },
+   {
+    "action": "Approve",
+    "allow_self_approval": 1,
+    "allowed": "Depot Manager",
+    "next_state": "Approved",
+    "state": "Under Review"
+   },
+   {
+    "action": "Reject",
+    "allow_self_approval": 1,
+    "allowed": "Depot Manager",
+    "next_state": "Rejected",
+    "state": "Under Review"
+   },
+   {
+    "action": "Reopen",
+    "allow_self_approval": 1,
+    "allowed": "Depot Manager",
+    "next_state": "Under Review",
+    "state": "Rejected"
+   },
+   {
+    "action": "Request Change",
+    "allow_self_approval": 1,
+    "allowed": "Depot Manager",
+    "next_state": "Under Review",
+    "state": "Approved"
+   }
+  ],
+  "workflow_name": "Dependency Request Workflow",
+  "workflow_state_field": "workflow_state"
+ },
+ {
+  "doctype": "Workflow",
+  "document_type": "URC Loan Request",
+  "is_active": 1,
+  "name": "URC Loan Request Workflow",
+  "override_status": 0,
+  "send_email_alert": 0,
+  "states": [
+   {
+    "allow_edit": "Depot Manager",
+    "doc_status": "0",
+    "state": "Draft"
+   },
+   {
+    "allow_edit": "Depot Manager",
+    "doc_status": "0",
+    "state": "Depot Review"
+   },
+   {
+    "allow_edit": "Accounts Manager",
+    "doc_status": "0",
+    "state": "Finance Approval"
+   },
+   {
+    "allow_edit": "Accounts Manager",
+    "doc_status": "0",
+    "state": "Approved"
+   },
+   {
+    "allow_edit": "Accounts Manager",
+    "doc_status": "0",
+    "state": "Disbursed"
+   }
+  ],
+  "transitions": [
+   {
+    "action": "Submit for Depot Review",
+    "allow_self_approval": 1,
+    "allowed": "Depot Manager",
+    "next_state": "Depot Review",
+    "state": "Draft"
+   },
+   {
+    "action": "Send to Finance",
+    "allow_self_approval": 1,
+    "allowed": "Depot Manager",
+    "next_state": "Finance Approval",
+    "state": "Depot Review"
+   },
+   {
+    "action": "Approve",
+    "allow_self_approval": 1,
+    "allowed": "Accounts Manager",
+    "next_state": "Approved",
+    "state": "Finance Approval"
+   },
+   {
+    "action": "Disburse",
+    "allow_self_approval": 1,
+    "allowed": "Accounts Manager",
+    "next_state": "Disbursed",
+    "state": "Approved"
+   }
+  ],
+  "workflow_name": "URC Loan Request Workflow",
+  "workflow_state_field": "workflow_state"
+ },
+ {
+  "doctype": "Workflow",
+  "document_type": "Excise Master Change Proposal",
+  "is_active": 1,
+  "name": "Excise Master Change Proposal Workflow",
+  "override_status": 0,
+  "send_email_alert": 0,
+  "states": [
+   {
+    "allow_edit": "Depot Manager",
+    "doc_status": "0",
+    "state": "Draft"
+   },
+   {
+    "allow_edit": "Depot Manager",
+    "doc_status": "0",
+    "state": "Submitted to HO"
+   },
+   {
+    "allow_edit": "Accounts Manager",
+    "doc_status": "0",
+    "state": "Approved"
+   },
+   {
+    "allow_edit": "Accounts Manager",
+    "doc_status": "0",
+    "state": "Rejected"
+   }
+  ],
+  "transitions": [
+   {
+    "action": "Submit to HO",
+    "allow_self_approval": 1,
+    "allowed": "Depot Manager",
+    "next_state": "Submitted to HO",
+    "state": "Draft"
+   },
+   {
+    "action": "Approve",
+    "allow_self_approval": 1,
+    "allowed": "Accounts Manager",
+    "next_state": "Approved",
+    "state": "Submitted to HO"
+   },
+   {
+    "action": "Reject",
+    "allow_self_approval": 1,
+    "allowed": "Accounts Manager",
+    "next_state": "Rejected",
+    "state": "Submitted to HO"
+   },
+   {
+    "action": "Edit",
+    "allow_self_approval": 1,
+    "allowed": "Depot Manager",
+    "next_state": "Draft",
+    "state": "Rejected"
+   }
+  ],
+  "workflow_name": "Excise Master Change Proposal Workflow",
   "workflow_state_field": "workflow_state"
  }
 ]

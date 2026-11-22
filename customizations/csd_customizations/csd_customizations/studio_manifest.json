@@ -546,6 +546,89 @@
    "title": "Supplier CPS — hide duplicates, enforce canonical fields, add validation, recreate portal form"
   },
   {
+   "change_set": "01M61K2Z442D37YXHQMK7HQC9N",
+   "created_by": "run:35a0f78fc737",
+   "operations": [
+    "Create workspace HTML block \"SRM Tiles\"",
+    "Create workspace \"SRM Home\" with 0 number card(s), 0 chart(s) and 7 shortcut(s)"
+   ],
+   "requirements": [
+    100021
+   ],
+   "risk": "low",
+   "session": "35a0f78fc737",
+   "title": "Add SRM Tiles HTML Block and SRM Home Workspace with Report Shortcuts"
+  },
+  {
+   "change_set": "01M61KAQ65AKAZN26M4HKP285D",
+   "created_by": "run:fdc26bc1b603",
+   "operations": [
+    "Create workspace HTML block \"demo-pilot-banner\"",
+    "Create workspace HTML block \"srm-tiles-block\"",
+    "Create workspace \"SRM Home\" with 0 number card(s), 0 chart(s) and 0 shortcut(s)"
+   ],
+   "requirements": [
+    100022
+   ],
+   "risk": "low",
+   "session": "fdc26bc1b603",
+   "title": "Restore SRM Home workspace: demo banner + SRM Tiles HTML block; recreate workspace"
+  },
+  {
+   "change_set": "01M61KFSR4NCC2TGD24QVNKKDQ",
+   "created_by": "run:eb42a0ab6caa",
+   "operations": [
+    "Create workspace HTML block \"demo-pilot banner\"",
+    "Create workspace HTML block \"SRM Tiles\"",
+    "Create workspace \"SRM Home\" with 0 number card(s), 0 chart(s) and 0 shortcut(s)"
+   ],
+   "requirements": [
+    100023
+   ],
+   "risk": "low",
+   "session": "eb42a0ab6caa",
+   "title": "SRM Home workspace and HTML blocks repair"
+  },
+  {
+   "change_set": "01M61WVBNS62QRK7V9Z0MKM0WM",
+   "created_by": "run:80b11d5a232c",
+   "operations": [
+    "Add server script \"supplier_onboarding_validation\" on Supplier (before save)"
+   ],
+   "requirements": [
+    100122
+   ],
+   "risk": "medium",
+   "session": "80b11d5a232c",
+   "title": "Overwrite Supplier server validation script to remove .format() usage"
+  },
+  {
+   "change_set": "01M61WWR0V30BDGBCZ7F7VDD0N",
+   "created_by": "run:99a23453783f",
+   "operations": [
+    "Add server script \"Supplier_CSD_Autovalidation\" on Supplier (before save)"
+   ],
+   "requirements": [
+    100123
+   ],
+   "risk": "medium",
+   "session": "99a23453783f",
+   "title": "Fix Supplier_CSD_Autovalidation server script"
+  },
+  {
+   "change_set": "01M61WY7PEFQT1AJ9GHV0DQN4M",
+   "created_by": "run:e5701161ac25",
+   "operations": [
+    "Add server script \"Supplier - CSD Supplier Auto-Validation\" on Supplier (before save)"
+   ],
+   "requirements": [
+    100124
+   ],
+   "risk": "medium",
+   "session": "e5701161ac25",
+   "title": "Replace Supplier CSD auto-validation server script"
+  },
+  {
    "change_set": "01M61XG4GZNWAHXNXK8NA1YXHA",
    "created_by": "run:c52c9dd424e0",
    "operations": [
@@ -1274,6 +1357,52 @@
    "title": "Add SRM Contrast Fix List client script for Supplier Change Request"
   },
   {
+   "change_set": "01M6JPPC8DPSTMF679AY0XRZD7",
+   "created_by": "run:57b81e5e5c36",
+   "operations": [
+    "Create role \"HR Reviewer\"",
+    "Create role \"Department Head\"",
+    "Create child table \"Case Movement\" in module Custom with 4 fields and 1 role permission(s)",
+    "Create DocType \"Case\" in module Custom with 11 fields and 3 role permission(s)",
+    "Create workflow \"Case Approval\" on Case: 6 states, 6 transitions",
+    "Create email notification \"Case Pending Reminder\" on Case (Days After)",
+    "Create number card \"Open Cases\": Count on Case",
+    "Create bar chart \"Cases by State\" on Case",
+    "Create bar chart \"Cases by Owner\" on Case",
+    "Create dashboard \"Case Dashboard\" with 2 chart(s) and 1 number card(s)",
+    "Create workspace \"Case Management\" with 1 number card(s), 2 chart(s) and 4 shortcut(s)"
+   ],
+   "requirements": [
+    100181,
+    100182
+   ],
+   "risk": "high",
+   "session": "57b81e5e5c36",
+   "title": "Case Management (Custom) – Workflow, Notification, Dashboard"
+  },
+  {
+   "change_set": "01M6JR25VJHH0N81WCNXNKNBXT",
+   "created_by": "run:a4de76b0150f",
+   "operations": [
+    "Add Int field \"Days Open\" (custom_days_open) to Case",
+    "Add Link field \"Assigned Role\" (custom_assigned_role) to Case, options: Role",
+    "Add Link field \"To Role\" (custom_to_role) to Case Movement, options: Role",
+    "Set read_only = True on field \"movements\" of Case",
+    "Add server script \"case_append_movement_and_compute_days\" on Case (before save)",
+    "Add server script \"prevent_edit_of_existing_case_movement_rows\" on Case Movement (before save)",
+    "Create report \"Case Lifecycle\" on Case with 9 columns",
+    "Create report \"Case Ageing\" on Case with 7 columns",
+    "Create number card \"Average Days Open\": Average of custom_days_open on Case",
+    "Create email notification \"Case Escalated Alert\" on Case (Value Change)"
+   ],
+   "requirements": [
+    100183
+   ],
+   "risk": "medium",
+   "session": "a4de76b0150f",
+   "title": "Case Assignment Log, Ageing KPIs, and Escalation Alert"
+  },
+  {
    "change_set": "01M6K5XPESJVQ5ZFY15PCWHQMN",
    "created_by": "run:2cd4d36085c3",
    "operations": [
@@ -1383,6 +1512,781 @@
    "risk": "high",
    "session": "17e74b372253",
    "title": "SRM PoC: Registry lookup, Fee receipts, and DMS POC (ops-only)"
+  },
+  {
+   "change_set": "01M81C8VYHFMVDKXC5GHB8555A",
+   "created_by": "run:13eb1228c96d",
+   "operations": [
+    "Add Select field \"Demand Cycle\" (custom_demand_cycle) to Material Request, mandatory, options: PD / FD",
+    "Add Data field \"MSTC Reference\" (custom_mstc_reference) to Material Request",
+    "Set reqd = True on field \"customer\" of Material Request",
+    "Add server script \"SCM_require_mstc_before_forward_to_ho\" on Material Request (before save)",
+    "Add server script \"SCM_require_fd_before_submit\" on Material Request (before submit)",
+    "Create workflow \"SCM PD FD Cycle\" on Material Request: 6 states, 6 transitions",
+    "Grant role \"Customer\" on Material Request (level 0): read, write, create",
+    "Create portal web form \"SCM Provisional Demand\" (/scm-provisional-demand) on Material Request with 7 field(s)",
+    "Create system notification notification \"SCM New PD\" on Material Request (New)",
+    "Create system notification notification \"SCM Forwarded to HO\" on Material Request (Value Change)",
+    "Create system notification notification \"SCM MR Approved (FD Submitted)\" on Material Request (Submit)"
+   ],
+   "requirements": [
+    199,
+    200,
+    202,
+    203
+   ],
+   "risk": "high",
+   "session": "13eb1228c96d",
+   "title": "SCM PD/FD Demand on Material Request with Portal Intake and Validations"
+  },
+  {
+   "change_set": "01M81CCTRPWNEDPJK4BK6NSMT4",
+   "created_by": "run:13eb1228c96d",
+   "operations": [
+    "Create role \"Depot User\"",
+    "Add Check field \"Converted to Permit\" (custom_is_permit) to Purchase Order after workflow_state",
+    "Add Date field \"Permit Date\" (custom_permit_date) to Purchase Order after custom_is_permit",
+    "Add Link field \"Permit By\" (custom_permit_by) to Purchase Order after custom_permit_date, options: User",
+    "Add Check field \"Converted to Permit\" (custom_is_permit) to Sales Order after status",
+    "Add Date field \"Permit Date\" (custom_permit_date) to Sales Order after custom_is_permit",
+    "Add Link field \"Permit By\" (custom_permit_by) to Sales Order after custom_permit_date, options: User",
+    "Add Link field \"Depot (Warehouse)\" (custom_depot) to Supplier Product Registration, mandatory, options: Warehouse",
+    "Add Link field \"Brand\" (custom_brand) to Supplier Product Registration, mandatory, options: Brand",
+    "Add Data field \"Label Name\" (custom_label_name) to Supplier Product Registration",
+    "Add client script \"PO Permit Conversion Button\" to the Purchase Order form",
+    "Add client script \"SO Permit Conversion Button\" to the Sales Order form",
+    "Create workflow \"Depot Registration Workflow\" on Supplier Product Registration: 4 states, 4 transitions",
+    "Grant role \"Depot User\" on Supplier Product Registration (level 0): read, write, create, print, email",
+    "Create print format \"Depot Permit (PO)\" for Purchase Order",
+    "Create print format \"Depot Permit (SO)\" for Sales Order",
+    "Create email notification \"Depot Registration Submitted\" on Supplier Product Registration (Value Change)",
+    "Create report \"SCM Purchase Orders by Supplier and Period\" on Purchase Order with 5 columns",
+    "Create bar chart \"SCM POs by Supplier (Count)\" on Purchase Order",
+    "Create number card \"SCM Open POs\": Count on Purchase Order",
+    "Create dashboard \"SCM Procurement\" with 1 chart(s) and 1 number card(s)"
+   ],
+   "requirements": [
+    215,
+    216,
+    222
+   ],
+   "risk": "high",
+   "session": "13eb1228c96d",
+   "title": "SCM Depot: Permit Conversion, Depot Brand/Label Registration, PO Visibility"
+  },
+  {
+   "change_set": "01M81CV2GQK02JQNM6ST0FNZ5H",
+   "created_by": "run:13eb1228c96d",
+   "operations": [
+    "Add Select field \"Order Category\" (custom_order_category) to Purchase Order after supplier, options: Regular / Supplementary / Initial / Confirmatory",
+    "Add Select field \"Order Category\" (custom_order_category) to Material Request after material_request_type, options: Regular / Supplementary / Initial / Confirmatory",
+    "Add Link field \"Bank Guarantee\" (custom_bank_guarantee) to Purchase Order after supplier_name, mandatory, options: Bank Guarantee",
+    "Add Check field \"Restricted for Purchase Orders\" (custom_is_restricted_to_order) to Supplier",
+    "Add Small Text field \"Restriction Reason\" (custom_restriction_reason) to Supplier",
+    "Set reqd = True on field \"set_warehouse\" of Purchase Order",
+    "Set reqd = True on field \"set_warehouse\" of Material Request",
+    "Add server script \"PO_validate_bg_and_supplier_restriction\" on Purchase Order (before submit)"
+   ],
+   "requirements": [
+    223,
+    224,
+    230
+   ],
+   "risk": "medium",
+   "session": "13eb1228c96d",
+   "title": "SCM – Order Categories, Depot Tagging, BG Enforcement and Supplier Restrictions"
+  },
+  {
+   "change_set": "01M81D17YTJF2WKM063R1XX3V0",
+   "created_by": "run:13eb1228c96d",
+   "operations": [
+    "Create role \"Depot Manager\"",
+    "Add Link field \"URC Material Request\" (custom_urc_material_request) to Delivery Note after company, options: Material Request",
+    "Add Check field \"Is URC\" (custom_is_urc) to Customer after customer_group",
+    "Add Link field \"Default Depot Warehouse\" (custom_depot_warehouse) to Customer after custom_is_urc, options: Warehouse",
+    "Set in_standard_filter = True on field \"workflow_state\" of Material Request",
+    "Add client script \"Material Request - Issue Release Order Button\" to the Material Request form",
+    "Create workflow \"SCM Release Order\" on Delivery Note: 2 states, 1 transitions",
+    "Grant role \"Depot Manager\" on Material Request (level 0): read, report, print, email",
+    "Grant role \"Depot User\" on Material Request (level 0): read, report, print, email",
+    "Grant role \"Depot Manager\" on Delivery Note (level 0): read, write, create, submit, cancel, report, print, email",
+    "Create report \"SCM URC Requests\" on Material Request with 8 columns",
+    "Create pie chart \"SCM Material Requests by State\" on Material Request",
+    "Create number card \"SCM Material Requests (Count)\": Count on Material Request",
+    "Create workspace HTML block \"SCM Depot Banner\"",
+    "Create print format \"SCM Payment Acknowledgement\" for Payment Entry",
+    "Create email notification \"SCM URC Payment Acknowledged\" on Payment Entry (Submit)",
+    "Create print format \"SCM Release Order\" for Delivery Note",
+    "Create system notification notification \"SCM MR Approved - Notify Depot\" on Material Request (Value Change)",
+    "Create system notification notification \"SCM New URC Created\" on Customer (New)",
+    "Create workspace \"SCM Depot\" with 1 number card(s), 1 chart(s) and 2 shortcut(s)"
+   ],
+   "requirements": [
+    256,
+    257,
+    265,
+    266,
+    268
+   ],
+   "risk": "high",
+   "session": "13eb1228c96d",
+   "title": "SCM Depot: URC Payments, Release Orders and Visibility"
+  },
+  {
+   "change_set": "01M81D4J48ESSDFKHTKFBNJDTX",
+   "created_by": "run:13eb1228c96d",
+   "operations": [
+    "Add Data field \"QD Number\" (custom_qd_number) to Material Request",
+    "Add Date field \"QD Release Date\" (custom_qd_release_date) to Material Request",
+    "Add Small Text field \"QD Remarks\" (custom_qd_remarks) to Material Request",
+    "Add Attach field \"Utilization Certificate\" (custom_utilization_certificate) to Material Request",
+    "Add Date field \"Utilization Certificate Date\" (custom_utilization_certificate_date) to Material Request",
+    "Add Currency field \"Utilization Amount\" (custom_utilization_certificate_amount) to Material Request",
+    "Set mandatory_depends_on = eval:doc.custom_qd_release_date on field \"custom_utilization_certificate\" of Material Request",
+    "Set in_standard_filter = True on field \"custom_qd_release_date\" of Material Request",
+    "Set in_standard_filter = True on field \"custom_utilization_certificate_date\" of Material Request",
+    "Add server script \"SCM MR - Require UC if QD released\" on Material Request (before submit)",
+    "Grant role \"Depot User\" on Material Request (level 0): read, write, report, print, email, share",
+    "Create email notification \"SCM Utilization Certificate Received\" on Material Request (Value Change)",
+    "Create report \"SCM QD Tracker\" on Material Request with 9 columns"
+   ],
+   "requirements": [
+    276
+   ],
+   "risk": "high",
+   "session": "13eb1228c96d",
+   "title": "SCM QD and Utilization Certificate (MR-centric) – Minimal Config Pack"
+  },
+  {
+   "change_set": "01M81EN4FKAR6D2BY60ZN6N7AW",
+   "created_by": "run:f789fb9228f6",
+   "operations": [
+    "Add Data field \"CSD Index Code\" (custom_csd_index_code) to Item",
+    "Add Check field \"QD Item\" (custom_is_qd) to Item",
+    "Add Currency field \"URC Credit Amount\" (custom_urc_credit_amount) to Material Request",
+    "Add Link field \"URC Credit Reference\" (custom_urc_credit_reference) to Material Request, options: Journal Entry",
+    "Add Check field \"URC Credit Posted\" (custom_urc_credit_posted) to Material Request",
+    "Set read_only = True on field \"custom_urc_credit_posted\" of Material Request",
+    "Create report \"SCM QD Items Master\" on Item with 6 columns",
+    "Create report \"SCM Available Stock by Warehouse\" on Bin with 3 columns",
+    "Create bar chart \"SCM QD Items by Index (Count)\" on Item",
+    "Create bar chart \"SCM Bins with Stock (Count) by Warehouse\" on Bin",
+    "Create workspace HTML block \"SCM QD Overview Banner\"",
+    "Create print format \"SCM Utilization Certificate\" for Material Request",
+    "Create email notification \"SCM Forward UC to F&A\" on Material Request (Days After)",
+    "Create dashboard \"SCM QD Overview\" with 2 chart(s) and 0 number card(s)"
+   ],
+   "requirements": [
+    277
+   ],
+   "risk": "medium",
+   "session": "f789fb9228f6",
+   "title": "SCM QD visibility and Utilization Certificate forwarding"
+  },
+  {
+   "change_set": "01M81FCM041434Z97H4KA3Q5DD",
+   "created_by": "run:73c0bcfa352b",
+   "operations": [
+    "Add Link field \"Depot\" (custom_depot) to Purchase Order, options: Warehouse",
+    "Set description = Depot (Warehouse) selected for this PO. When set, supplier_warehouse is defaulted from this depot if empty. on field \"custom_depot\" of Purchase Order",
+    "Set label = Depot on field \"custom_depot\" of Purchase Order",
+    "Add server script \"PO_set_supplier_warehouse_from_depot\" on Purchase Order (before insert)",
+    "Create email notification \"SCM PO Submitted - Notify Supplier\" on Purchase Order (Submit)",
+    "Create email notification \"SCM PO Submitted - Notify Depot\" on Purchase Order (Submit)",
+    "Create email notification \"SCM PO WorkflowState TNA or Denied - Notify SCM and Depot\" on Purchase Order (Value Change)",
+    "Create email notification \"SCM MR WorkflowState TNA or Denied - Notify SCM and Depot\" on Material Request (Value Change)"
+   ],
+   "requirements": [
+    225,
+    226,
+    231
+   ],
+   "risk": "medium",
+   "session": "73c0bcfa352b",
+   "title": "SCM: Depot-specific PO, notifications for PO/MR status changes, and defaults"
+  },
+  {
+   "change_set": "01M81FJ79X86E55J82BV5D0F13",
+   "created_by": "run:73c0bcfa352b",
+   "operations": [
+    "Create role \"URC Demand User\"",
+    "Create role \"LIF Reviewer\"",
+    "Create role \"CS Directorate\"",
+    "Add Link field \"URC Requester\" (custom_urc_requester) to Material Request, options: User",
+    "Add Link field \"LIF Reviewer\" (custom_lif_reviewer_user) to Material Request, options: User",
+    "Add Check field \"LIF Reviewed\" (custom_lif_reviewed) to Material Request",
+    "Add Link field \"AGM Secretariat Reviewer\" (custom_agm_secy_user) to Material Request, options: User",
+    "Add Check field \"AGM Secretariat Reviewed\" (custom_agm_secy_reviewed) to Material Request",
+    "Add Link field \"CS Directorate Reviewer\" (custom_cs_dir_user) to Material Request, options: User",
+    "Add Check field \"CS Directorate Reviewed\" (custom_cs_dir_reviewed) to Material Request",
+    "Add client script \"Material Request - SCM cascading reviewers\" to the Material Request form",
+    "Add server script \"Material Request - Enforce URC review chain\" on Material Request (before submit)",
+    "Grant role \"URC Demand User\" on Material Request (level 0): read, write, create",
+    "Grant role \"LIF Reviewer\" on Material Request (level 0): read, write",
+    "Grant role \"AGM Secretariat\" on Material Request (level 0): read, write",
+    "Grant role \"CS Directorate\" on Material Request (level 0): read, write",
+    "Create email notification \"SCM MR - Notify LIF Reviewer\" on Material Request (New)",
+    "Create email notification \"SCM MR - Notify AGM Secretariat\" on Material Request (Value Change)",
+    "Create email notification \"SCM MR - Notify CS Directorate\" on Material Request (Value Change)",
+    "Create email notification \"SCM MR - Reviewer Chain Complete (Notify URC)\" on Material Request (Value Change)"
+   ],
+   "requirements": [
+    211,
+    264
+   ],
+   "risk": "high",
+   "session": "73c0bcfa352b",
+   "title": "SCM Demand Reviews on Material Request (URC → LIF → AGM Secretariat → CS Directorate)"
+  },
+  {
+   "change_set": "01M81FP23B3A1WABPDJ2R8E7Z2",
+   "created_by": "run:73c0bcfa352b",
+   "operations": [
+    "Add Check field \"Auto Create Purchase Order\" (custom_auto_create_po) to Material Request",
+    "Add Link field \"Auto PO Supplier\" (custom_auto_po_supplier) to Material Request, options: Supplier",
+    "Add Link field \"Alternate Item (if available)\" (custom_alternate_item) to Material Request Item, options: Item",
+    "Set mandatory_depends_on = eval:doc.custom_auto_create_po on field \"custom_auto_po_supplier\" of Material Request",
+    "Add server script \"SCM_auto_create_po_from_approved_mr\" on Material Request (after submit)",
+    "Add client script \"SCM_MR_Item_Suggest_Alternate\" to the Material Request Item form",
+    "Create email notification \"SCM MR Submitted Notify Purchase\" on Material Request (Submit)",
+    "Create report \"SCM Auto Generated POs\" on Purchase Order with 5 columns",
+    "Create number card \"SCM Draft POs\": Count on Purchase Order"
+   ],
+   "requirements": [
+    217
+   ],
+   "risk": "medium",
+   "session": "73c0bcfa352b",
+   "title": "SCM Auto‑PO from Approved MR and Alternate Item Suggestion"
+  },
+  {
+   "change_set": "01M81HJEZX8ABJ1VNQB7H3XWC9",
+   "created_by": "run:b10699c733a1",
+   "operations": [
+    "Create role \"Regional Manager\"",
+    "Create DocType \"Consolidated Demand\" in module Custom with 6 fields and 3 role permission(s)",
+    "Create child table \"Collection Schedule Line\" in module Custom with 6 fields and 2 role permission(s)",
+    "Create DocType \"Collection Schedule\" in module Custom with 5 fields and 2 role permission(s)",
+    "Add Float field \"Minimum Order Quantity\" (custom_min_order_qty) to Warehouse",
+    "Add Float field \"Maximum Order Quantity\" (custom_max_order_qty) to Warehouse",
+    "Add Link field \"Supplier\" (custom_supplier) to Promotional Scheme, options: Supplier",
+    "Add Link field \"URC (Customer)\" (custom_urc) to Collection Schedule, mandatory, options: Customer",
+    "Add Data field \"URC Notification Email\" (custom_recipient_email) to Collection Schedule, mandatory, options: Email",
+    "Add server script \"MR_enforce_warehouse_thresholds\" on Material Request (before save)",
+    "Grant role \"Depot User\" on Promotional Scheme (level 0): read, report, print",
+    "Grant role \"Depot Manager\" on Promotional Scheme (level 0): read, report, print",
+    "Grant role \"URC Demand User\" on Promotional Scheme (level 0): read, report, print",
+    "Grant role \"Regional Manager\" on Promotional Scheme (level 0): read, report, print",
+    "Create report \"SCM Promotional Schemes\" on Promotional Scheme with 5 columns",
+    "Create email notification \"SCM Promotional Scheme - New Notify Depot and RM\" on Promotional Scheme (New)",
+    "Create email notification \"SCM Collection Schedule - Notify URC Days Before\" on Collection Schedule (Days Before)"
+   ],
+   "requirements": [
+    212,
+    213,
+    235,
+    239
+   ],
+   "risk": "high",
+   "session": "b10699c733a1",
+   "title": "SCM consolidation, thresholds, promotions access/alerts, and collection scheduling (corrected)"
+  },
+  {
+   "change_set": "01M81J0682YFBMMAFWJPA8DQHE",
+   "created_by": "run:b10699c733a1",
+   "operations": [
+    "Create role \"Regional Manager\"",
+    "Create DocType \"Supplementary Demand Statement\" in module Stock with 8 fields and 4 role permission(s)",
+    "Create DocType \"Transport Claim Waiver\" in module Stock with 7 fields and 4 role permission(s)",
+    "Create DocType \"SCM Market Intelligence\" in module Buying with 7 fields and 4 role permission(s)",
+    "Add Select field \"Storage Requirement\" (custom_storage_requirement) to Item, options: Ambient / Chilled / Frozen",
+    "Add Select field \"Storage Type\" (custom_storage_type) to Warehouse, options: Ambient / Chilled / Frozen",
+    "Add server script \"SE Enforce Storage Type\" on Stock Entry (before submit)",
+    "Add server script \"PR Enforce Storage Type\" on Purchase Receipt (before submit)",
+    "Create workflow \"Supplementary Demand Statement Workflow\" on Supplementary Demand Statement: 4 states, 4 transitions",
+    "Create workflow \"Transport Claim Waiver Workflow\" on Transport Claim Waiver: 4 states, 3 transitions",
+    "Create report \"SCM Depot Stock Overview\" on Bin with 5 columns",
+    "Create report \"SCM Supplementary Statements\" on Supplementary Demand Statement with 7 columns",
+    "Create report \"SCM Market Intelligence Report\" on SCM Market Intelligence with 7 columns",
+    "Create bar chart \"SCM Depot Stock Levels Chart\" on Bin",
+    "Create number card \"SCM Low Stock Bins\": Count on Bin",
+    "Create system notification notification \"SDS - Pending RM Approval\" on Supplementary Demand Statement (Value Change)",
+    "Create system notification notification \"TCW - Pending RM Approval\" on Transport Claim Waiver (Value Change)",
+    "Create workspace HTML block \"SCM RM Banner\"",
+    "Create dashboard \"SCM Regional Manager Dashboard\" with 1 chart(s) and 1 number card(s)",
+    "Create workspace \"SCM Regional Manager\" with 1 number card(s), 1 chart(s) and 3 shortcut(s)"
+   ],
+   "requirements": [
+    306,
+    307,
+    309,
+    312,
+    326
+   ],
+   "risk": "high",
+   "session": "b10699c733a1",
+   "title": "SCM Regional Manager: Supplementary Demands, Storage Controls, Short/Surplus, Waiver Approval, Market Intelligence"
+  },
+  {
+   "change_set": "01M81JN1MEN3FP378XZMQ0XAQJ",
+   "created_by": "run:b10699c733a1",
+   "operations": [
+    "Create DocType \"URC Payment Advice\" in module CSD Customizations with 9 fields and 4 role permission(s)",
+    "Add Int field \"Acknowledgement SLA (Days)\" (custom_ack_sla_days) to Purchase Order",
+    "Add Currency field \"Penalty Amount\" (custom_penalty_amount) to Purchase Order",
+    "Add Link field \"Penalty Journal Entry\" (custom_penalty_journal_entry) to Purchase Order, options: Journal Entry",
+    "Set allow_on_submit = 1 on field \"custom_penalty_amount\" of Purchase Order",
+    "Set allow_on_submit = 1 on field \"custom_penalty_journal_entry\" of Purchase Order",
+    "Set in_standard_filter = 1 on field \"custom_demand_cycle\" of Material Request",
+    "Set in_standard_filter = 1 on field \"custom_order_category\" of Material Request",
+    "Create workflow \"URC Payment Advice Approval\" on URC Payment Advice: 3 states, 3 transitions",
+    "Create portal web form \"URC Invoice Payment\" (/urc-invoice-payment) on URC Payment Advice with 7 field(s)",
+    "Create system notification notification \"URC Payment Advice Submitted - Notify Depot Manager\" on URC Payment Advice (Save)",
+    "Create print format \"URC Payment Receipt\" for URC Payment Advice",
+    "Create email notification \"PO Acknowledgement SLA Breach - Action Penalty\" on Purchase Order (Days After)",
+    "Create report \"SCM Store Orders - Pending Approval\" on Material Request with 8 columns"
+   ],
+   "requirements": [
+    219,
+    237
+   ],
+   "risk": "high",
+   "session": "b10699c733a1",
+   "title": "CSD SCM – URC Payment Advice, PO Acknowledgement SLA, Store Order Filters/Report"
+  },
+  {
+   "change_set": "01M81JR14ZKWK75HZ1BEMC9C6E",
+   "created_by": "run:b10699c733a1",
+   "operations": [
+    "Add Link field \"URC Payables Account\" (custom_urc_payables_account) to Company, options: Account",
+    "Add Link field \"URC Clearing Account\" (custom_urc_clearing_account) to Company, options: Account",
+    "Set mandatory_depends_on = eval:doc.custom_demand_cycle=='QD' on field \"custom_qd_number\" of Material Request",
+    "Set mandatory_depends_on = eval:doc.custom_demand_cycle=='QD' on field \"custom_qd_release_date\" of Material Request",
+    "Set description = Required when Demand Cycle is QD on field \"custom_qd_number\" of Material Request",
+    "Set options = PD\nFD\nQD on field \"custom_demand_cycle\" of Material Request",
+    "Add server script \"Material Request - Require QD Fields\" on Material Request (before submit)",
+    "Add server script \"Material Request - Post URC Credit\" on Material Request (after submit)",
+    "Create report \"SCM QD Index Availability\" on Bin with 5 columns",
+    "Create number card \"SCM QD Items In Stock\": Count on Bin",
+    "Create workspace HTML block \"SCM Depot Banner\"",
+    "Create report \"SCM Depot Demands\" on Material Request with 9 columns",
+    "Create workspace \"SCM Depot Overview\" with 1 number card(s), 0 chart(s) and 2 shortcut(s)"
+   ],
+   "requirements": [
+    207,
+    274,
+    278,
+    280
+   ],
+   "risk": "medium",
+   "session": "b10699c733a1",
+   "title": "SCM: QD availability, URC credit posting, and QD cycle controls"
+  },
+  {
+   "change_set": "01M81KVPM0MKMMKZXA4QDBAPX3",
+   "created_by": "run:c1f357718847",
+   "operations": [
+    "Create workspace HTML block \"SCM BI Banner\"",
+    "Create number card \"SCM Open Material Requests\": Count on Material Request",
+    "Create number card \"SCM Open Purchase Orders\": Count on Purchase Order",
+    "Create number card \"SCM Purchase Order Value\": Sum of grand_total on Purchase Order",
+    "Create number card \"SCM Pending URC Payment Advices\": Count on URC Payment Advice",
+    "Create pie chart \"SCM Purchase Orders by Supplier\" on Purchase Order",
+    "Create donut chart \"SCM Material Requests by Status\" on Material Request",
+    "Create bar chart \"SCM Stock by Warehouse\" on Bin",
+    "Create workspace \"SCM BI Home\" with 4 number card(s), 3 chart(s) and 2 shortcut(s)"
+   ],
+   "requirements": [
+    100193
+   ],
+   "risk": "low",
+   "session": "c1f357718847",
+   "title": "SCM Executive BI – SRM-branded workspace, cards and charts"
+  },
+  {
+   "change_set": "01M81KWSNS8AMMXVFF9WER0A94",
+   "created_by": "run:ba34b115737b",
+   "operations": [
+    "Create DocType \"Beneficiary Quota Rule\" in module Custom with 4 fields and 4 role permission(s)",
+    "Add Link field \"Beneficiary Designation\" (custom_beneficiary_designation) to Material Request after customer, options: Designation",
+    "Add Data field \"Beneficiary Rank\" (custom_beneficiary_rank) to Material Request after custom_beneficiary_designation",
+    "Set mandatory_depends_on = eval:doc.material_request_type=='Material Issue' on field \"custom_beneficiary_designation\" of Material Request",
+    "Set mandatory_depends_on = eval:doc.material_request_type=='Material Issue' on field \"custom_beneficiary_rank\" of Material Request",
+    "Add server script \"SCM Enforce Beneficiary Monthly Quota\" on Material Request (before submit)",
+    "Create report \"SCM - Material Requests by Workflow State\" on Material Request with 8 columns",
+    "Create pie chart \"Material Requests by Workflow State\" on Material Request",
+    "Create dashboard \"SCM Approvals\" with 1 chart(s) and 0 number card(s)"
+   ],
+   "requirements": [
+    210,
+    252
+   ],
+   "risk": "medium",
+   "session": "ba34b115737b",
+   "title": "SCM Quota Enforcement and Approvals Visibility (ERPNext v15)"
+  },
+  {
+   "change_set": "01M81MN7G048W2D7095S3164DK",
+   "created_by": "run:e98c618003c2",
+   "operations": [
+    "Add Link field \"Workflow State\" (custom_workflow_state) to Consolidated Demand, options: Workflow State",
+    "Add Link field \"Depot Approver\" (custom_depot_approver) to Consolidated Demand, options: User",
+    "Add Link field \"Regional Manager Approver\" (custom_rm_approver) to Consolidated Demand, options: User",
+    "Add Link field \"HO Approver\" (custom_ho_approver) to Consolidated Demand, options: User",
+    "Add Small Text field \"Regional Manager Comments\" (custom_rm_comments) to Consolidated Demand",
+    "Add Check field \"Authenticated\" (custom_authenticated) to URC Payment Advice",
+    "Add Select field \"Authentication Method\" (custom_auth_method) to URC Payment Advice, options: Manual / Bank Reconciliation / Gateway Callback / Other",
+    "Add Small Text field \"Authentication Notes\" (custom_auth_notes) to URC Payment Advice",
+    "Add server script \"cd_require_rm_before_ho_submit\" on Consolidated Demand (before submit)",
+    "Add server script \"urc_payment_auth_required_on_submit\" on URC Payment Advice (before submit)",
+    "Create daily scheduled job \"Daily Consolidated Demand Aggregation\"",
+    "Create email notification \"Consolidated Demand - Pending RM Approval\" on Consolidated Demand (New)",
+    "Create email notification \"Consolidated Demand - RM Approved - Notify HO\" on Consolidated Demand (Save)",
+    "Create email notification \"URC Payment Advice - Submitted - Notify Depot Manager\" on URC Payment Advice (Submit)"
+   ],
+   "requirements": [
+    201,
+    208
+   ],
+   "risk": "medium",
+   "session": "e98c618003c2",
+   "title": "Depot Demand Validation, PD Schedule, and URC Payment Authentication - Config Pack"
+  },
+  {
+   "change_set": "01M81MWYT4QJHFDPP7XN0JKCM2",
+   "created_by": "run:e98c618003c2",
+   "operations": [
+    "Add Currency field \"Estimated Cost\" (custom_estimated_cost) to Project",
+    "Add Currency field \"Depot Manager Delegation Limit\" (custom_depot_manager_limit) to Project",
+    "Add Select field \"Expense Type\" (custom_expense_type) to Purchase Invoice, options: Office Expenses / Medical Bills / IT Equipment / Furniture / Budgetary Expenditure / Other",
+    "Add Currency field \"Regional Manager Threshold\" (custom_regional_manager_threshold) to Purchase Invoice",
+    "Add Check field \"Issued by HO\" (custom_ho_issued) to SCM Market Intelligence",
+    "Add server script \"Project - enforce_delegation_and_workflow_state\" on Project (before save)",
+    "Add server script \"Purchase Invoice - enforce_regional_approval_when_threshold_exceeded\" on Purchase Invoice (before save)",
+    "Add server script \"SCM Market Intelligence - HO_issue_flag_enforces_state\" on SCM Market Intelligence (before save)",
+    "Create workflow \"Project Delegation Approval\" on Project: 5 states, 6 transitions",
+    "Create workflow \"Expense Approval Workflow\" on Purchase Invoice: 5 states, 6 transitions",
+    "Create workflow \"SCM Market Survey Workflow\" on SCM Market Intelligence: 5 states, 4 transitions"
+   ],
+   "requirements": [
+    323,
+    324,
+    325
+   ],
+   "risk": "high",
+   "session": "e98c618003c2",
+   "title": "Delegation Workflows: Project, Expense, Market Survey"
+  },
+  {
+   "change_set": "01M81NEYWM6B68HK34F5EZ7X36",
+   "created_by": "run:e98c618003c2",
+   "operations": [
+    "Add Int field \"Offtake Months (for moving average)\" (custom_offtake_months) to Item",
+    "Add Float field \"Average Offtake (monthly)\" (custom_avg_offtake) to Item",
+    "Add Check field \"Slow / Non-moving Item\" (custom_is_slow_moving) to Item",
+    "Add Select field \"Case Type\" (custom_case_type) to Case, options: General / Expenditure Variance / Waiver of Penal Interest",
+    "Add Link field \"Related URC\" (custom_related_urc) to Case, options: Customer",
+    "Add Link field \"Related Depot\" (custom_related_depot) to Case, options: Warehouse",
+    "Add Currency field \"Waiver Amount\" (custom_waiver_amount) to Case",
+    "Add Int field \"Days Overdue\" (custom_days_overdue) to Case",
+    "Add server script \"Case_require_type_for_waiver\" on Case (before insert)",
+    "Create report \"Slow and Non-moving Items Report\" on Item with 7 columns",
+    "Create pie chart \"Slow/Non-moving Items Chart\" on Item",
+    "Create number card \"Slow Items\": Count on Item",
+    "Create line chart \"Monthly Expenditure (Sum)\" on Purchase Invoice",
+    "Create report \"Expenditure Trend Report\" on Purchase Invoice with 7 columns",
+    "Create email notification \"Case - New Expenditure Variance - Notify Depot Manager\" on Case (New)",
+    "Create email notification \"Case - New Waiver of Penal Interest - Notify Regional Manager\" on Case (New)",
+    "Create email notification \"Item Flagged Slow Moving - Notify Regional Manager\" on Item (Value Change)",
+    "Create daily scheduled job \"Compute Offtake and Flag Slow Items\"",
+    "Create daily scheduled job \"Expenditure Variance Monitor\"",
+    "Create dashboard \"SCM Regional Manager Overview\" with 2 chart(s) and 1 number card(s)"
+   ],
+   "requirements": [
+    304,
+    318,
+    320
+   ],
+   "risk": "medium",
+   "session": "e98c618003c2",
+   "title": "RM Analytics + Corrective Actions (Slow/Non-Moving, Spend Variance, Waiver Cases)"
+  },
+  {
+   "change_set": "01M81NHE7XNDG8KCMJ20EBM371",
+   "created_by": "run:e98c618003c2",
+   "operations": [
+    "Add Link field \"URC Temporary Credit Account\" (custom_urc_temp_credit_account) to Company, options: Account",
+    "Add Link field \"Default Receivable Account for URC\" (custom_urc_receivable_account) to Company, options: Account",
+    "Add Check field \"URC Temp Credit Revoked\" (custom_credit_revoked) to Consolidated Demand",
+    "Add Date field \"Credit Revoked On\" (custom_credit_revoked_on) to Consolidated Demand",
+    "Add Check field \"URC Credit Revoked\" (custom_urc_credit_revoked) to Material Request",
+    "Add Date field \"URC Credit Revoked On\" (custom_urc_credit_revoked_on) to Material Request",
+    "Add Link field \"URC Credit Reversal Journal\" (custom_urc_credit_reversal_reference) to Material Request, options: Journal Entry",
+    "Add Check field \"Has QD Item\" (custom_has_qd_item) to Sales Invoice",
+    "Add Currency field \"QD Net Amount\" (custom_qd_net_amount) to Sales Invoice",
+    "Add server script \"SI_compute_qd_amount_and_flag\" on Sales Invoice (before save)",
+    "Create daily scheduled job \"SCM revoke URC temp credit daily\"",
+    "Create report \"SCM QD Sales by URC\" on Sales Invoice with 5 columns",
+    "Create bar chart \"QD Sales by URC\" on Sales Invoice",
+    "Create dashboard \"SCM QD Sales Overview\" with 1 chart(s) and 0 number card(s)"
+   ],
+   "requirements": [
+    273,
+    275
+   ],
+   "risk": "medium",
+   "session": "e98c618003c2",
+   "title": "URC Temp Credit Auto-Revocation and QD Sales by URC"
+  },
+  {
+   "change_set": "01M81NWVYMCFDSRQH0TV7B5NJY",
+   "created_by": "run:e98c618003c2",
+   "operations": [
+    "Add Link field \"Payment Gateway Account\" (custom_payment_gateway_account) to URC Payment Advice, options: Payment Gateway Account",
+    "Add Select field \"Payment Status\" (custom_payment_status) to URC Payment Advice, options: Draft / Pending / Paid / Failed",
+    "Add Link field \"Payment Request\" (custom_payment_request) to URC Payment Advice, options: Payment Request",
+    "Add server script \"urc_create_payment_request\" on URC Payment Advice (before submit)"
+   ],
+   "requirements": [
+    255
+   ],
+   "risk": "medium",
+   "session": "e98c618003c2",
+   "title": "Enable URC payment option (stand‑in Payment Request) on URC Payment Advice"
+  },
+  {
+   "change_set": "01M81NX4YQ8R0EYESTK2MZBMVR",
+   "created_by": "run:e98c618003c2",
+   "operations": [
+    "Add Check field \"Is Liquor Product\" (custom_is_liquor_product) to Item",
+    "Add Int field \"Off-take Months (Moving Average)\" (custom_offtake_months) to Warehouse",
+    "Add Int field \"Administrative Time (Days)\" (custom_admin_time_days) to Warehouse",
+    "Add Int field \"Lead Time (Days)\" (custom_lead_time_days) to Warehouse",
+    "Add Int field \"Sale Period (Days)\" (custom_sale_period_days) to Warehouse",
+    "Add Percent field \"Reserve (%)\" (custom_reserve_percent) to Warehouse",
+    "Add Float field \"Off-take Avg Monthly Qty\" (custom_offtake_avg_monthly_qty) to Material Request Item",
+    "Add Float field \"Recommended Qty (Off-take)\" (custom_offtake_recommended_qty) to Material Request Item",
+    "Add Small Text field \"Off-take Notes\" (custom_offtake_notes) to Material Request Item",
+    "Set read_only = 1 on field \"custom_offtake_avg_monthly_qty\" of Material Request Item",
+    "Set read_only = 1 on field \"custom_offtake_recommended_qty\" of Material Request Item",
+    "Set read_only = 1 on field \"custom_offtake_notes\" of Material Request Item",
+    "Add server script \"SCM MR - compute_offtake_fields\" on Material Request (before save)",
+    "Create weekly scheduled job \"SCM Offtake Forecaster - Weekly\""
+   ],
+   "requirements": [
+    218
+   ],
+   "risk": "medium",
+   "session": "e98c618003c2",
+   "title": "Off-take on PD/FD (Material Request) with Depot Tuning and Weekly Forecast"
+  },
+  {
+   "change_set": "01M81NZGFNJHHF4BBENW40H9K2",
+   "created_by": "run:e98c618003c2",
+   "operations": [
+    "Add Date field \"Last Payment Advice Date\" (custom_last_payment_advice_date) to Customer",
+    "Add Currency field \"Last Payment Advice Amount\" (custom_last_payment_advice_amount) to Customer",
+    "Add server script \"urc_payment_advice_update_payment_request_and_urc\" on URC Payment Advice (after submit)"
+   ],
+   "requirements": [
+    271
+   ],
+   "risk": "medium",
+   "session": "e98c618003c2",
+   "title": "URC Payment Advice — auto-update Payment Request & URC on Depot approval"
+  },
+  {
+   "change_set": "01M81P4FP3WJWR4PR4MBQ13H40",
+   "created_by": "run:e98c618003c2",
+   "operations": [
+    "Create DocType \"Temporary Credit Request\" in module CSD Customizations with 8 fields and 6 role permission(s)",
+    "Add server script \"TCR_validate_core_fields_and_amount\" on Temporary Credit Request (before save)",
+    "Create workflow \"Temporary Credit Request Approval\" on Temporary Credit Request: 5 states, 5 transitions",
+    "Create portal web form \"Temporary Credit Request\" (/temporary-credit-request) on Temporary Credit Request with 6 field(s)",
+    "Create report \"Temporary Credit Requests - List\" on Temporary Credit Request with 7 columns",
+    "Create email notification \"Temporary Credit Request - New Notify Depot Manager\" on Temporary Credit Request (New)",
+    "Create email notification \"Temporary Credit Request - Notify RM on RM Review\" on Temporary Credit Request (Value Change)"
+   ],
+   "requirements": [
+    270
+   ],
+   "risk": "high",
+   "session": "e98c618003c2",
+   "title": "URC Temporary Credit Request intake (TCR) – workflow, portal, alerts"
+  },
+  {
+   "change_set": "01M81PC5XZGZG6H15HASPTD1Y4",
+   "created_by": "run:bdd370bfb03b",
+   "operations": [
+    "Add Data field \"Scheme Index\" (custom_scheme_index) to Promotional Scheme",
+    "Add Check field \"Approved for Depot\" (custom_approved_for_depot) to Promotional Scheme",
+    "Add Link field \"Applicable Schedule\" (custom_supplier_fee_schedule) to Promotional Scheme, options: Supplier Fee Schedule",
+    "Add Data field \"Supplier Name\" (custom_supplier_name) to Promotional Scheme",
+    "Add Link field \"Supplier Group\" (custom_supplier_group) to Promotional Scheme, options: Supplier Group",
+    "Add Data field \"Scheme Index\" (custom_scheme_index) to Supplier Fee Schedule",
+    "Add Check field \"Approved for Depot\" (custom_approved_for_depot) to Supplier Fee Schedule",
+    "Add client script \"Promotional Scheme - List default approved filter\" to the Promotional Scheme form",
+    "Add client script \"Supplier Fee Schedule - List default approved filter\" to the Supplier Fee Schedule form",
+    "Grant role \"Depot User\" on Promotional Scheme (level 0): read",
+    "Grant role \"Depot Manager\" on Promotional Scheme (level 0): read",
+    "Grant role \"URC Demand User\" on Promotional Scheme (level 0): read",
+    "Grant role \"Depot User\" on Supplier Fee Schedule (level 0): read",
+    "Grant role \"Depot Manager\" on Supplier Fee Schedule (level 0): read",
+    "Grant role \"URC Demand User\" on Supplier Fee Schedule (level 0): read",
+    "Create report \"Approved Promotion Schemes\" on Promotional Scheme with 9 columns",
+    "Create report \"Approved Supplier Fee Schedules\" on Supplier Fee Schedule with 8 columns"
+   ],
+   "requirements": [
+    236
+   ],
+   "risk": "high",
+   "session": "bdd370bfb03b",
+   "title": "Depot/URC view of Approved Promotion Schemes and Schedules"
+  },
+  {
+   "change_set": "01M81PRF42ETN47JJPDCGY6VA0",
+   "created_by": "run:bdd370bfb03b",
+   "operations": [
+    "Create DocType \"Liquor Demand Forecast\" in module CSD Customizations with 3 fields and 4 role permission(s)",
+    "Create DocType \"Liquor Forecast Settings\" in module CSD Customizations with 2 fields and 2 role permission(s)",
+    "Create weekly scheduled job \"Compute Liquor Demand Forecast Weekly\"",
+    "Create report \"Liquor Demand Forecast\" on Liquor Demand Forecast with 3 columns",
+    "Insert 1 starter record(s) into Liquor Forecast Settings"
+   ],
+   "requirements": [
+    209
+   ],
+   "risk": "medium",
+   "session": "bdd370bfb03b",
+   "title": "PD Liquor Demand Forecast (weekly moving-average from Sales Invoices)"
+  },
+  {
+   "change_set": "01M81PYVPCTWJAWK21HSEH6PRT",
+   "created_by": "run:bdd370bfb03b",
+   "operations": [
+    "Create DocType \"Dependency Request\" in module CSD Customizations with 10 fields and 3 role permission(s)",
+    "Add server script \"Dependency Request - Block Edit if Approved\" on Dependency Request (before save)",
+    "Add server script \"Dependency Request - Auto NOC on Approval\" on Dependency Request (after save)",
+    "Create workflow \"Dependency Request Workflow\" on Dependency Request: 4 states, 5 transitions",
+    "Create system notification notification \"Dependency - Dual Dependency Flagged\" on Dependency Request (Value Change)",
+    "Create system notification notification \"Dependency - Approved\" on Dependency Request (Value Change)",
+    "Create print format \"Dependency Request - NOC Letter\" for Dependency Request"
+   ],
+   "requirements": [
+    269
+   ],
+   "risk": "high",
+   "session": "bdd370bfb03b",
+   "title": "URC Dependency Request Workflow with Dual-Dependency Notification and NOC"
+  },
+  {
+   "change_set": "01M81R39CQBSC2TDWVW581RF46",
+   "created_by": "run:089a71a6f523",
+   "operations": [
+    "Create email notification \"Notify Finance on Receipt Payment Entry Submit\" on Payment Entry (Submit)",
+    "Create system notification notification \"Notify Finance on Receipt Payment Entry Submit - System\" on Payment Entry (Submit)"
+   ],
+   "requirements": [
+    141
+   ],
+   "risk": "medium",
+   "session": "089a71a6f523",
+   "title": "Notify Finance & Accounting on Payment Entry (receipts) submit"
+  },
+  {
+   "change_set": "01M81R3T7HDWDPCV198QB6BW26",
+   "created_by": "run:089a71a6f523",
+   "operations": [
+    "Create child table \"URC Loan Repayment\" in module Custom with 3 fields",
+    "Create DocType \"URC Loan Request\" in module Custom with 8 fields and 3 role permission(s)",
+    "Create DocType \"Excise Master Change Proposal\" in module Custom with 8 fields and 3 role permission(s)",
+    "Create workflow \"URC Loan Request Workflow\" on URC Loan Request: 5 states, 4 transitions",
+    "Create workflow \"Excise Master Change Proposal Workflow\" on Excise Master Change Proposal: 4 states, 4 transitions",
+    "Create report \"Excise Master Change Proposal Register\" on Excise Master Change Proposal with 9 columns",
+    "Create email notification \"Accounts Alert on Customer Payment Entry Submit\" on Payment Entry (Submit)"
+   ],
+   "requirements": [
+    102,
+    103,
+    284
+   ],
+   "risk": "high",
+   "session": "089a71a6f523",
+   "title": "URC Loan Requests, Excise Change Proposals, and Payment Entry Alerts"
+  },
+  {
+   "change_set": "01M81R5RPXBQ7BP2YPCZ9BR122",
+   "created_by": "run:2477b48d6c5c",
+   "operations": [
+    "Set reqd = 0 on field \"customer\" of Material Request",
+    "Set mandatory_depends_on = eval:doc.material_request_type==\"Customer Provided\" on field \"customer\" of Material Request"
+   ],
+   "requirements": [
+    100194
+   ],
+   "risk": "medium",
+   "session": "2477b48d6c5c",
+   "title": "Make Customer mandatory only for Customer Provided Material Requests"
+  },
+  {
+   "change_set": "01M81R9RHA9JQK1TB5YDTV4TYD",
+   "created_by": "run:3465315c5ee4",
+   "operations": [
+    "Insert 1 starter record(s) into Warehouse",
+    "Insert 6 starter record(s) into Material Request",
+    "Insert 5 starter record(s) into Purchase Order"
+   ],
+   "requirements": [
+    100191
+   ],
+   "risk": "medium",
+   "session": "3465315c5ee4",
+   "title": "Seed demo supply-chain data (Material Requests + Purchase Orders + Warehouse)"
+  },
+  {
+   "change_set": "01M81RNVY31X6A4WDP4EWTQE3D",
+   "created_by": "run:70a297169999",
+   "operations": [
+    "Insert 3 starter record(s) into Temporary Credit Request",
+    "Insert 5 starter record(s) into Supplier Fee Schedule",
+    "Insert 1 starter record(s) into Excise Master Change Proposal",
+    "Insert 3 starter record(s) into URC Loan Request",
+    "Insert 3 starter record(s) into Issue"
+   ],
+   "requirements": [
+    100192
+   ],
+   "risk": "medium",
+   "session": "70a297169999",
+   "title": "Seed demo records for SCM / related DocTypes"
+  },
+  {
+   "change_set": "01M81RRRDTS2FGY14S3X8D0344",
+   "created_by": "run:3cd047bd429c",
+   "operations": [
+    "Create dashboard \"SCM Executive BI\" with 3 chart(s) and 4 number card(s)"
+   ],
+   "requirements": [
+    100195
+   ],
+   "risk": "low",
+   "session": "3cd047bd429c",
+   "title": "SCM Executive BI dashboard"
+  },
+  {
+   "change_set": "01M81RXS1WW4HJPQ2EK16X4ZSR",
+   "created_by": "run:d5c82b26e3e1",
+   "operations": [
+    "Create bar chart \"SCM Purchase Orders by Supplier\" on Purchase Order",
+    "Create number card \"SCM Open Material Requests\": Count on Material Request",
+    "Create number card \"SCM Purchase Order Value\": Sum of grand_total on Purchase Order"
+   ],
+   "requirements": [
+    100196
+   ],
+   "risk": "low",
+   "session": "d5c82b26e3e1",
+   "title": "SCM BI polish — chart + number cards"
   }
  ]
 }
