@@ -277,7 +277,18 @@ PERMISSIONS = [
  }
 ]
 
-SETTINGS = []
+SETTINGS = [
+ {
+  "doctype": "CSD Desk Theme",
+  "field": "enabled",
+  "value": "1"
+ },
+ {
+  "doctype": "CSD Desk Theme",
+  "field": "css",
+  "value": ".list-row:hover, .result .list-row-container:hover { background: #fffbe0 !important; }\n.form-control[readonly], .form-control[disabled] { opacity: 1 !important; }"
+ }
+]
 
 
 def run():

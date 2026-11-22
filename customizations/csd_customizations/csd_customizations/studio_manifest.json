@@ -78,7 +78,9 @@
     "Create bar chart \"NC by Supplier\" on Non Conformance",
     "Create dashboard \"Supplier SRM\" with 6 chart(s) and 4 number card(s)"
    ],
-   "requirements": [],
+   "requirements": [
+    430
+   ],
    "risk": "high",
    "session": "8601d0d47058",
    "title": "Supplier SRM Core (Docs, Workflows, Alerts, Dashboard & Reports)"
@@ -2362,6 +2364,47 @@
    "risk": "medium",
    "session": "7b9d0cce01c1",
    "title": "Seed Bank Transaction PoC dataset (stage 3e - finance)"
+  },
+  {
+   "change_set": "01M825YJ63AZWTJKAY44EHTK4A",
+   "created_by": "run:3e7ba4617517",
+   "operations": [
+    "Set CSD Desk Theme › enabled = 1",
+    "Set CSD Desk Theme › css = .list-row:hover, .result .list-row-container:hover { background: #fffbe0 !important; }\n.form-control[readonly], .form-control[disabled] { opacity: 1 !important; }"
+   ],
+   "requirements": [
+    100209
+   ],
+   "risk": "medium",
+   "session": "3e7ba4617517",
+   "title": "Enable CSD Desk Theme and add hover CSS"
+  },
+  {
+   "change_set": "01M826BETFSVDNCG18CG6MGDFW",
+   "created_by": "run:6525ab607639",
+   "operations": [
+    "Insert 2 starter record(s) into Quality Procedure",
+    "Insert 4 starter record(s) into Beneficiary Quota Rule"
+   ],
+   "requirements": [
+    100210
+   ],
+   "risk": "medium",
+   "session": "6525ab607639",
+   "title": "PoC dataset — Quality Procedures and Beneficiary Quota Rules (stage 4a)"
+  },
+  {
+   "change_set": "01M826D1KN1F5Y1E1R0HKY5SNN",
+   "created_by": "run:b938908eb4b6",
+   "operations": [
+    "Insert 3 starter record(s) into Non Conformance"
+   ],
+   "requirements": [
+    100211
+   ],
+   "risk": "medium",
+   "session": "b938908eb4b6",
+   "title": "Seed Non Conformance PoC dataset (stage 4b)"
   }
  ]
 }
