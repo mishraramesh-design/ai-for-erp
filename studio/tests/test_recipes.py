@@ -261,3 +261,10 @@ def test_unsupported_chart_timespan_is_mapped_to_a_supported_one():
     from studio.spec import normalize_ops
     f = lambda t: normalize_ops([{"op": "create_dashboard_chart", "name": "c", "doctype": "Supplier", "timespan": t}])[0]["timespan"]
     assert f("Last 6 Months") == "Last Year" and f("Last 30 Days") == "Last Month" and f("Last 7 Days") == "Last Week" and f("Last Year") == "Last Year"
+
+
+def test_chart_and_card_on_a_child_table_are_rejected():
+    ops = [{"op": "create_dashboard_chart", "name": "SO item qty", "doctype": "Sales Order Item", "chart_type": "Count", "date_field": "creation"},
+           {"op": "create_number_card", "label": "SO items", "doctype": "Sales Order Item"}]
+    c = codes(ops)
+    assert "chart_child" in c or "card_child" in c or "doctype_missing" in c

@@ -705,6 +705,8 @@ def _check_record(op, ctx, snap, add, i) -> None:
             if not ctx.role_exists(r):
                 add("error", "role_missing", f'Role "{r}" does not exist.' + _close(r, snap.roles()), i)
     elif t == "create_number_card":
+        if ctx.doctype_exists(op.doctype) and ctx.is_child(op.doctype):
+            add("error", "card_child", f'"{op.doctype}" is a child table; a number card cannot be built on it. Use its parent DocType.', i)
         if op.function != "Count":
             if need(op.field, "Aggregate field"):
                 ft = _field_type(ctx, dt, op.field) if dt not in ctx.planned_doctypes else "Float"
@@ -713,6 +715,8 @@ def _check_record(op, ctx, snap, add, i) -> None:
             else:
                 add("error", "field_needed", f"{op.function} needs the numeric field to aggregate.", i)
     elif t == "create_dashboard_chart":
+        if ctx.doctype_exists(op.doctype) and ctx.is_child(op.doctype):
+            add("error", "chart_child", f'"{op.doctype}" is a child table; a dashboard chart cannot be built on it. Chart its parent DocType instead.', i)
         if op.chart_type == "Group By":
             if not need(op.group_by_field, "group_by_field"):
                 add("error", "group_by_field", "A Group By chart needs group_by_field.", i)
