@@ -1141,3 +1141,7 @@ QD on field "custom_demand_cycle" of Material Request
   - Insert 5 starter record(s) into Purchase Invoice
   - Insert 3 starter record(s) into Sales Invoice
 
+## Seed Bank Transaction PoC dataset (stage 3e - finance)  (`01M8232D0CN54AGXY1QZ81WTWE`, risk medium)
+- Requirement 100206: PoC dataset: stage 3e - finance: bank statement transactions for the reconciliation demo
+  - Insert 7 starter record(s) into Bank Transaction
+

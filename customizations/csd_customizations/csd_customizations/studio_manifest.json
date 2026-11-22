@@ -2349,6 +2349,19 @@
    "risk": "medium",
    "session": "b9ab3f6e65c4",
    "title": "PoC dataset — seed Purchase and Sales Invoices"
+  },
+  {
+   "change_set": "01M8232D0CN54AGXY1QZ81WTWE",
+   "created_by": "run:7b9d0cce01c1",
+   "operations": [
+    "Insert 7 starter record(s) into Bank Transaction"
+   ],
+   "requirements": [
+    100206
+   ],
+   "risk": "medium",
+   "session": "7b9d0cce01c1",
+   "title": "Seed Bank Transaction PoC dataset (stage 3e - finance)"
   }
  ]
 }
