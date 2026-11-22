@@ -552,6 +552,10 @@ def _check_seed(op, ctx, snap, add, i) -> None:
         for k, v in rec.items():
             f = fields.get(k)
             if k in ("name", "naming_series"):
+                continue
+            if k == "docstatus":
+                if v not in (0, 1):
+                    add("error", "seed_docstatus", f"Record {n}: docstatus must be 0 (draft) or 1 (submitted).", i)
                 continue  # ERPNext assigns both; a wrong series string must not fail the whole plan
             if f is None:
                 add("error", "seed_field", f'Record {n}: "{k}" is not a field of {op.doctype}.', i)

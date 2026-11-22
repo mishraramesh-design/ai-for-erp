@@ -128,8 +128,12 @@ class Applier:
                             step["updated"].append([op.doctype, nm, {k: old.get(k) for k in vals}])
                             self.erp.update(op.doctype, nm, vals)
                         continue
-                doc = self.erp.insert(op.doctype, {"doctype": op.doctype, **rec})
+                want_submit = int(rec.get("docstatus") or 0) == 1
+                doc = self.erp.insert(op.doctype, {"doctype": op.doctype, **{k: v for k, v in rec.items() if k != "docstatus"}})
                 step["created"].append([op.doctype, doc.get("name")])
+                if want_submit:  # a document that posts to the ledgers (invoice, stock entry, journal)
+                    self.erp.call_method("frappe.client.submit", {"doc": doc})
+                    step.setdefault("submitted", []).append([op.doctype, doc.get("name")])
             step["note"] = f"inserted {len(step['created'])} and updated {len(step['updated'])} of {len(op.records)} record(s)"
         else:  # pragma: no cover - the discriminated union makes this unreachable
             raise ValueError(f"unknown operation {t}")
@@ -185,6 +189,11 @@ class Applier:
                     self.erp.set_value(dt, dt, field, before if before is not None else "")
                 for dt, name, before in reversed(s.get("updated") or []):
                     self.erp.update(dt, name, before)
+                for dt, name in reversed(s.get("submitted") or []):
+                    try:
+                        self.erp.call_method("frappe.client.cancel", {"doctype": dt, "name": name})
+                    except ErpError:
+                        pass
                 for dt, name in reversed(s.get("created") or []):
                     self.erp.delete(dt, name)
             except ErpError as e:
