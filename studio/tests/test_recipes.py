@@ -274,3 +274,14 @@ def test_notification_on_a_system_doctype_is_rejected():
     bad = {"op": "create_notification", "name": "Loop alert", "doctype": "Notification", "event": "New", "subject": "x",
            "message": "y", "recipients": [{"role": "System Manager"}]}
     assert "notify_system" in codes([bad])
+
+
+def test_scheduled_job_and_filter_normalisation():
+    from studio.spec import normalize_ops
+    job = {"op": "create_scheduled_job", "name": "SCM revoke expired credit", "frequency": "Daily",
+           "script": "for r in frappe.get_all('Customer', fields=['name']):\n    frappe.db.set_value('Customer', r.name, 'custom_temporary_qd_credit', 0)"}
+    assert not [c for c in codes([job]) if c.startswith(("job", "cron", "script"))]
+    assert "job_uses_doc" in codes([{**job, "script": "x = doc.name"}])
+    assert "cron_format" in codes([{**job, "frequency": "Cron", "cron": "daily"}])
+    out = normalize_ops([{"op": "create_number_card", "label": "L", "doctype": "Supplier", "filters": {"custom_suspended": 1}}])
+    assert out[0]["filters"] == [{"field": "custom_suspended", "value": 1}]

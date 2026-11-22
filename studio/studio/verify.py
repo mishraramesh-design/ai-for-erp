@@ -284,6 +284,9 @@ def _record_checks(op, d, add, i) -> None:
         add(i, "web form reads the right DocType", d.get("doc_type") == op.doctype, f"found {d.get('doc_type')}")
         add(i, "web form fields stored", len(d.get("web_form_fields") or []) == len(op.fields),
             f"{len(d.get('web_form_fields') or [])} of {len(op.fields)}")
+    elif t == "create_scheduled_job":
+        add(i, "job is a scheduler event", d.get("script_type") == "Scheduler Event" and not d.get("disabled"), f"found {d.get('script_type')}")
+        add(i, f"job runs {op.frequency}", d.get("event_frequency") == op.frequency, f"found {d.get('event_frequency')}")
     elif t == "create_print_format":
         add(i, "print format is for the right DocType", d.get("doc_type") == op.doctype, f"found {d.get('doc_type')}")
         add(i, "print format is active and custom", not d.get("disabled") and bool(d.get("custom_format")))

@@ -38,6 +38,7 @@ You output ONE JSON object:
  create_dashboard_chart {{name, doctype, chart_type? Group By|Count|Sum|Average, group_by_field? (Group By), date_field? (time axis for Count/Sum/Average), value_field?, graph? Bar|Line|Pie|Donut|Percentage, interval?, timespan?, filters?}}
  create_dashboard {{name, charts: [chart names created or existing], cards: [number card labels]}}   (shows charts and cards together at /app/dashboard-view/<name>)
  create_html_block {{name, html, style?}}   (static banner/branding block for a workspace; no scripts, no external resources)
+ create_scheduled_job {{name, frequency Hourly|Daily|Weekly|Monthly|Cron, cron? (5 fields, only for Cron), script}}   (a scheduler-event Server Script: run logic on a timer, e.g. generate a schedule, revoke expired credit, flag slow-moving stock, compare spend to trend. Restricted Python like add_server_validation: NO imports, use frappe.get_all / frappe.db.get_value / frappe.get_doc(...).insert() / frappe.utils.*; no .format(), no underscore names)
  create_print_format {{name, doctype, html (Jinja using doc.<fieldname>), css?}}   (a printable document, e.g. an acknowledgement receipt)
  seed_records {{doctype, records: [{{field: value}}], key_field?}}   (up to 50 starter/demo/reference records; skipped when key_field already exists; use for registries and lookup data)
  create_workspace {{title, module? (default Buying), html_blocks: [block names], cards: [number card labels], charts: [chart names], shortcuts: [{{label, doctype, view? List|New|Report Builder|Dashboard}}], roles?}}   (a landing page; create blocks/cards/charts earlier in the same ops list)
@@ -74,7 +75,7 @@ def _fields_line(snap, doctype: str, limit: int = 90) -> str:
     return f"{doctype}{sub}: " + ", ".join(rows[:limit]) + (" …" if len(rows) > limit else "")
 
 
-def build_context(message: str, ctx: dict, snap, extra_doctypes: Optional[list] = None) -> str:
+def build_context(message: str, ctx: dict, snap, extra_doctypes: Optional[list] = None, max_want: int = 6) -> str:
     names = snap.doctype_names()
     lower = message.lower()
     want: list = []
@@ -84,10 +85,10 @@ def build_context(message: str, ctx: dict, snap, extra_doctypes: Optional[list] 
     for n in sorted(names, key=len, reverse=True):
         if len(n) > 4 and n.lower() in lower and n not in want:
             want.append(n)
-        if len(want) >= 6:
+        if len(want) >= max_want:
             break
     for n in extra_doctypes or []:
-        if n in names and n not in want and len(want) < 7:
+        if n in names and n not in want and len(want) < max_want + 1:
             want.append(n)
     parts = ["DOCTYPE FIELDS (fieldname:type→link target):"] + [_fields_line(snap, n) for n in want]
     facts = []
@@ -195,7 +196,7 @@ def plan_batch(reqs: list, snap, llm, guidance: str = "", created_by: str = "", 
               "configuration or customization (using ONLY the ops) would satisfy it, and combine them into one coherent change set. "
               "Be honest: list in not_covered anything the ops cannot do.\n" + SPEC_HELP)
     mods = " ".join(r.text for r in reqs) + " " + (guidance or "")
-    user = (build_context(mods, {}, snap) + "\n\nREQUIREMENTS (the number in brackets is the id to use in covered / not_covered):\n"
+    user = (build_context(mods, {}, snap, max_want=10) + "\n\nREQUIREMENTS (the number in brackets is the id to use in covered / not_covered):\n"
             + "\n".join(_req_block(r, (hints or {}).get(r.id, "")) for r in reqs)
             + (f"\n\nPROJECT GUIDANCE FROM THE ARCHITECT:\n{guidance}" if guidance else "")
             + (f"\n\nFEEDBACK ON YOUR PREVIOUS ATTEMPT (fix these; do not repeat them):\n{feedback}" if feedback else ""))

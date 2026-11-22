@@ -281,6 +281,14 @@ class CreateHtmlBlock(_Op):
     style: str = ""  # CSS scoped to the block
 
 
+class CreateScheduledJob(_Op):
+    op: Literal["create_scheduled_job"] = "create_scheduled_job"
+    name: str
+    frequency: Literal["Hourly", "Daily", "Weekly", "Monthly", "Cron"] = "Daily"
+    cron: str = ""        # only for frequency Cron, e.g. "0 6 * * *"
+    script: str           # restricted Python; may create or update documents, e.g. a reminder, an expiry, a revocation
+
+
 class CreatePrintFormat(_Op):
     op: Literal["create_print_format"] = "create_print_format"
     name: str
@@ -340,14 +348,14 @@ class CreateWorkspace(_Op):
 
 RECORD_OPS = {"create_html_block": "Custom HTML Block", "create_workspace": "Workspace", "create_notification": "Notification", "create_report": "Report", "create_number_card": "Number Card",
               "create_dashboard_chart": "Dashboard Chart", "create_dashboard": "Dashboard", "create_web_form": "Web Form",
-              "create_print_format": "Print Format"}
+              "create_print_format": "Print Format", "create_scheduled_job": "Server Script"}
 
 
 Op = Annotated[
     Union[
         AddCustomField, SetProperty, AddClientScript, AddServerValidation, SetSetting,
         CreateRole, AddPermission, CreateDocType, CreateWorkflow, CreateNotification, CreateReport,
-        CreateNumberCard, CreateDashboardChart, CreateDashboard, CreateHtmlBlock, CreateWorkspace, CreateWebForm, CreatePrintFormat, SeedRecords,
+        CreateNumberCard, CreateDashboardChart, CreateDashboard, CreateHtmlBlock, CreateWorkspace, CreateWebForm, CreatePrintFormat, SeedRecords, CreateScheduledJob,
     ],
     Field(discriminator="op"),
 ]
@@ -359,7 +367,7 @@ RISK = {
     "add_permission": 2, "create_workflow": 2,
     "create_notification": 1, "create_report": 0, "create_number_card": 0, "create_dashboard_chart": 0, "create_dashboard": 0,
     "create_html_block": 0, "create_workspace": 0, "create_web_form": 2,
-    "create_print_format": 0, "seed_records": 1,
+    "create_print_format": 0, "seed_records": 1, "create_scheduled_job": 1,
 }
 RISK_LEVELS = ("low", "medium", "high")
 
@@ -412,6 +420,8 @@ def describe(op) -> str:
         return f'Create dashboard "{op.name}" with {len(op.charts)} chart(s) and {len(op.cards)} number card(s)'
     if t == "create_web_form":
         return f'Create portal web form "{op.title}" (/{op.route}) on {op.doctype} with {len(op.fields)} field(s)'
+    if t == "create_scheduled_job":
+        return f'Create {op.frequency.lower()} scheduled job "{op.name}"'
     if t == "create_print_format":
         return f'Create print format "{op.name}" for {op.doctype}'
     if t == "seed_records":
@@ -515,6 +525,21 @@ def normalize_ops(ops) -> list:
         if o.get("op") in ("add_client_script", "add_server_validation", "create_workflow") and isinstance(o.get("name"), str):
             import re as _re
             o["name"] = _re.sub(r"\s+", " ", _re.sub(r"[^A-Za-z0-9 _.\-()&,]", "", o["name"].replace("/", "-"))).strip()
+        if o.get("op") in ("create_number_card", "create_report", "create_dashboard_chart") and "filters" in o:
+            f = o["filters"]
+            if isinstance(f, dict):
+                f = [{"field": k, "value": v} for k, v in f.items()]
+            elif isinstance(f, str):
+                f = []
+            if isinstance(f, list):
+                fixed = []
+                for x in f:
+                    if isinstance(x, (list, tuple)) and len(x) >= 3:   # [doctype, field, op, value] or [field, op, value]
+                        x = {"field": x[-3], "operator": x[-2], "value": x[-1]}
+                    if isinstance(x, dict):
+                        fixed.append(x)
+                f = fixed
+            o["filters"] = f
         if o.get("op") == "create_dashboard_chart" and "timespan" in o:
             ts = str(o["timespan"]).lower()
             o["timespan"] = ("Last Week" if "week" in ts or "7" in ts else "Last Month" if "month" in ts and not any(c in ts for c in ("3", "6", "12")) or "30" in ts

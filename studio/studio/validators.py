@@ -59,7 +59,7 @@ STANDARD_DOC_METHODS = {
 PHASE = {"create_role": 0, "create_doctype": 1, "add_custom_field": 2, "set_property": 3, "add_client_script": 4,
          "add_server_validation": 4, "create_workflow": 5, "set_setting": 5, "add_permission": 6,
          "create_notification": 7, "create_report": 7, "create_number_card": 7, "create_dashboard_chart": 7,
-         "create_dashboard": 8, "create_html_block": 7, "create_workspace": 9, "create_web_form": 7, "create_print_format": 7, "seed_records": 8}
+         "create_dashboard": 8, "create_html_block": 7, "create_workspace": 9, "create_web_form": 7, "create_print_format": 7, "seed_records": 8, "create_scheduled_job": 7}
 
 
 @dataclass
@@ -571,7 +571,7 @@ def _check_record(op, ctx, snap, add, i) -> None:
     label = {"create_notification": "Notification", "create_report": "Report", "create_number_card": "Number Card",
              "create_dashboard_chart": "Dashboard Chart", "create_dashboard": "Dashboard",
              "create_html_block": "Custom HTML Block", "create_workspace": "Workspace", "create_web_form": "Web Form",
-             "create_print_format": "Print Format"}[t]
+             "create_print_format": "Print Format", "create_scheduled_job": "Server Script"}[t]
     name = op.label if t == "create_number_card" else op.title if t in ("create_workspace", "create_web_form") else op.name
     if t == "create_notification" and op.doctype in SYSTEM_DOCTYPES_NO_NOTIFY:
         add("error", "notify_system", f'A notification on "{op.doctype}" would fire on the platform\'s own records (and can loop). '
@@ -617,6 +617,16 @@ def _check_record(op, ctx, snap, add, i) -> None:
                 add("error", "card_missing", f'Number card "{c}" does not exist; create it earlier in the same change set.', i)
         if not op.charts and not op.cards:
             add("error", "dashboard_empty", "A dashboard needs at least one chart or number card.", i)
+        return
+    if t == "create_scheduled_job":
+        if op.frequency == "Cron" and len((op.cron or "").split()) != 5:
+            add("error", "cron_format", 'A Cron job needs a five-field cron expression, e.g. "0 6 * * *".', i)
+        for lv, code, msg in check_python(op.script, set(), False):
+            add(lv, code, msg, i)
+        if not op.script.strip():
+            add("error", "script_empty", "The scheduled job has no script.", i)
+        if re.search(r"\bdoc\b", op.script):
+            add("error", "job_uses_doc", "A scheduled job runs without a document, so `doc` does not exist. Loop over frappe.get_all(...) results instead.", i)
         return
     if t == "create_print_format":
         if not (snap.has_doctype(op.doctype) or op.doctype in ctx.planned_doctypes):
