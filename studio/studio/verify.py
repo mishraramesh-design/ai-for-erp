@@ -52,7 +52,10 @@ def verify_changeset(cs, erp) -> list[Check]:
         if dt and dt not in seen and not (op.op == "create_doctype" and op.is_child_table):
             seen.add(dt)
             try:
-                erp.list_docs(dt, fields=["name"], limit=1)
+                if op.op == "set_setting":  # a Single DocType has no table to list: read the document
+                    erp.get_doc(dt, dt)
+                else:
+                    erp.list_docs(dt, fields=["name"], limit=1)
                 out.append(Check(i, f"{dt} can be read (table healthy)", "pass"))
             except ErpError as e:
                 if e.status >= 500:
