@@ -285,3 +285,9 @@ def test_scheduled_job_and_filter_normalisation():
     assert "cron_format" in codes([{**job, "frequency": "Cron", "cron": "daily"}])
     out = normalize_ops([{"op": "create_number_card", "label": "L", "doctype": "Supplier", "filters": {"custom_suspended": 1}}])
     assert out[0]["filters"] == [{"field": "custom_suspended", "value": 1}]
+
+
+def test_seed_update_existing_skips_required_check():
+    from studio.spec import SeedRecords
+    op = SeedRecords(doctype="Note", records=[{"name": "x", "public": 1}], key_field="name", update_existing=True)
+    assert op.update_existing is True

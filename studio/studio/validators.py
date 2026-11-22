@@ -560,7 +560,7 @@ def _check_seed(op, ctx, snap, add, i) -> None:
                 add("error", "seed_link", f'Record {n}: {k} "{v}" is not an existing {f["options"]}. Use a real record name from the site or leave it out.', i)
             elif f.get("fieldtype") == "Select" and f.get("options") and str(v) not in f["options"].split("\n"):
                 add("error", "seed_select", f'Record {n}: {k} must be one of {f["options"].replace(chr(10), ", ")}.', i)
-        for f in fields.values():
+        for f in ([] if getattr(op, "update_existing", False) else fields.values()):
             if f.get("reqd") and f["fieldname"] != "naming_series" and f["fieldtype"] not in ("Table", "Section Break", "Column Break") and rec.get(f["fieldname"]) in (None, "") and not f.get("default"):
                 add("error", "seed_required", f'Record {n}: required field "{f["fieldname"]}" is missing.', i)
                 break

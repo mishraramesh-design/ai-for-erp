@@ -40,7 +40,7 @@ You output ONE JSON object:
  create_html_block {{name, html, style?}}   (static banner/branding block for a workspace; no scripts, no external resources)
  create_scheduled_job {{name, frequency Hourly|Daily|Weekly|Monthly|Cron, cron? (5 fields, only for Cron), script}}   (a scheduler-event Server Script: run logic on a timer, e.g. generate a schedule, revoke expired credit, flag slow-moving stock, compare spend to trend. Restricted Python like add_server_validation: NO imports, use frappe.get_all / frappe.db.get_value / frappe.get_doc(...).insert() / frappe.utils.*; no .format(), no underscore names)
  create_print_format {{name, doctype, html (Jinja using doc.<fieldname>), css?}}   (a printable document, e.g. an acknowledgement receipt)
- seed_records {{doctype, records: [{{field: value}}], key_field?}}   (up to 50 starter/demo/reference records; skipped when key_field already exists; use for registries and lookup data)
+ seed_records {{doctype, records: [{{field: value}}], key_field?, update_existing?}}   (up to 50 starter/demo/reference records; skipped when key_field already exists, or updated in place when update_existing is true (e.g. key_field "name" to set values on existing Warehouses); use for registries and lookup data)
  create_workspace {{title, module? (default Buying), html_blocks: [block names], cards: [number card labels], charts: [chart names], shortcuts: [{{label, doctype, view? List|New|Report Builder|Dashboard}}], roles?}}   (a landing page; create blocks/cards/charts earlier in the same ops list)
 Field types: {", ".join(FIELD_TYPES)}. Link fields need options = an EXISTING DocType name. Select options are newline-separated.
 Rules:

@@ -302,6 +302,7 @@ class SeedRecords(_Op):
     doctype: str
     records: list[dict]          # field values; only fields that exist on the DocType
     key_field: str = ""          # when set, a record whose key already exists is skipped
+    update_existing: bool = False  # with key_field: update the existing record's listed fields instead (undo restores them)
 
 
 class WorkspaceShortcut(_Op):

@@ -121,10 +121,16 @@ class Applier:
                 if key and rec.get(key) is not None:
                     found = self.erp.list_docs(op.doctype, fields=["name"], filters=[[key, "=", rec[key]]], limit=1)
                     if found:
+                        if getattr(op, "update_existing", False):
+                            nm = found[0]["name"]
+                            old = self.erp.get_doc(op.doctype, nm)
+                            vals = {k: v for k, v in rec.items() if k not in ("doctype", "name")}
+                            step["updated"].append([op.doctype, nm, {k: old.get(k) for k in vals}])
+                            self.erp.update(op.doctype, nm, vals)
                         continue
                 doc = self.erp.insert(op.doctype, {"doctype": op.doctype, **rec})
                 step["created"].append([op.doctype, doc.get("name")])
-            step["note"] = f"inserted {len(step['created'])} of {len(op.records)} record(s)"
+            step["note"] = f"inserted {len(step['created'])} and updated {len(step['updated'])} of {len(op.records)} record(s)"
         else:  # pragma: no cover - the discriminated union makes this unreachable
             raise ValueError(f"unknown operation {t}")
         return step
