@@ -281,4 +281,8 @@ def tester(reqs: list, cs, snap, llm) -> list:
             + "\n".join(_req_block(r) for r in reqs if r.id in set(cs.requirement_ids)) + "\n\nAPPLIED OPERATIONS (JSON):\n" + ops)
     raw = llm.complete_json(system, user)
     tests = raw.get("tests", [])
-    return [t for t in tests if isinstance(t, dict)][:6]
+    # Records the Studio itself writes (dashboards, cards, reports, notifications, print formats ...) are checked by the
+    # read-back verifier; "saving a throwaway one" only collides with the real one. Never test those.
+    skip = {"Dashboard", "Dashboard Chart", "Number Card", "Workspace", "Custom HTML Block", "Report", "Notification",
+            "Print Format", "Web Form", "Workflow", "Server Script", "Client Script", "Custom Field", "Property Setter"}
+    return [t for t in tests if isinstance(t, dict) and t.get("doctype") not in skip][:6]

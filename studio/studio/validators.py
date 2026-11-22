@@ -555,6 +555,9 @@ def _check_seed(op, ctx, snap, add, i) -> None:
                 continue  # ERPNext assigns both; a wrong series string must not fail the whole plan
             if f is None:
                 add("error", "seed_field", f'Record {n}: "{k}" is not a field of {op.doctype}.', i)
+            elif f.get("fieldtype") == "Link" and f.get("options") and isinstance(v, str) and v and f["options"] not in ctx.planned_doctypes \
+                    and not snap.doc_exists(f["options"], v):
+                add("error", "seed_link", f'Record {n}: {k} "{v}" is not an existing {f["options"]}. Use a real record name from the site or leave it out.', i)
             elif f.get("fieldtype") == "Select" and f.get("options") and str(v) not in f["options"].split("\n"):
                 add("error", "seed_select", f'Record {n}: {k} must be one of {f["options"].replace(chr(10), ", ")}.', i)
         for f in fields.values():
