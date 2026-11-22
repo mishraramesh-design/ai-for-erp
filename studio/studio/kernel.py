@@ -573,7 +573,8 @@ class Kernel:
         # Groups plan in parallel, so an earlier group may have changed the site since this plan was validated
         # (the same workflow, a field, a role). Validate again against the live site before writing anything.
         with self._write_lock:
-            d.snap.invalidate()
+            touched = {getattr(o, "doctype", None) for o in cs.ops} | {getattr(o, "name", None) for o in cs.ops if o.op == "create_doctype"}
+            d.snap.invalidate_for({x for x in touched if x})
             stale = [i for i in validate(cs, d.snap) if i.level == "error"]
         if stale:
             msg = "; ".join(i.message for i in stale[:6])

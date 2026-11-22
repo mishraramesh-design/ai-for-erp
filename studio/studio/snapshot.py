@@ -33,6 +33,15 @@ class Snapshot:
             self._roles = None
             self._modules = None
 
+    def invalidate_for(self, doctypes) -> None:
+        """Forget only what a change set can have altered (the DocType list, roles and the named DocTypes' metadata),
+        so re-checking one plan does not make every parallel planner re-read the whole site."""
+        with self._lock:
+            self._doctypes = None
+            self._roles = None
+            for d in doctypes:
+                self._metas.pop(d, None)
+
     def _stale(self, at: float) -> bool:
         return (time.time() - at) > self.ttl
 
