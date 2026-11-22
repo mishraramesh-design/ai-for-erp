@@ -551,14 +551,14 @@ def _check_seed(op, ctx, snap, add, i) -> None:
     for n, rec in enumerate(op.records, 1):
         for k, v in rec.items():
             f = fields.get(k)
-            if k == "name":
-                continue
+            if k in ("name", "naming_series"):
+                continue  # ERPNext assigns both; a wrong series string must not fail the whole plan
             if f is None:
                 add("error", "seed_field", f'Record {n}: "{k}" is not a field of {op.doctype}.', i)
             elif f.get("fieldtype") == "Select" and f.get("options") and str(v) not in f["options"].split("\n"):
                 add("error", "seed_select", f'Record {n}: {k} must be one of {f["options"].replace(chr(10), ", ")}.', i)
         for f in fields.values():
-            if f.get("reqd") and f["fieldtype"] not in ("Table", "Section Break", "Column Break") and rec.get(f["fieldname"]) in (None, "") and not f.get("default"):
+            if f.get("reqd") and f["fieldname"] != "naming_series" and f["fieldtype"] not in ("Table", "Section Break", "Column Break") and rec.get(f["fieldname"]) in (None, "") and not f.get("default"):
                 add("error", "seed_required", f'Record {n}: required field "{f["fieldname"]}" is missing.', i)
                 break
 
