@@ -132,6 +132,9 @@ def verify_changeset(cs, erp) -> list[Check]:
                 add(i, f"{dt} '{nm}' exists", d is not None)
                 if d:
                     _record_checks(op, d, add, i)
+            elif t == "seed_records":
+                n = len(erp.list_docs(op.doctype, fields=["name"], limit=500))
+                add(i, f"{op.doctype} holds at least {len(op.records)} record(s)", n >= len(op.records), f"found {n}")
             elif t == "create_workflow":
                 d = erp.get_doc("Workflow", op.name)
                 add(i, f"workflow '{op.name}' exists", d is not None)
@@ -281,6 +284,10 @@ def _record_checks(op, d, add, i) -> None:
         add(i, "web form reads the right DocType", d.get("doc_type") == op.doctype, f"found {d.get('doc_type')}")
         add(i, "web form fields stored", len(d.get("web_form_fields") or []) == len(op.fields),
             f"{len(d.get('web_form_fields') or [])} of {len(op.fields)}")
+    elif t == "create_print_format":
+        add(i, "print format is for the right DocType", d.get("doc_type") == op.doctype, f"found {d.get('doc_type')}")
+        add(i, "print format is active and custom", not d.get("disabled") and bool(d.get("custom_format")))
+        add(i, "template stored", (d.get("html") or "").strip() == op.html.strip())
     elif t == "create_html_block":
         add(i, "HTML stored", (d.get("html") or "").strip() == op.html.strip())
     elif t == "create_workspace":

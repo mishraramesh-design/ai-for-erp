@@ -115,6 +115,16 @@ class Applier:
             else:
                 doc = self.erp.insert(dt, payload)
                 step["created"].append([dt, doc.get("name") or payload["name"]])
+        elif t == "seed_records":
+            key = op.key_field
+            for rec in op.records:
+                if key and rec.get(key) is not None:
+                    found = self.erp.list_docs(op.doctype, fields=["name"], filters=[[key, "=", rec[key]]], limit=1)
+                    if found:
+                        continue
+                doc = self.erp.insert(op.doctype, {"doctype": op.doctype, **rec})
+                step["created"].append([op.doctype, doc.get("name")])
+            step["note"] = f"inserted {len(step['created'])} of {len(op.records)} record(s)"
         else:  # pragma: no cover - the discriminated union makes this unreachable
             raise ValueError(f"unknown operation {t}")
         return step

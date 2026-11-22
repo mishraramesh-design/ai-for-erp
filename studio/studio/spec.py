@@ -281,6 +281,21 @@ class CreateHtmlBlock(_Op):
     style: str = ""  # CSS scoped to the block
 
 
+class CreatePrintFormat(_Op):
+    op: Literal["create_print_format"] = "create_print_format"
+    name: str
+    doctype: str
+    html: str          # Jinja template, e.g. {{ doc.supplier }}
+    css: str = ""
+
+
+class SeedRecords(_Op):
+    op: Literal["seed_records"] = "seed_records"
+    doctype: str
+    records: list[dict]          # field values; only fields that exist on the DocType
+    key_field: str = ""          # when set, a record whose key already exists is skipped
+
+
 class WorkspaceShortcut(_Op):
     label: str
     doctype: str
@@ -324,14 +339,15 @@ class CreateWorkspace(_Op):
 
 
 RECORD_OPS = {"create_html_block": "Custom HTML Block", "create_workspace": "Workspace", "create_notification": "Notification", "create_report": "Report", "create_number_card": "Number Card",
-              "create_dashboard_chart": "Dashboard Chart", "create_dashboard": "Dashboard", "create_web_form": "Web Form"}
+              "create_dashboard_chart": "Dashboard Chart", "create_dashboard": "Dashboard", "create_web_form": "Web Form",
+              "create_print_format": "Print Format"}
 
 
 Op = Annotated[
     Union[
         AddCustomField, SetProperty, AddClientScript, AddServerValidation, SetSetting,
         CreateRole, AddPermission, CreateDocType, CreateWorkflow, CreateNotification, CreateReport,
-        CreateNumberCard, CreateDashboardChart, CreateDashboard, CreateHtmlBlock, CreateWorkspace, CreateWebForm,
+        CreateNumberCard, CreateDashboardChart, CreateDashboard, CreateHtmlBlock, CreateWorkspace, CreateWebForm, CreatePrintFormat, SeedRecords,
     ],
     Field(discriminator="op"),
 ]
@@ -343,6 +359,7 @@ RISK = {
     "add_permission": 2, "create_workflow": 2,
     "create_notification": 1, "create_report": 0, "create_number_card": 0, "create_dashboard_chart": 0, "create_dashboard": 0,
     "create_html_block": 0, "create_workspace": 0, "create_web_form": 2,
+    "create_print_format": 0, "seed_records": 1,
 }
 RISK_LEVELS = ("low", "medium", "high")
 
@@ -395,6 +412,10 @@ def describe(op) -> str:
         return f'Create dashboard "{op.name}" with {len(op.charts)} chart(s) and {len(op.cards)} number card(s)'
     if t == "create_web_form":
         return f'Create portal web form "{op.title}" (/{op.route}) on {op.doctype} with {len(op.fields)} field(s)'
+    if t == "create_print_format":
+        return f'Create print format "{op.name}" for {op.doctype}'
+    if t == "seed_records":
+        return f'Insert {len(op.records)} starter record(s) into {op.doctype}'
     if t == "create_html_block":
         return f'Create workspace HTML block "{op.name}"'
     if t == "create_workspace":

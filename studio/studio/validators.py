@@ -25,7 +25,7 @@ RESERVED_EXCEPT_FOR_DOCTYPES = {"naming_series", "items"}  # allowed in a brand-
 PROPERTY_TYPES = {
     "reqd": "Check", "hidden": "Check", "read_only": "Check", "in_list_view": "Check",
     "in_standard_filter": "Check", "allow_on_submit": "Check", "bold": "Check", "print_hide": "Check",
-    "unique": "Check", "label": "Data", "default": "Text", "options": "Text", "description": "Text",
+    "unique": "Check", "in_global_search": "Check", "label": "Data", "default": "Text", "options": "Text", "description": "Text",
     "depends_on": "Data", "mandatory_depends_on": "Code", "read_only_depends_on": "Code",
 }
 # Single DocTypes the configuration agent may edit. Extend deliberately; never wildcard.
@@ -57,7 +57,7 @@ STANDARD_DOC_METHODS = {
 PHASE = {"create_role": 0, "create_doctype": 1, "add_custom_field": 2, "set_property": 3, "add_client_script": 4,
          "add_server_validation": 4, "create_workflow": 5, "set_setting": 5, "add_permission": 6,
          "create_notification": 7, "create_report": 7, "create_number_card": 7, "create_dashboard_chart": 7,
-         "create_dashboard": 8, "create_html_block": 7, "create_workspace": 9, "create_web_form": 7}
+         "create_dashboard": 8, "create_html_block": 7, "create_workspace": 9, "create_web_form": 7, "create_print_format": 7, "seed_records": 8}
 
 
 @dataclass
@@ -430,6 +430,9 @@ def validate(cs: ChangeSet, snap) -> list:
         elif t in RECORD_OPS:
             _check_record(op, ctx, snap, add, i)
 
+        elif t == "seed_records":
+            _check_seed(op, ctx, snap, add, i)
+
         elif t == "add_permission":
             if op.doctype in ctx.planned_doctypes:
                 add("error", "perm_on_new_doctype", f'Put "{op.doctype}" permissions inside its create_doctype operation.', i)
@@ -531,11 +534,39 @@ def _field_type(ctx, doctype: str, field: str) -> str:
     return ""
 
 
+def _check_seed(op, ctx, snap, add, i) -> None:
+    if not (snap.has_doctype(op.doctype) or op.doctype in ctx.planned_doctypes):
+        add("error", "doctype_missing", f'DocType "{op.doctype}" does not exist.' + _close(op.doctype, snap.doctypes()), i)
+        return
+    if len(op.records) > 50 or not op.records:
+        add("error", "seed_size", "seed_records takes 1 to 50 records.", i)
+    if op.doctype in ("User", "Role", "DocType", "Custom Field", "Server Script", "Client Script", "Property Setter", "Workflow", "DocPerm"):
+        add("error", "seed_doctype", f"Starter records may not be inserted into {op.doctype}.", i)
+    if op.doctype in ctx.planned_doctypes:
+        return  # fields are validated with the create_doctype operation itself
+    meta = snap.meta(op.doctype) or {}
+    fields = {f["fieldname"]: f for f in meta.get("fields", [])}
+    for n, rec in enumerate(op.records, 1):
+        for k, v in rec.items():
+            f = fields.get(k)
+            if k == "name":
+                continue
+            if f is None:
+                add("error", "seed_field", f'Record {n}: "{k}" is not a field of {op.doctype}.', i)
+            elif f.get("fieldtype") == "Select" and f.get("options") and str(v) not in f["options"].split("\n"):
+                add("error", "seed_select", f'Record {n}: {k} must be one of {f["options"].replace(chr(10), ", ")}.', i)
+        for f in fields.values():
+            if f.get("reqd") and f["fieldtype"] not in ("Table", "Section Break", "Column Break") and rec.get(f["fieldname"]) in (None, "") and not f.get("default"):
+                add("error", "seed_required", f'Record {n}: required field "{f["fieldname"]}" is missing.', i)
+                break
+
+
 def _check_record(op, ctx, snap, add, i) -> None:
     t = op.op
     label = {"create_notification": "Notification", "create_report": "Report", "create_number_card": "Number Card",
              "create_dashboard_chart": "Dashboard Chart", "create_dashboard": "Dashboard",
-             "create_html_block": "Custom HTML Block", "create_workspace": "Workspace", "create_web_form": "Web Form"}[t]
+             "create_html_block": "Custom HTML Block", "create_workspace": "Workspace", "create_web_form": "Web Form",
+             "create_print_format": "Print Format"}[t]
     name = op.label if t == "create_number_card" else op.title if t in ("create_workspace", "create_web_form") else op.name
     if not re.match(r"^[A-Za-z0-9][A-Za-z0-9 _.\-()/&,]{2,120}$", name or ""):
         add("error", "record_name", f'Invalid {label} name "{name}" (3-120 letters, digits, spaces, - _ . ( ) / & ,).', i)
@@ -577,6 +608,15 @@ def _check_record(op, ctx, snap, add, i) -> None:
                 add("error", "card_missing", f'Number card "{c}" does not exist; create it earlier in the same change set.', i)
         if not op.charts and not op.cards:
             add("error", "dashboard_empty", "A dashboard needs at least one chart or number card.", i)
+        return
+    if t == "create_print_format":
+        if not (snap.has_doctype(op.doctype) or op.doctype in ctx.planned_doctypes):
+            add("error", "doctype_missing", f'DocType "{op.doctype}" does not exist.' + _close(op.doctype, snap.doctypes()), i)
+        low = op.html.lower()
+        if "<script" in low or "javascript:" in low or re.search(r"\bon[a-z]+\s*=", low) or "{% import" in low or "__" in low:
+            add("error", "print_unsafe", "A print format may not contain scripts, event handlers, imports or dunder access.", i)
+        if not op.html.strip():
+            add("error", "html_empty", "The print format is empty.", i)
         return
     if t == "create_html_block":
         low = op.html.lower() + op.style.lower()

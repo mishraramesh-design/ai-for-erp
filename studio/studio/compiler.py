@@ -228,6 +228,11 @@ def html_block_payload(op) -> dict:
     return {"doctype": "Custom HTML Block", "name": op.name, "html": op.html, "style": op.style, "private": 0}
 
 
+def print_format_payload(op) -> dict:
+    return {"doctype": "Print Format", "name": op.name, "doc_type": op.doctype, "print_format_type": "Jinja",
+            "custom_format": 1, "standard": "No", "disabled": 0, "html": op.html, "css": op.css}
+
+
 def web_form_name(title: str) -> str:
     """Frappe names a web form after its title (lowercase, spaces to hyphens); an explicit name is ignored."""
     import re
@@ -293,4 +298,5 @@ def record_payload(op) -> dict:
     return {"create_notification": notification_payload, "create_report": report_payload,
             "create_number_card": number_card_payload, "create_dashboard_chart": dashboard_chart_payload,
             "create_dashboard": dashboard_payload, "create_web_form": web_form_payload, "create_html_block": html_block_payload,
+            "create_print_format": print_format_payload,
             "create_workspace": workspace_payload}[op.op](op)

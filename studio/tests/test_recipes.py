@@ -222,3 +222,15 @@ def test_custom_prefix_not_required_on_a_doctype_we_own():
         op = {"op": "add_custom_field", "doctype": dt, "fieldname": "days_open", "label": "Days Open", "fieldtype": "Int"}
         return [i.code for i in validate(ChangeSet(ops=[op]), snap) if i.level == "error"]
     assert "custom_prefix" not in errs("Case") and "custom_prefix" in errs("Supplier")
+
+
+def test_print_format_and_seed_records_validate_and_apply():
+    ops = [
+        {"op": "create_doctype", "name": "Fee Stage", "module": "Buying", "naming": "hash", "fields": [
+            {"fieldname": "stage", "label": "Stage", "fieldtype": "Data", "reqd": 1}]},
+        {"op": "seed_records", "doctype": "Fee Stage", "key_field": "stage", "records": [{"stage": "Registration"}, {"stage": "Renewal"}]},
+        {"op": "create_print_format", "name": "Fee Receipt", "doctype": "Fee Stage", "html": "<h1>{{ doc.stage }}</h1>"},
+    ]
+    assert not [c for c in codes(ops) if c.startswith(("seed", "print", "doctype_missing", "html"))]
+    assert "print_unsafe" in codes([{"op": "create_print_format", "name": "Bad receipt", "doctype": "Supplier", "html": "<script>x</script>"}])
+    assert "seed_field" in codes([{"op": "seed_records", "doctype": "Supplier", "records": [{"nope": 1}]}])

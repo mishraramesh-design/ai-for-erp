@@ -38,6 +38,8 @@ You output ONE JSON object:
  create_dashboard_chart {{name, doctype, chart_type? Group By|Count|Sum|Average, group_by_field? (Group By), date_field? (time axis for Count/Sum/Average), value_field?, graph? Bar|Line|Pie|Donut|Percentage, interval?, timespan?, filters?}}
  create_dashboard {{name, charts: [chart names created or existing], cards: [number card labels]}}   (shows charts and cards together at /app/dashboard-view/<name>)
  create_html_block {{name, html, style?}}   (static banner/branding block for a workspace; no scripts, no external resources)
+ create_print_format {{name, doctype, html (Jinja using doc.<fieldname>), css?}}   (a printable document, e.g. an acknowledgement receipt)
+ seed_records {{doctype, records: [{{field: value}}], key_field?}}   (up to 50 starter/demo/reference records; skipped when key_field already exists; use for registries and lookup data)
  create_workspace {{title, module? (default Buying), html_blocks: [block names], cards: [number card labels], charts: [chart names], shortcuts: [{{label, doctype, view? List|New|Report Builder|Dashboard}}], roles?}}   (a landing page; create blocks/cards/charts earlier in the same ops list)
 Field types: {", ".join(FIELD_TYPES)}. Link fields need options = an EXISTING DocType name. Select options are newline-separated.
 Rules:
