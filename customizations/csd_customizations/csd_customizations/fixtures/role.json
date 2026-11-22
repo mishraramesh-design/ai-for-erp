@@ -4,5 +4,17 @@
   "doctype": "Role",
   "name": "Branch User",
   "role_name": "Branch User"
+ },
+ {
+  "desk_access": 1,
+  "doctype": "Role",
+  "name": "AGM Secretariat",
+  "role_name": "AGM Secretariat"
+ },
+ {
+  "desk_access": 1,
+  "doctype": "Role",
+  "name": "CSD Portal User",
+  "role_name": "CSD Portal User"
  }
 ]

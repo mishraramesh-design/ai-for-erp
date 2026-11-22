@@ -2,6 +2,51 @@
  {
   "cards": [
    {
+    "card": "Total Suppliers"
+   },
+   {
+    "card": "Active Suppliers"
+   },
+   {
+    "card": "Suppliers On Hold"
+   },
+   {
+    "card": "Suspension Decisions"
+   }
+  ],
+  "charts": [
+   {
+    "chart": "Suppliers by Group",
+    "width": "Half"
+   },
+   {
+    "chart": "Suppliers by Type",
+    "width": "Half"
+   },
+   {
+    "chart": "Suppliers by Country",
+    "width": "Half"
+   },
+   {
+    "chart": "PNC Decisions by Type",
+    "width": "Half"
+   },
+   {
+    "chart": "New Suppliers - Monthly",
+    "width": "Half"
+   },
+   {
+    "chart": "NC by Supplier",
+    "width": "Half"
+   }
+  ],
+  "dashboard_name": "Supplier SRM",
+  "doctype": "Dashboard",
+  "name": "Supplier SRM"
+ },
+ {
+  "cards": [
+   {
     "card": "Pending C-Forms"
    }
   ],
@@ -14,5 +59,64 @@
   "dashboard_name": "Supplier C-Forms Dashboard",
   "doctype": "Dashboard",
   "name": "Supplier C-Forms Dashboard"
+ },
+ {
+  "cards": [
+   {
+    "card": "Total Suppliers"
+   },
+   {
+    "card": "Suspended Suppliers"
+   },
+   {
+    "card": "Average Supplier Score (Last Year)"
+   }
+  ],
+  "charts": [
+   {
+    "chart": "Suppliers by Group",
+    "width": "Half"
+   },
+   {
+    "chart": "Suspended Suppliers Count",
+    "width": "Half"
+   }
+  ],
+  "dashboard_name": "Supplier Management Dashboard",
+  "doctype": "Dashboard",
+  "name": "Supplier Management Dashboard"
+ },
+ {
+  "cards": [
+   {
+    "card": "Total Suppliers"
+   },
+   {
+    "card": "Suspended Suppliers"
+   },
+   {
+    "card": "Average Supplier Score (Last Year)"
+   },
+   {
+    "card": "Open Supplier Issues"
+   }
+  ],
+  "charts": [
+   {
+    "chart": "Suppliers by Group",
+    "width": "Half"
+   },
+   {
+    "chart": "Suspended Suppliers Count",
+    "width": "Half"
+   },
+   {
+    "chart": "Open Supplier Issues",
+    "width": "Half"
+   }
+  ],
+  "dashboard_name": "Supplier Performance Dashboard",
+  "doctype": "Dashboard",
+  "name": "Supplier Performance Dashboard"
  }
 ]

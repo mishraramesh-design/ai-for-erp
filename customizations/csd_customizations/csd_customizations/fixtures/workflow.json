@@ -1,6 +1,111 @@
 [
  {
   "doctype": "Workflow",
+  "document_type": "PNC Decision",
+  "is_active": 1,
+  "name": "PNC-BoA Approval",
+  "override_status": 0,
+  "send_email_alert": 0,
+  "states": [
+   {
+    "allow_edit": "Purchase Manager",
+    "doc_status": "0",
+    "state": "Draft"
+   },
+   {
+    "allow_edit": "Quality Manager",
+    "doc_status": "0",
+    "state": "Under Review"
+   },
+   {
+    "allow_edit": "Purchase Manager",
+    "doc_status": "0",
+    "state": "Finalized"
+   }
+  ],
+  "transitions": [
+   {
+    "action": "Send for Review",
+    "allow_self_approval": 1,
+    "allowed": "Purchase Manager",
+    "next_state": "Under Review",
+    "state": "Draft"
+   },
+   {
+    "action": "Finalize Decision",
+    "allow_self_approval": 1,
+    "allowed": "Quality Manager",
+    "next_state": "Finalized",
+    "state": "Under Review"
+   }
+  ],
+  "workflow_name": "PNC-BoA Approval",
+  "workflow_state_field": "workflow_state"
+ },
+ {
+  "doctype": "Workflow",
+  "document_type": "Non Conformance",
+  "is_active": 1,
+  "name": "Supplier NC Resolution",
+  "override_status": 0,
+  "send_email_alert": 0,
+  "states": [
+   {
+    "allow_edit": "Quality Manager",
+    "doc_status": "0",
+    "state": "Logged"
+   },
+   {
+    "allow_edit": "Quality Manager",
+    "doc_status": "0",
+    "state": "Under Investigation"
+   },
+   {
+    "allow_edit": "Purchase Manager",
+    "doc_status": "0",
+    "state": "Resolved"
+   },
+   {
+    "allow_edit": "Quality Manager",
+    "doc_status": "0",
+    "state": "Closed"
+   }
+  ],
+  "transitions": [
+   {
+    "action": "Start Investigation",
+    "allow_self_approval": 1,
+    "allowed": "Quality Manager",
+    "next_state": "Under Investigation",
+    "state": "Logged"
+   },
+   {
+    "action": "Resolve",
+    "allow_self_approval": 1,
+    "allowed": "Purchase Manager",
+    "next_state": "Resolved",
+    "state": "Under Investigation"
+   },
+   {
+    "action": "Close",
+    "allow_self_approval": 1,
+    "allowed": "Quality Manager",
+    "next_state": "Closed",
+    "state": "Resolved"
+   },
+   {
+    "action": "Reopen",
+    "allow_self_approval": 1,
+    "allowed": "Quality Manager",
+    "next_state": "Under Investigation",
+    "state": "Resolved"
+   }
+  ],
+  "workflow_name": "Supplier NC Resolution",
+  "workflow_state_field": "workflow_state"
+ },
+ {
+  "doctype": "Workflow",
   "document_type": "Supplier",
   "is_active": 1,
   "name": "Supplier Onboarding",
@@ -59,6 +164,42 @@
    }
   ],
   "workflow_name": "Supplier Onboarding",
+  "workflow_state_field": "workflow_state"
+ },
+ {
+  "doctype": "Workflow",
+  "document_type": "Purchase Order",
+  "is_active": 1,
+  "name": "Purchase Order Acknowledgement",
+  "override_status": 0,
+  "send_email_alert": 0,
+  "states": [
+   {
+    "allow_edit": "Purchase User",
+    "doc_status": "0",
+    "state": "Draft"
+   },
+   {
+    "allow_edit": "Purchase User",
+    "doc_status": "1",
+    "state": "Submitted"
+   },
+   {
+    "allow_edit": "Supplier",
+    "doc_status": "1",
+    "state": "Acknowledged"
+   }
+  ],
+  "transitions": [
+   {
+    "action": "Acknowledge",
+    "allow_self_approval": 1,
+    "allowed": "Supplier",
+    "next_state": "Acknowledged",
+    "state": "Submitted"
+   }
+  ],
+  "workflow_name": "Purchase Order Acknowledgement",
   "workflow_state_field": "workflow_state"
  },
  {
@@ -137,6 +278,68 @@
  },
  {
   "doctype": "Workflow",
+  "document_type": "Supplier Change Request",
+  "is_active": 1,
+  "name": "Supplier Change Request Workflow - SRM",
+  "override_status": 0,
+  "send_email_alert": 0,
+  "states": [
+   {
+    "allow_edit": "Branch User",
+    "doc_status": "0",
+    "state": "Draft"
+   },
+   {
+    "allow_edit": "Purchase Manager",
+    "doc_status": "0",
+    "state": "Submitted for Review"
+   },
+   {
+    "allow_edit": "Purchase Manager",
+    "doc_status": "0",
+    "state": "Approved"
+   },
+   {
+    "allow_edit": "Branch User",
+    "doc_status": "0",
+    "state": "Rejected"
+   }
+  ],
+  "transitions": [
+   {
+    "action": "Submit for Review",
+    "allow_self_approval": 1,
+    "allowed": "Branch User",
+    "next_state": "Submitted for Review",
+    "state": "Draft"
+   },
+   {
+    "action": "Approve",
+    "allow_self_approval": 1,
+    "allowed": "Purchase Manager",
+    "next_state": "Approved",
+    "state": "Submitted for Review"
+   },
+   {
+    "action": "Reject",
+    "allow_self_approval": 1,
+    "allowed": "Purchase Manager",
+    "next_state": "Rejected",
+    "state": "Submitted for Review"
+   },
+   {
+    "action": "Edit",
+    "allow_self_approval": 1,
+    "allowed": "Branch User",
+    "next_state": "Draft",
+    "state": "Rejected"
+   }
+  ],
+  "workflow_name": "Supplier Change Request Workflow - SRM",
+  "workflow_state_field": "workflow_state"
+ },
+ {
+  "doctype": "Workflow",
   "document_type": "Branch Price Revision",
   "is_active": 1,
   "name": "Branch Price Revision Approval",
@@ -188,6 +391,142 @@
    }
   ],
   "workflow_name": "Branch Price Revision Approval",
+  "workflow_state_field": "workflow_state"
+ },
+ {
+  "doctype": "Workflow",
+  "document_type": "Issue",
+  "is_active": 1,
+  "name": "Supplier Issue Workflow",
+  "override_status": 0,
+  "send_email_alert": 0,
+  "states": [
+   {
+    "allow_edit": "Quality Manager",
+    "doc_status": "0",
+    "state": "Open"
+   },
+   {
+    "allow_edit": "Department Head",
+    "doc_status": "0",
+    "state": "Under Review"
+   },
+   {
+    "allow_edit": "Quality Manager",
+    "doc_status": "0",
+    "state": "Resolved"
+   },
+   {
+    "allow_edit": "Purchase Manager",
+    "doc_status": "0",
+    "state": "Closed"
+   }
+  ],
+  "transitions": [
+   {
+    "action": "Start Review",
+    "allow_self_approval": 1,
+    "allowed": "Quality Manager",
+    "next_state": "Under Review",
+    "state": "Open"
+   },
+   {
+    "action": "Resolve",
+    "allow_self_approval": 1,
+    "allowed": "Department Head",
+    "next_state": "Resolved",
+    "state": "Under Review"
+   },
+   {
+    "action": "Close",
+    "allow_self_approval": 1,
+    "allowed": "Purchase Manager",
+    "next_state": "Closed",
+    "state": "Resolved"
+   },
+   {
+    "action": "Reopen",
+    "allow_self_approval": 1,
+    "allowed": "Department Head",
+    "next_state": "Open",
+    "state": "Under Review"
+   }
+  ],
+  "workflow_name": "Supplier Issue Workflow",
+  "workflow_state_field": "workflow_state"
+ },
+ {
+  "doctype": "Workflow",
+  "document_type": "Supplier Quotation",
+  "is_active": 1,
+  "name": "Supplier Quotation PNC BoA Workflow",
+  "override_status": 0,
+  "send_email_alert": 0,
+  "states": [
+   {
+    "allow_edit": "Purchase User",
+    "doc_status": "0",
+    "state": "Draft"
+   },
+   {
+    "allow_edit": "Department Head",
+    "doc_status": "0",
+    "state": "For PNC Review"
+   },
+   {
+    "allow_edit": "Department Head",
+    "doc_status": "0",
+    "state": "For BOA Approval"
+   },
+   {
+    "allow_edit": "Purchase Manager",
+    "doc_status": "1",
+    "state": "Approved"
+   },
+   {
+    "allow_edit": "Purchase User",
+    "doc_status": "0",
+    "state": "Rejected"
+   }
+  ],
+  "transitions": [
+   {
+    "action": "Send to PNC",
+    "allow_self_approval": 1,
+    "allowed": "Purchase User",
+    "next_state": "For PNC Review",
+    "state": "Draft"
+   },
+   {
+    "action": "Recommend to BOA",
+    "allow_self_approval": 1,
+    "allowed": "Department Head",
+    "next_state": "For BOA Approval",
+    "state": "For PNC Review"
+   },
+   {
+    "action": "Approve",
+    "allow_self_approval": 1,
+    "allowed": "Purchase Manager",
+    "next_state": "Approved",
+    "state": "For BOA Approval"
+   },
+   {
+    "action": "Reject",
+    "allow_self_approval": 1,
+    "allowed": "Purchase Manager",
+    "next_state": "Rejected",
+    "state": "For BOA Approval"
+   },
+   {
+    "action": "Reject",
+    "allow_self_approval": 1,
+    "allowed": "Department Head",
+    "next_state": "Rejected",
+    "state": "For PNC Review"
+   }
+  ],
+  "workflow_name": "Supplier Quotation PNC BoA Workflow",
   "workflow_state_field": "workflow_state"
  }
 ]

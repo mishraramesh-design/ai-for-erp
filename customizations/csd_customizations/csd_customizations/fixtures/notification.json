@@ -1,6 +1,207 @@
 [
  {
   "channel": "Email",
+  "date_changed": "custom_target_resolution_date",
+  "days_in_advance": 1,
+  "doctype": "Notification",
+  "document_type": "Non Conformance",
+  "enabled": 1,
+  "event": "Days Before",
+  "message": "<p>The Non Conformance {{ doc.name }} is due tomorrow ({{ doc.custom_target_resolution_date }}). Please review and act.</p>",
+  "message_type": "HTML",
+  "name": "Supplier NC Due Tomorrow",
+  "recipients": [
+   {
+    "receiver_by_role": "Quality Manager"
+   },
+   {
+    "receiver_by_role": "Purchase Manager"
+   }
+  ],
+  "subject": "NC due tomorrow for {{ doc.custom_supplier or 'Unassigned Supplier' }}"
+ },
+ {
+  "channel": "Email",
+  "condition": "doc.custom_supplier",
+  "doctype": "Notification",
+  "document_type": "Non Conformance",
+  "enabled": 1,
+  "event": "New",
+  "message": "<p>A new Non Conformance has been logged{{ ' for ' + doc.custom_supplier if doc.custom_supplier else '' }}. Please triage and plan resolution.</p>",
+  "message_type": "HTML",
+  "name": "Supplier NC Logged",
+  "recipients": [
+   {
+    "receiver_by_role": "Quality Manager"
+   },
+   {
+    "receiver_by_role": "Purchase Manager"
+   }
+  ],
+  "subject": "New Supplier NC Logged: {{ doc.name }}"
+ },
+ {
+  "channel": "Email",
+  "doctype": "Notification",
+  "document_type": "Supplier",
+  "enabled": 1,
+  "event": "New",
+  "message": "<p>A new Supplier <strong>{{ doc.supplier_name }}</strong> has been created. Please review the onboarding documents and eligibility.</p><p><a href=\"/app/supplier/{{ doc.name }}\">Open Supplier</a></p>",
+  "message_type": "HTML",
+  "name": "New Supplier Created - Notify Purchase Managers",
+  "recipients": [
+   {
+    "receiver_by_role": "Purchase Manager"
+   }
+  ],
+  "subject": "New Supplier created: {{ doc.supplier_name }}"
+ },
+ {
+  "channel": "Email",
+  "condition": "doc.docstatus == 1",
+  "doctype": "Notification",
+  "document_type": "Purchase Order",
+  "enabled": 1,
+  "event": "New",
+  "message": "<p>A new Purchase Order <strong>{{ doc.name }}</strong> has been created/submitted for your attention.<br/>Supplier: {{ doc.supplier }}<br/>Please review and acknowledge via the portal.</p>",
+  "message_type": "HTML",
+  "name": "PO Created - Supplier",
+  "recipients": [
+   {
+    "receiver_by_role": "Supplier"
+   }
+  ],
+  "subject": "New Purchase Order {{ doc.name }}"
+ },
+ {
+  "channel": "Email",
+  "doctype": "Notification",
+  "document_type": "Purchase Order",
+  "enabled": 1,
+  "event": "Value Change",
+  "message": "<p>Purchase Order <strong>{{ doc.name }}</strong> has been acknowledged by the supplier.<br/>Acknowledged By: {{ doc.custom_acknowledged_by }}<br/>Acknowledged On: {{ doc.custom_acknowledged_on }}</p>",
+  "message_type": "HTML",
+  "name": "PO Acknowledged - Notify Internal",
+  "recipients": [
+   {
+    "receiver_by_role": "Purchase Manager"
+   },
+   {
+    "receiver_by_role": "Accounts Manager"
+   }
+  ],
+  "subject": "Purchase Order {{ doc.name }} acknowledged",
+  "value_changed": "custom_is_acknowledged"
+ },
+ {
+  "channel": "System Notification",
+  "doctype": "Notification",
+  "document_type": "Supplier Quotation",
+  "enabled": 1,
+  "event": "Submit",
+  "message": "<p>Supplier Quotation {{ doc.name }} has been submitted by {{ doc.supplier_name or doc.supplier }}.</p><p>Please review proposed offer rates on each item line.</p>",
+  "message_type": "HTML",
+  "name": "Notify Purchase on Supplier Quotation Submit",
+  "notification_title": "Supplier Quotation {{ doc.name }} submitted",
+  "notification_type": "Alert",
+  "recipients": [
+   {
+    "receiver_by_role": "Purchase User"
+   },
+   {
+    "receiver_by_role": "Purchase Manager"
+   }
+  ],
+  "subject": "Supplier Quotation {{ doc.name }} submitted"
+ },
+ {
+  "channel": "System Notification",
+  "condition": "doc.workflow_state == \"Pending Approval\"",
+  "doctype": "Notification",
+  "document_type": "Supplier",
+  "enabled": 1,
+  "event": "Value Change",
+  "message": "Supplier {{ doc.supplier_name }} ({{ doc.name }}) moved to Pending Approval.",
+  "message_type": "HTML",
+  "name": "Notify Purchase Manager on Supplier Pending Approval",
+  "notification_title": "Supplier {{ doc.supplier_name }} is Pending Approval",
+  "notification_type": "Alert",
+  "recipients": [
+   {
+    "receiver_by_role": "Purchase Manager"
+   }
+  ],
+  "subject": "Supplier {{ doc.supplier_name }} is Pending Approval",
+  "value_changed": "workflow_state"
+ },
+ {
+  "channel": "Email",
+  "doctype": "Notification",
+  "document_type": "Purchase Receipt",
+  "enabled": 1,
+  "event": "Submit",
+  "message": "Purchase Receipt {{ doc.name }} for Supplier {{ doc.supplier }} has been submitted.\n\nSupplier Delivery Status: {{ doc.custom_supplier_delivery_status }}\n\nPlease contact the buyer if you need further details.",
+  "message_type": "HTML",
+  "name": "Purchase Receipt Notify Supplier On Submit",
+  "recipients": [
+   {
+    "receiver_by_role": "Supplier"
+   }
+  ],
+  "subject": "Purchase Receipt {{ doc.name }} submitted"
+ },
+ {
+  "channel": "Email",
+  "doctype": "Notification",
+  "document_type": "Purchase Receipt",
+  "enabled": 1,
+  "event": "Value Change",
+  "message": "The Supplier Delivery Status for Purchase Receipt {{ doc.name }} (Supplier: {{ doc.supplier }}) has changed to: {{ doc.custom_supplier_delivery_status }}.",
+  "message_type": "HTML",
+  "name": "Purchase Receipt Notify Supplier On Status Change",
+  "recipients": [
+   {
+    "receiver_by_role": "Supplier"
+   }
+  ],
+  "subject": "Purchase Receipt {{ doc.name }} - status updated",
+  "value_changed": "custom_supplier_delivery_status"
+ },
+ {
+  "channel": "Email",
+  "doctype": "Notification",
+  "document_type": "Delivery Note",
+  "enabled": 1,
+  "event": "Submit",
+  "message": "Delivery Note {{ doc.name }} has been submitted.\n\nSupplier Delivery Status: {{ doc.custom_supplier_delivery_status }}\n\nLinked Supplier: {{ doc.custom_supplier_link }}",
+  "message_type": "HTML",
+  "name": "Delivery Note Notify Supplier On Submit",
+  "recipients": [
+   {
+    "receiver_by_role": "Supplier"
+   }
+  ],
+  "subject": "Delivery Note {{ doc.name }} submitted"
+ },
+ {
+  "channel": "Email",
+  "doctype": "Notification",
+  "document_type": "Delivery Note",
+  "enabled": 1,
+  "event": "Value Change",
+  "message": "The Supplier Delivery Status for Delivery Note {{ doc.name }} has changed to: {{ doc.custom_supplier_delivery_status }}.\n\nLinked Supplier: {{ doc.custom_supplier_link }}",
+  "message_type": "HTML",
+  "name": "Delivery Note Notify Supplier On Status Change",
+  "recipients": [
+   {
+    "receiver_by_role": "Supplier"
+   }
+  ],
+  "subject": "Delivery Note {{ doc.name }} - status updated",
+  "value_changed": "custom_supplier_delivery_status"
+ },
+ {
+  "channel": "Email",
   "condition": "doc.workflow_state == 'Submitted'",
   "doctype": "Notification",
   "document_type": "Supplier C-Form",
@@ -16,6 +217,127 @@
   ],
   "subject": "C-Form submitted for Supplier {{ doc.supplier }}",
   "value_changed": "workflow_state"
+ },
+ {
+  "channel": "System Notification",
+  "doctype": "Notification",
+  "document_type": "Supplier Change Request",
+  "enabled": 1,
+  "event": "Submit",
+  "message": "<p>Supplier Change Request <strong>{{ doc.name }}</strong> has been submitted by <strong>{{ doc.supplier }}</strong> on <strong>{{ doc.requested_on }}</strong>.</p><p>Type: {{ doc.request_type }}</p><p>Description: {{ doc.description }}</p>",
+  "message_type": "HTML",
+  "name": "SCR Submitted - Notify Purchase Managers",
+  "notification_title": "Supplier Change Request Submitted: {{ doc.name }}",
+  "notification_type": "Alert",
+  "recipients": [
+   {
+    "receiver_by_role": "Purchase Manager"
+   }
+  ],
+  "subject": "Supplier Change Request Submitted: {{ doc.name }}"
+ },
+ {
+  "channel": "Email",
+  "condition": "doc.workflow_state == 'Submitted for Review'",
+  "doctype": "Notification",
+  "document_type": "Supplier Change Request",
+  "enabled": 1,
+  "event": "Value Change",
+  "message": "A Supplier Change Request ({{ doc.name }}) has moved to Submitted for Review. Supplier: {{ doc.supplier }}. Please review in SRM.",
+  "message_type": "HTML",
+  "name": "SCR - Submitted for Review - Notify Reviewers",
+  "recipients": [
+   {
+    "receiver_by_role": "Purchase Manager"
+   },
+   {
+    "receiver_by_role": "Accounts Manager"
+   }
+  ],
+  "subject": "Supplier Change Request submitted for review: {{ doc.name }}",
+  "value_changed": "workflow_state"
+ },
+ {
+  "channel": "Email",
+  "condition": "doc.workflow_state == 'Approved'",
+  "doctype": "Notification",
+  "document_type": "Supplier Change Request",
+  "enabled": 1,
+  "event": "Value Change",
+  "message": "Your Supplier Change Request ({{ doc.name }}) has been approved. Supplier: {{ doc.supplier }}.",
+  "message_type": "HTML",
+  "name": "SCR - Approved - Notify Supplier and Branch",
+  "recipients": [
+   {
+    "receiver_by_role": "Supplier"
+   },
+   {
+    "receiver_by_role": "Branch User"
+   }
+  ],
+  "subject": "Supplier Change Request approved: {{ doc.name }}",
+  "value_changed": "workflow_state"
+ },
+ {
+  "channel": "System Notification",
+  "condition": "doc.workflow_state == \"Under Review\"",
+  "doctype": "Notification",
+  "document_type": "Supplier Change Request",
+  "enabled": 1,
+  "event": "Value Change",
+  "message": "<p>Change Request {{ doc.name }} moved to <b>{{ doc.workflow_state }}</b>.</p>",
+  "message_type": "HTML",
+  "name": "SCR Moved to Under Review",
+  "notification_title": "Supplier Change Request {{ doc.name }} is Under Review",
+  "notification_type": "Alert",
+  "recipients": [
+   {
+    "receiver_by_role": "Purchase User"
+   },
+   {
+    "receiver_by_role": "Branch User"
+   }
+  ],
+  "subject": "Supplier Change Request {{ doc.name }} is Under Review",
+  "value_changed": "workflow_state"
+ },
+ {
+  "channel": "System Notification",
+  "condition": "doc.workflow_state in (\"Approved\", \"Rejected\")",
+  "doctype": "Notification",
+  "document_type": "Supplier Change Request",
+  "enabled": 1,
+  "event": "Value Change",
+  "message": "<p>Your Change Request {{ doc.name }} is now <b>{{ doc.workflow_state }}</b>.</p>",
+  "message_type": "HTML",
+  "name": "SCR Approved or Rejected",
+  "notification_title": "Supplier Change Request {{ doc.name }}: {{ doc.workflow_state }}",
+  "notification_type": "Alert",
+  "recipients": [
+   {
+    "receiver_by_role": "Supplier"
+   }
+  ],
+  "subject": "Supplier Change Request {{ doc.name }}: {{ doc.workflow_state }}",
+  "value_changed": "workflow_state"
+ },
+ {
+  "channel": "Email",
+  "date_changed": "end_date",
+  "days_in_advance": 30,
+  "doctype": "Notification",
+  "document_type": "Bank Guarantee",
+  "enabled": 1,
+  "event": "Days Before",
+  "message": "Bank Guarantee {{ doc.bank_guarantee_number }} is expiring on {{ doc.end_date }}. Please review and renew if required.",
+  "message_type": "HTML",
+  "name": "Bank Guarantee Expiry Alert",
+  "recipients": [
+   {
+    "receiver_by_role": "Purchase Manager"
+   }
+  ],
+  "subject": "Bank Guarantee Expiry: {{ doc.bank_guarantee_number }}"
  },
  {
   "channel": "System Notification",
@@ -36,5 +358,69 @@
   ],
   "subject": "Branch Price Revision Pending Approval: {{ doc.name }}",
   "value_changed": "workflow_state"
+ },
+ {
+  "channel": "Email",
+  "condition": "doc.get('custom_supplier') and doc.status!='Closed'",
+  "date_changed": "creation",
+  "days_in_advance": 7,
+  "doctype": "Notification",
+  "document_type": "Issue",
+  "enabled": 1,
+  "event": "Days After",
+  "message": "<p>Issue {{ doc.name }} ({{ doc.subject }}) linked to Supplier {{ doc.custom_supplier }} is pending for more than 7 days.</p>",
+  "message_type": "HTML",
+  "name": "Escalate Supplier Issue Over 7 Days",
+  "recipients": [
+   {
+    "receiver_by_role": "Purchase Manager"
+   },
+   {
+    "receiver_by_role": "Quality Manager"
+   }
+  ],
+  "subject": "Supplier Issue pending > 7 days: {{ doc.name }}"
+ },
+ {
+  "channel": "Email",
+  "condition": "doc.workflow_state=='For PNC Review' or doc.workflow_state=='For BOA Approval'",
+  "doctype": "Notification",
+  "document_type": "Supplier Quotation",
+  "enabled": 1,
+  "event": "Value Change",
+  "message": "<p>Supplier Quotation {{ doc.name }} moved to stage: {{ doc.workflow_state }}</p>",
+  "message_type": "HTML",
+  "name": "Notify Purchase on Supplier Quotation PNC/BOA Status",
+  "recipients": [
+   {
+    "receiver_by_role": "Department Head"
+   },
+   {
+    "receiver_by_role": "Purchase Manager"
+   }
+  ],
+  "subject": "Supplier Quotation moved to PNC/BoA",
+  "value_changed": "workflow_state"
+ },
+ {
+  "channel": "Email",
+  "condition": "doc.custom_suspended==1",
+  "doctype": "Notification",
+  "document_type": "Supplier",
+  "enabled": 1,
+  "event": "Value Change",
+  "message": "<p>Supplier {{ doc.name }} has been suspended. Reason: {{ doc.custom_suspension_reason }}</p>",
+  "message_type": "HTML",
+  "name": "Notify when Supplier Suspended",
+  "recipients": [
+   {
+    "receiver_by_role": "Purchase Manager"
+   },
+   {
+    "receiver_by_role": "AGM Secretariat"
+   }
+  ],
+  "subject": "Supplier Suspended: {{ doc.name }}",
+  "value_changed": "custom_suspended"
  }
 ]

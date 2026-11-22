@@ -21,9 +21,36 @@
   "disabled": 0,
   "doctype": "Server Script",
   "doctype_event": "Before Save",
+  "name": "PNC Decision - Validate PNC Decision fields",
+  "reference_doctype": "PNC Decision",
+  "script": "SUSPEND_DECISION = 'Suspend'\n\n# Ensure reason is provided when suspending\nif doc.get('decision') == SUSPEND_DECISION and not doc.get('reason'):\n    frappe.throw('Reason is required when Decision is Suspend.')\n\n# Effective Date must be set\nif not doc.get('effective_date'):\n    frappe.throw('Effective Date is required.')\n",
+  "script_type": "DocType Event"
+ },
+ {
+  "disabled": 0,
+  "doctype": "Server Script",
+  "doctype_event": "Before Save",
   "name": "supplier_onboarding_validation",
   "reference_doctype": "Supplier",
   "script": "MIN_YEARS = 2\nMIN_MONTHS = 3\n\nstate = doc.get('workflow_state') or ''\nif state in ('Under Review', 'Approved'):\n    est = doc.get('custom_establishment_date')\n    if not est:\n        frappe.throw('Establishment Date is required before review/approval.')\n    today = frappe.utils.getdate(frappe.utils.today())\n    years = (today - frappe.utils.getdate(est)).days / 365.0\n    if years < MIN_YEARS:\n        frappe.throw('Supplier must be in existence for at least {0} years.'.format(MIN_YEARS))\n\n    months = frappe.utils.cint(doc.get('custom_product_availability_months') or 0)\n    if months < MIN_MONTHS:\n        frappe.throw('Product must be available in the civil market for at least {0} months.'.format(MIN_MONTHS))\n\n    if doc.get('custom_is_sole_marketer') != 'Yes':\n        frappe.throw('Supplier must be the sole marketer (set Is Sole Marketer to \"Yes\").')",
+  "script_type": "DocType Event"
+ },
+ {
+  "disabled": 0,
+  "doctype": "Server Script",
+  "doctype_event": "Before Save",
+  "name": "Supplier Document - require_attachment_for_key_docs",
+  "reference_doctype": "Supplier Document",
+  "script": "REQUIRED = (\"Turnover and sales certificate\", \"Factory location\")\nif doc.get('custom_document_type') in REQUIRED:\n    if not doc.get('custom_file'):\n        frappe.throw('Attachment required for ' + (doc.get('custom_document_type') or 'this document'))\n\n# validation will block save if missing attachment.",
+  "script_type": "DocType Event"
+ },
+ {
+  "disabled": 0,
+  "doctype": "Server Script",
+  "doctype_event": "Before Save",
+  "name": "Supplier - ensure_required_supporting_docs",
+  "reference_doctype": "Supplier",
+  "script": "REQUIRED = (\"Turnover and sales certificate\", \"Factory location\")\nfound = []\ndocs = doc.get('custom_supporting_documents') or []\nfor d in docs:\n    dt = d.get('custom_document_type')\n    f = d.get('custom_file')\n    if dt in REQUIRED and f:\n        if dt not in found:\n            found.append(dt)\nmissing = []\nfor r in REQUIRED:\n    if r not in found:\n        missing.append(r)\nif missing:\n    frappe.throw('Please upload required supporting documents before saving: ' + ', '.join(missing))\nelse:\n    # mark eligibility complete when the required supporting docs are present\n    doc.custom_eligibility_complete = 1",
   "script_type": "DocType Event"
  },
  {
@@ -42,6 +69,24 @@
   "name": "Supplier C-Form - validate_c_form_fields",
   "reference_doctype": "Supplier C-Form",
   "script": "if doc.get('custom_document_type') == 'C-Form':\n    if not doc.get('custom_c_form_number'):\n        frappe.throw('C-Form Number is required for documents marked as C-Form.')\n    if not doc.get('custom_document_file'):\n        frappe.throw('Please attach the C-Form file in Document File for C-Form submissions.')\n    if not doc.get('custom_c_form_received_date'):\n        doc.custom_c_form_received_date = frappe.utils.today()\nelse:\n    pass",
+  "script_type": "DocType Event"
+ },
+ {
+  "disabled": 0,
+  "doctype": "Server Script",
+  "doctype_event": "Before Submit",
+  "name": "Supplier Change Request - require_supporting_docs_for_new_or_change_requests",
+  "reference_doctype": "Supplier Change Request",
+  "script": "if doc.get('custom_change_request_type') in ['New Introduction', 'Change Request']:\n    docs = doc.get('custom_supplier_documents') or []\n    if not docs or len(docs) == 0:\n        frappe.throw('At least one Supporting Document must be attached for New Introduction or Change Request.')",
+  "script_type": "DocType Event"
+ },
+ {
+  "disabled": 0,
+  "doctype": "Server Script",
+  "doctype_event": "Before Save",
+  "name": "Supplier - CSD Supplier Auto-Validation",
+  "reference_doctype": "Supplier",
+  "script": "TAX_ID_REQUIRED_COUNTRIES = [\"India\"]\nBANK_TRANSFER_OPTIONS = [\"Bank Transfer\", \"NEFT/RTGS\"]\nMIN_ELIGIBILITY_ROWS = 1\nMIN_SUPPORTING_DOC_ROWS = 1\n\nerrors = []\n\ntoday = frappe.utils.getdate(frappe.utils.nowdate())\n\n# Establishment Date cannot be in the future\nif doc.get(\"custom_establishment_date\"):\n    if frappe.utils.getdate(doc.custom_establishment_date) > today:\n        errors.append(\"Establishment Date cannot be in the future.\")\n\n# Tax ID mandatory for specific countries\nif doc.get(\"country\") and doc.country in TAX_ID_REQUIRED_COUNTRIES and not doc.get(\"tax_id\"):\n    errors.append(\"Tax ID is mandatory for suppliers in {}.\".format(\", \".join(TAX_ID_REQUIRED_COUNTRIES)))\n\n# Preferred Payment Method dependent checks\nppm = doc.get(\"custom_preferred_payment_method\")\nif ppm:\n    if ppm in BANK_TRANSFER_OPTIONS and not doc.get(\"default_bank_account\"):\n        errors.append(\"Default Bank Account is required when Preferred Payment Method is {}.\".format(ppm))\n    if \"UPI\" in ppm:\n        upi = (doc.get(\"custom_upi_id\") or \"\").strip()\n        if not upi:\n            errors.append(\"UPI ID is required when Preferred Payment Method is UPI.\")\n        else:\n            if \"@\" not in upi or len(upi) < 5 or len(upi) > 45:\n                errors.append(\"UPI ID appears invalid (expected format like name@bank).\")\n\n# Website basic sanity (must start with http/https if provided)\nif doc.get(\"website\"):\n    w = doc.website.strip()\n    if not (w.startswith(\"http://\") or w.startswith(\"https://\")):\n        errors.append(\"Website URL must start with http:// or https://.\")\n\n# Contact sanity (very light validation)\nif doc.get(\"email_id\"):\n    if not frappe.utils.validate_email_address(doc.email_id, False):\n        errors.append(\"Primary Email appears invalid.\")\n\nif doc.get(\"mobile_no\"):\n    digits = \"\".join([c for c in doc.mobile_no if c.isdigit()])\n    if len(digits) < 7:\n        errors.append(\"Primary Mobile No. appears invalid.\")\n\n# Risk review logic\nif doc.get(\"custom_risk_rating\"):\n    if not doc.get(\"custom_risk_review_date\"):\n        errors.append(\"Risk Review Date is required when Risk Rating is set.\")\n    else:\n        if frappe.utils.getdate(doc.custom_risk_review_date) < today:\n            errors.append(\"Risk Review Date cannot be in the past.\")\n\n# Minimum Eligibility Criteria and Supporting Documents\nelig = doc.get(\"custom_eligibility_criteria\") or []\ndocs = doc.get(\"custom_supporting_documents\") or []\nif len(elig) < MIN_ELIGIBILITY_ROWS:\n    errors.append(\"At least {} Eligibility Criteria row(s) required.\".format(MIN_ELIGIBILITY_ROWS))\nif len(docs) < MIN_SUPPORTING_DOC_ROWS:\n    errors.append(\"At least {} Supporting Document(s) required.\".format(MIN_SUPPORTING_DOC_ROWS))\n\n# Summarize and finalize\nif errors:\n    doc.custom_eligibility_complete = 0\n    doc.custom_csd_validation_summary = \"CSD validation failed:\\n- \" + \"\\n- \".join(errors)\n    frappe.throw(\"CSD validation failed. Please review the Validation Summary.\")\nelse:\n    doc.custom_eligibility_complete = 1\n    doc.custom_csd_validation_summary = \"All CSD checks passed on {0}.\".format(frappe.utils.formatdate(today))\n",
   "script_type": "DocType Event"
  },
  {
@@ -69,6 +114,51 @@
   "name": "Supplier Source Declaration - ssd_validate_dates",
   "reference_doctype": "Supplier Source Declaration",
   "script": "if doc.get('valid_from') and doc.get('valid_to'):\n    if frappe.utils.getdate(doc.valid_to) < frappe.utils.getdate(doc.valid_from):\n        frappe.throw('\"Valid To\" cannot be earlier than \"Valid From\"')\n",
+  "script_type": "DocType Event"
+ },
+ {
+  "disabled": 0,
+  "doctype": "Server Script",
+  "doctype_event": "Before Save",
+  "name": "Supplier - require_suspension_reason_if_suspended",
+  "reference_doctype": "Supplier",
+  "script": "if doc.custom_suspended==1:\n  if not doc.custom_suspension_reason or str(doc.custom_suspension_reason).strip()==\"\":\n    frappe.throw(\"Suspension Reason is required when Suspended is checked.\")\nelse:\n  pass",
+  "script_type": "DocType Event"
+ },
+ {
+  "disabled": 0,
+  "doctype": "Server Script",
+  "doctype_event": "Before Save",
+  "name": "Issue - require_supplier_for_supplier_issues",
+  "reference_doctype": "Issue",
+  "script": "if doc.get('issue_type')==\"Supplier\":\n  if not doc.get('custom_supplier'):\n    frappe.throw(\"For supplier-related issues, Supplier must be set in the 'Supplier' field.\")\nelse:\n  pass",
+  "script_type": "DocType Event"
+ },
+ {
+  "disabled": 0,
+  "doctype": "Server Script",
+  "doctype_event": "Before Save",
+  "name": "Supplier Scorecard - set_numeric_supplier_score",
+  "reference_doctype": "Supplier Scorecard",
+  "script": "if doc.get('supplier_score'):\n  doc.custom_supplier_score_numeric = frappe.utils.flt(doc.get('supplier_score'))\nelse:\n  if not doc.get('custom_supplier_score_numeric'):\n    doc.custom_supplier_score_numeric = 0.0",
+  "script_type": "DocType Event"
+ },
+ {
+  "disabled": 0,
+  "doctype": "Server Script",
+  "doctype_event": "Before Save",
+  "name": "Supplier Fee Schedule - supplier_fee_schedule_set_paid_on_and_require_ref",
+  "reference_doctype": "Supplier Fee Schedule",
+  "script": "if True:\n\t# When status is set to 'Paid', ensure payment_reference exists and set paid_on if not present\n\tif doc.get('status') and str(doc.get('status')).lower() == 'paid':\n\t\tif not doc.get('payment_reference'):\n\t\t\tfrappe.throw('Payment reference is required when status is Paid.')\n\t\t# set paid_on to today if not set\n\t\tif not doc.get('paid_on'):\n\t\t\tdoc.paid_on = frappe.utils.nowdate()\n\telse:\n\t\t# no automatic clearing of paid_on for non-Paid statuses in this POC\n\t\tpass",
+  "script_type": "DocType Event"
+ },
+ {
+  "disabled": 0,
+  "doctype": "Server Script",
+  "doctype_event": "Before Save",
+  "name": "Supplier Document - supplier_document_require_file_and_set_dms_path",
+  "reference_doctype": "Supplier Document",
+  "script": "if True:\n\t# Require at least one attachment field\n\tif not doc.get('file') and not doc.get('custom_file'):\n\t\tfrappe.throw('An attachment is required on Supplier Document (file or custom_file).')\n\t# Enforce private files by checking the stored path contains \"/private/\" or 'private' prefix\n\tfile_checked = False\n\tfor f in ['file','custom_file']:\n\t\tval = doc.get(f)\n\t\tif val:\n\t\t\tif isinstance(val, str) and ('/private/' in val or val.startswith('private')):\n\t\t\t\tfile_checked = True\n\t\t\telse:\n\t\t\t\tfrappe.throw('Attached files must be private. Please upload via Private Files for ' + f + '.')\n\tif not file_checked:\n\t\tfrappe.throw('No private attachment detected. Please upload files to private storage.')\n\t# Populate or normalize a DMS folder-path metadata field for hierarchical grouping in-ERP\n\t# Use the linked supplier name if available (custom_supplier) else leave generic\n\tsupplier_name = doc.get('custom_supplier') or ''\t\n\tdoctype_label = doc.get('document_type') or 'Documents'\n\tif supplier_name:\n\t\tpath = '/Suppliers/' + supplier_name + '/' + doctype_label + '/'\n\t\tdoc.custom_dms_folder_path = path\n\telse:\n\t\tdoc.custom_dms_folder_path = '/Suppliers/Unlinked/' + doctype_label + '/'",
   "script_type": "DocType Event"
  }
 ]

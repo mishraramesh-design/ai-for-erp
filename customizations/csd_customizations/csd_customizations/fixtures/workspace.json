@@ -42,5 +42,59 @@
   "roles": [],
   "shortcuts": [],
   "title": "SRM Home"
+ },
+ {
+  "charts": [
+   {
+    "chart_name": "Cases by State",
+    "label": "Cases by State"
+   },
+   {
+    "chart_name": "Cases by Owner",
+    "label": "Cases by Owner"
+   }
+  ],
+  "content": "[{\"id\": \"b01\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Case Management</b></span>\", \"col\": 12}}, {\"id\": \"b02\", \"type\": \"custom_block\", \"data\": {\"custom_block_name\": \"Case banner\", \"col\": 12}}, {\"id\": \"b03\", \"type\": \"custom_block\", \"data\": {\"custom_block_name\": \"Case Tiles\", \"col\": 12}}, {\"id\": \"b04\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Open Cases\", \"col\": 4}}, {\"id\": \"b05\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Average Days Open\", \"col\": 4}}, {\"id\": \"b06\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"b07\", \"type\": \"chart\", \"data\": {\"chart_name\": \"Cases by State\", \"col\": 6}}, {\"id\": \"b08\", \"type\": \"chart\", \"data\": {\"chart_name\": \"Cases by Owner\", \"col\": 6}}, {\"id\": \"b09\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"b10\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h5\\\"><b>Shortcuts</b></span>\", \"col\": 12}}, {\"id\": \"b11\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Cases\", \"col\": 3}}, {\"id\": \"b12\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"New Case\", \"col\": 3}}]",
+  "custom_blocks": [
+   {
+    "custom_block_name": "Case banner",
+    "label": "Case banner"
+   },
+   {
+    "custom_block_name": "Case Tiles",
+    "label": "Case Tiles"
+   }
+  ],
+  "doctype": "Workspace",
+  "label": "Case Management",
+  "module": "Buying",
+  "name": "Case Management",
+  "number_cards": [
+   {
+    "label": "Open Cases",
+    "number_card_name": "Open Cases"
+   },
+   {
+    "label": "Average Days Open",
+    "number_card_name": "Average Days Open"
+   }
+  ],
+  "public": 1,
+  "roles": [],
+  "shortcuts": [
+   {
+    "doc_view": "List",
+    "label": "Cases",
+    "link_to": "Case",
+    "type": "DocType"
+   },
+   {
+    "doc_view": "New",
+    "label": "New Case",
+    "link_to": "Case",
+    "type": "DocType"
+   }
+  ],
+  "title": "Case Management"
  }
 ]

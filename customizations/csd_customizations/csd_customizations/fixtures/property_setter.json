@@ -7,7 +7,7 @@
   "name": "Supplier-custom_risk_review_date-mandatory_depends_on",
   "property": "mandatory_depends_on",
   "property_type": "Code",
-  "value": "eval:doc.custom_risk_rating=='High'"
+  "value": "eval:doc.custom_risk_rating"
  },
  {
   "doc_type": "Supplier",
@@ -17,7 +17,7 @@
   "name": "Supplier-custom_upi_id-mandatory_depends_on",
   "property": "mandatory_depends_on",
   "property_type": "Code",
-  "value": "eval:doc.custom_preferred_payment_method=='UPI'"
+  "value": "eval:doc.custom_preferred_payment_method && (doc.custom_preferred_payment_method.indexOf(\"UPI\")>=0)"
  },
  {
   "doc_type": "Supplier",
@@ -28,6 +28,136 @@
   "property": "in_standard_filter",
   "property_type": "Check",
   "value": "1"
+ },
+ {
+  "doc_type": "Supplier",
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "supplier_type",
+  "name": "Supplier-supplier_type-in_standard_filter",
+  "property": "in_standard_filter",
+  "property_type": "Check",
+  "value": "1"
+ },
+ {
+  "doc_type": "Supplier",
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "country",
+  "name": "Supplier-country-in_standard_filter",
+  "property": "in_standard_filter",
+  "property_type": "Check",
+  "value": "1"
+ },
+ {
+  "doc_type": "Supplier",
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "custom_risk_rating",
+  "name": "Supplier-custom_risk_rating-in_standard_filter",
+  "property": "in_standard_filter",
+  "property_type": "Check",
+  "value": "1"
+ },
+ {
+  "doc_type": "Supplier",
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "custom_risk_rating",
+  "name": "Supplier-custom_risk_rating-in_list_view",
+  "property": "in_list_view",
+  "property_type": "Check",
+  "value": "1"
+ },
+ {
+  "doc_type": "Supplier",
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "tax_id",
+  "name": "Supplier-tax_id-in_standard_filter",
+  "property": "in_standard_filter",
+  "property_type": "Check",
+  "value": "1"
+ },
+ {
+  "doc_type": "Supplier",
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "disabled",
+  "name": "Supplier-disabled-in_standard_filter",
+  "property": "in_standard_filter",
+  "property_type": "Check",
+  "value": "1"
+ },
+ {
+  "doc_type": "Supplier",
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "on_hold",
+  "name": "Supplier-on_hold-in_standard_filter",
+  "property": "in_standard_filter",
+  "property_type": "Check",
+  "value": "1"
+ },
+ {
+  "doc_type": "Supplier",
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "prevent_rfqs",
+  "name": "Supplier-prevent_rfqs-in_standard_filter",
+  "property": "in_standard_filter",
+  "property_type": "Check",
+  "value": "1"
+ },
+ {
+  "doc_type": "Supplier",
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "is_frozen",
+  "name": "Supplier-is_frozen-in_standard_filter",
+  "property": "in_standard_filter",
+  "property_type": "Check",
+  "value": "1"
+ },
+ {
+  "doc_type": "Non Conformance",
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "custom_supplier",
+  "name": "Non Conformance-custom_supplier-in_standard_filter",
+  "property": "in_standard_filter",
+  "property_type": "Check",
+  "value": "1"
+ },
+ {
+  "doc_type": "Non Conformance",
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "custom_target_resolution_date",
+  "name": "Non Conformance-custom_target_resolution_date-in_standard_filter",
+  "property": "in_standard_filter",
+  "property_type": "Check",
+  "value": "1"
+ },
+ {
+  "doc_type": "Non Conformance",
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "custom_severity",
+  "name": "Non Conformance-custom_severity-in_standard_filter",
+  "property": "in_standard_filter",
+  "property_type": "Check",
+  "value": "1"
+ },
+ {
+  "doc_type": "Supplier",
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "naming_series",
+  "name": "Supplier-naming_series-default",
+  "property": "default",
+  "property_type": "Text",
+  "value": "SUP-.YYYY.-.#####"
  },
  {
   "doc_type": "Supplier",
@@ -53,11 +183,91 @@
   "doc_type": "Supplier",
   "doctype": "Property Setter",
   "doctype_or_field": "DocField",
-  "field_name": "naming_series",
-  "name": "Supplier-naming_series-default",
-  "property": "default",
+  "field_name": "custom_supporting_documents",
+  "name": "Supplier-custom_supporting_documents-hidden",
+  "property": "hidden",
+  "property_type": "Check",
+  "value": "0"
+ },
+ {
+  "doc_type": "Supplier",
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "custom_supporting_documents",
+  "name": "Supplier-custom_supporting_documents-description",
+  "property": "description",
   "property_type": "Text",
-  "value": "SUP-.YYYY.-.#####"
+  "value": "Attach all supplier registration and compliance documents here to eliminate paper files."
+ },
+ {
+  "doc_type": "Supplier",
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "mobile_no",
+  "name": "Supplier-mobile_no-in_list_view",
+  "property": "in_list_view",
+  "property_type": "Check",
+  "value": "1"
+ },
+ {
+  "doc_type": "Supplier",
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "email_id",
+  "name": "Supplier-email_id-in_list_view",
+  "property": "in_list_view",
+  "property_type": "Check",
+  "value": "1"
+ },
+ {
+  "doc_type": "Supplier Change Request",
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "custom_supplier_documents",
+  "name": "Supplier Change Request-custom_supplier_documents-mandatory_depends_on",
+  "property": "mandatory_depends_on",
+  "property_type": "Code",
+  "value": "eval:doc.custom_change_request_type in ['New Introduction','Change Request']"
+ },
+ {
+  "doc_type": "Supplier",
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "custom_eligibility_complete",
+  "name": "Supplier-custom_eligibility_complete-read_only",
+  "property": "read_only",
+  "property_type": "Check",
+  "value": "1"
+ },
+ {
+  "doc_type": "Supplier",
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "custom_eligibility_complete",
+  "name": "Supplier-custom_eligibility_complete-description",
+  "property": "description",
+  "property_type": "Text",
+  "value": "Auto-set by server validation when all CSD checks pass."
+ },
+ {
+  "doc_type": "Supplier",
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "tax_id",
+  "name": "Supplier-tax_id-mandatory_depends_on",
+  "property": "mandatory_depends_on",
+  "property_type": "Code",
+  "value": "eval:doc.country==\"India\""
+ },
+ {
+  "doc_type": "Supplier",
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "default_bank_account",
+  "name": "Supplier-default_bank_account-mandatory_depends_on",
+  "property": "mandatory_depends_on",
+  "property_type": "Code",
+  "value": "eval:doc.custom_preferred_payment_method && (doc.custom_preferred_payment_method==\"Bank Transfer\" || doc.custom_preferred_payment_method==\"NEFT/RTGS\")"
  },
  {
   "doc_type": "Supplier Product Registration Item",
@@ -166,6 +376,56 @@
   "field_name": "valid_to",
   "name": "Supplier CPS-valid_to-reqd",
   "property": "reqd",
+  "property_type": "Check",
+  "value": "1"
+ },
+ {
+  "doc_type": "Supplier",
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "custom_suspension_reason",
+  "name": "Supplier-custom_suspension_reason-mandatory_depends_on",
+  "property": "mandatory_depends_on",
+  "property_type": "Code",
+  "value": "eval:doc.custom_suspended==1"
+ },
+ {
+  "doc_type": "Supplier",
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "custom_classification",
+  "name": "Supplier-custom_classification-in_standard_filter",
+  "property": "in_standard_filter",
+  "property_type": "Check",
+  "value": "1"
+ },
+ {
+  "doc_type": "Supplier",
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "custom_suspended",
+  "name": "Supplier-custom_suspended-in_standard_filter",
+  "property": "in_standard_filter",
+  "property_type": "Check",
+  "value": "1"
+ },
+ {
+  "doc_type": "Supplier",
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "custom_pnc_status",
+  "name": "Supplier-custom_pnc_status-in_standard_filter",
+  "property": "in_standard_filter",
+  "property_type": "Check",
+  "value": "1"
+ },
+ {
+  "doc_type": "Supplier Document",
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "custom_supplier",
+  "name": "Supplier Document-custom_supplier-in_standard_filter",
+  "property": "in_standard_filter",
   "property_type": "Check",
   "value": "1"
  }

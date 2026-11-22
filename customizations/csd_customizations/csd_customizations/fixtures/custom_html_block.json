@@ -19,5 +19,19 @@
   "name": "SRM Tiles",
   "private": 0,
   "style": ".srm-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px} .srm-tiles a{display:block;background:#000;color:#FFE600 !important;border-radius:10px;padding:18px;text-decoration:none;font-weight:700;font-size:16px} .srm-tiles .caption{color:#BDBDBD;font-size:12px;margin-top:6px;font-weight:400}"
+ },
+ {
+  "doctype": "Custom HTML Block",
+  "html": "<div class=\"case-banner\"><div class=\"case-topbar\"></div><h1>demo-pilot</h1><p>Case Management</p></div>",
+  "name": "Case banner",
+  "private": 0,
+  "style": ".case-banner{background:#000;color:#FFE600;padding:18px;border-radius:10px} .case-banner .case-topbar{height:6px;background:#FFE600;border-radius:2px;margin-bottom:10px} .case-banner h1{margin:0;font-size:28px;font-weight:800;color:#FFE600} .case-banner p{margin:4px 0 0;font-size:14px;color:#FFFFFF}"
+ },
+ {
+  "doctype": "Custom HTML Block",
+  "html": "<div class=\"case-tiles\"><a href=\"/app/case\"><div>Cases</div><div class=\"caption\">All cases</div></a><a href=\"/app/case/new\"><div>New Case</div><div class=\"caption\">Register a case</div></a><a href=\"/app/dashboard-view/Case Dashboard\"><div>Case Dashboard</div><div class=\"caption\">Management view</div></a><a href=\"/app/query-report/Case Lifecycle\"><div>Case Lifecycle</div><div class=\"caption\">Status and owners</div></a><a href=\"/app/query-report/Case Ageing\"><div>Case Ageing</div><div class=\"caption\">Days open</div></a></div>",
+  "name": "Case Tiles",
+  "private": 0,
+  "style": ".case-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px} .case-tiles a{display:block;background:#000;color:#FFE600 !important;border-radius:10px;padding:18px;text-decoration:none;font-weight:700;font-size:16px;border-left:8px solid #FFE600} .case-tiles .caption{color:#FFE600;font-size:12px;margin-top:6px;font-weight:400}"
  }
 ]
