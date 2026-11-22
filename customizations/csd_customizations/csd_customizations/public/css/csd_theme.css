@@ -138,3 +138,47 @@ body { background: var(--csd-sand); font-feature-settings: "cv11","ss01"; }
 ::selection { background: var(--csd-yellow); color: var(--csd-black); }
 ::-webkit-scrollbar { width: 10px; height: 10px; }
 ::-webkit-scrollbar-thumb { background: #c9c3a6; border-radius: 10px; border: 2px solid var(--csd-sand); }
+
+/* ---- Form fields: white, black outline, sand page behind ---- */
+.form-control, .frappe-control .control-input .form-control,
+.frappe-control input[type="text"], .frappe-control input[type="number"], .frappe-control input[type="password"],
+.frappe-control textarea, .frappe-control select, .awesomplete input, .filter-field .form-control {
+  background: #fff !important; border: 1px solid var(--csd-black) !important; border-radius: 6px !important;
+  box-shadow: none !important; color: var(--csd-black); transition: box-shadow .12s, border-color .12s;
+}
+.form-control:hover { border-width: 1px; box-shadow: 0 0 0 1px var(--csd-black) !important; }
+.form-control:focus, .frappe-control input:focus, .frappe-control textarea:focus, .frappe-control select:focus {
+  border-color: var(--csd-black) !important; background: var(--csd-yellow-wash) !important;
+  box-shadow: 0 0 0 3px var(--csd-yellow-soft) !important; outline: none;
+}
+/* read-only / disabled */
+.form-control[disabled], .form-control[readonly], .frappe-control .control-value, .like-disabled-input {
+  background: var(--csd-sand) !important; border: 1px solid #8b8776 !important; border-radius: 6px !important; color: #2b2b2b !important;
+  box-shadow: none !important; font-weight: 500;
+}
+.frappe-control .control-value.like-disabled-input { padding: 6px 10px; }
+/* labels */
+.form-group .control-label, .frappe-control .control-label, .frappe-control label.control-label {
+  font-size: 12px !important; font-weight: 500 !important; color: #4a4a45 !important; letter-spacing: .01em; margin-bottom: 4px;
+}
+.frappe-control.has-error .control-label, .reqd + .control-label { color: var(--csd-black) !important; }
+.label-area:has(+ .reqd) { box-shadow: inset 3px 0 0 var(--csd-yellow); padding-left: 6px; }
+/* checkboxes */
+input[type="checkbox"] {
+  -webkit-appearance: none !important; appearance: none !important; width: 18px !important; height: 18px !important;
+  background: #fff !important; border: 1.5px solid var(--csd-black) !important; border-radius: 4px !important;
+  box-shadow: none !important; position: relative; cursor: pointer; flex: none; vertical-align: middle; margin-right: 8px;
+}
+input[type="checkbox"]:checked { background: var(--csd-yellow) !important; }
+input[type="checkbox"]:checked::after {
+  content: ""; position: absolute; left: 5px; top: 1px; width: 5px; height: 10px;
+  border: solid var(--csd-black); border-width: 0 2px 2px 0; transform: rotate(45deg);
+}
+input[type="checkbox"]:focus { box-shadow: 0 0 0 3px var(--csd-yellow-soft) !important; }
+input[type="checkbox"]:disabled { background: var(--csd-sand) !important; border-color: #8b8776 !important; }
+.checkbox label, .frappe-control[data-fieldtype="Check"] label { display: flex; align-items: center; font-size: 13px; font-weight: 500; }
+/* dropdown suggestions */
+.awesomplete > ul { border: 1px solid var(--csd-black); border-radius: 8px; box-shadow: 0 6px 18px rgba(0,0,0,.15); }
+.awesomplete > ul > li[aria-selected="true"], .awesomplete > ul > li:hover { background: var(--csd-yellow-soft) !important; color: var(--csd-black) !important; }
+/* section cards: soft white on the sand page */
+.form-layout .form-page, .form-section { background: transparent; }
