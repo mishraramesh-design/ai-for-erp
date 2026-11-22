@@ -23,6 +23,101 @@ PERMISSIONS = [
    "write"
   ],
   "role": "Branch User"
+ },
+ {
+  "doctype": "Purchase Order",
+  "permlevel": 0,
+  "rights": [
+   "read",
+   "write",
+   "report",
+   "print",
+   "email"
+  ],
+  "role": "Supplier"
+ },
+ {
+  "doctype": "Supplier Quotation",
+  "permlevel": 0,
+  "rights": [
+   "read",
+   "write",
+   "create",
+   "submit"
+  ],
+  "role": "Supplier"
+ },
+ {
+  "doctype": "Supplier Change Request",
+  "permlevel": 0,
+  "rights": [
+   "read",
+   "write",
+   "create"
+  ],
+  "role": "Supplier"
+ },
+ {
+  "doctype": "Supplier Change Request",
+  "permlevel": 0,
+  "rights": [
+   "read",
+   "write"
+  ],
+  "role": "Branch User"
+ },
+ {
+  "doctype": "Supplier Change Request",
+  "permlevel": 0,
+  "rights": [
+   "read",
+   "write"
+  ],
+  "role": "Purchase Manager"
+ },
+ {
+  "doctype": "Supplier Change Request",
+  "permlevel": 0,
+  "rights": [
+   "read",
+   "write"
+  ],
+  "role": "Purchase User"
+ },
+ {
+  "doctype": "Bank Guarantee",
+  "permlevel": 0,
+  "rights": [
+   "read",
+   "write"
+  ],
+  "role": "Supplier"
+ },
+ {
+  "doctype": "Supplier Document",
+  "permlevel": 0,
+  "rights": [
+   "read",
+   "write",
+   "create"
+  ],
+  "role": "Supplier"
+ },
+ {
+  "doctype": "Supplier Document",
+  "permlevel": 0,
+  "rights": [
+   "read",
+   "write",
+   "create",
+   "delete",
+   "report",
+   "export",
+   "print",
+   "email",
+   "share"
+  ],
+  "role": "AGM Secretariat"
  }
 ]
 

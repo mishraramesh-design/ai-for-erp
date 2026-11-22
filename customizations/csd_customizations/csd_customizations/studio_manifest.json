@@ -34,6 +34,56 @@
    "title": "Supplier preferred payment method with conditional UPI ID (ERPNext v15)"
   },
   {
+   "change_set": "01M5DG48C8BRCDN8NEP0J1XHGT",
+   "created_by": "run:8601d0d47058",
+   "operations": [
+    "Create child table \"Supplier Document\" in module Buying with 5 fields and 1 role permission(s)",
+    "Create DocType \"PNC Decision\" in module Buying with 8 fields and 2 role permission(s)",
+    "Add Table field \"Supporting Documents\" (custom_supporting_documents) to Supplier after portal_users, options: Supplier Document",
+    "Add Link field \"Supplier\" (custom_supplier) to Non Conformance, options: Supplier",
+    "Add Date field \"Target Resolution Date\" (custom_target_resolution_date) to Non Conformance",
+    "Add Select field \"Severity\" (custom_severity) to Non Conformance, options: Low / Medium / High",
+    "Add Small Text field \"Root Cause\" (custom_root_cause) to Non Conformance",
+    "Add Text Editor field \"Corrective Action\" (custom_corrective_action) to Non Conformance",
+    "Set in_standard_filter = True on field \"supplier_group\" of Supplier",
+    "Set in_standard_filter = True on field \"supplier_type\" of Supplier",
+    "Set in_standard_filter = True on field \"country\" of Supplier",
+    "Set in_standard_filter = True on field \"custom_risk_rating\" of Supplier",
+    "Set in_list_view = True on field \"custom_risk_rating\" of Supplier",
+    "Set in_standard_filter = True on field \"tax_id\" of Supplier",
+    "Set in_standard_filter = True on field \"disabled\" of Supplier",
+    "Set in_standard_filter = True on field \"on_hold\" of Supplier",
+    "Set in_standard_filter = True on field \"prevent_rfqs\" of Supplier",
+    "Set in_standard_filter = True on field \"is_frozen\" of Supplier",
+    "Set in_standard_filter = True on field \"custom_supplier\" of Non Conformance",
+    "Set in_standard_filter = True on field \"custom_target_resolution_date\" of Non Conformance",
+    "Set in_standard_filter = True on field \"custom_severity\" of Non Conformance",
+    "Add server script \"Validate PNC Decision fields\" on PNC Decision (before save)",
+    "Create workflow \"PNC-BoA Approval\" on PNC Decision: 3 states, 2 transitions",
+    "Create workflow \"Supplier NC Resolution\" on Non Conformance: 4 states, 4 transitions",
+    "Create email notification \"Supplier NC Due Tomorrow\" on Non Conformance (Days Before)",
+    "Create email notification \"Supplier NC Logged\" on Non Conformance (New)",
+    "Create report \"Supplier Directory\" on Supplier with 7 columns",
+    "Create report \"PNC Decisions\" on PNC Decision with 5 columns",
+    "Create report \"Supplier Non Conformances\" on Non Conformance with 4 columns",
+    "Create number card \"Total Suppliers\": Count on Supplier",
+    "Create number card \"Active Suppliers\": Count on Supplier",
+    "Create number card \"Suppliers On Hold\": Count on Supplier",
+    "Create number card \"Suspension Decisions\": Count on PNC Decision",
+    "Create pie chart \"Suppliers by Group\" on Supplier",
+    "Create pie chart \"Suppliers by Type\" on Supplier",
+    "Create bar chart \"Suppliers by Country\" on Supplier",
+    "Create bar chart \"PNC Decisions by Type\" on PNC Decision",
+    "Create line chart \"New Suppliers - Monthly\" on Supplier",
+    "Create bar chart \"NC by Supplier\" on Non Conformance",
+    "Create dashboard \"Supplier SRM\" with 6 chart(s) and 4 number card(s)"
+   ],
+   "requirements": [],
+   "risk": "high",
+   "session": "8601d0d47058",
+   "title": "Supplier SRM Core (Docs, Workflows, Alerts, Dashboard & Reports)"
+  },
+  {
    "change_set": "01M5DJ2KXGFNKRDZBGSVGYS3NK",
    "created_by": "run:8601d0d47058",
    "operations": [
@@ -49,6 +99,31 @@
    "risk": "high",
    "session": "8601d0d47058",
    "title": "Supplier Onboarding Gate: Age, Market Availability, Sole Marketer + Workflow (ERPNext v15)"
+  },
+  {
+   "change_set": "01M5DKRAKCFS6XHWS79XY6CV86",
+   "created_by": "run:09e3f5bcaafe",
+   "operations": [
+    "Create child table \"Supplier Eligibility\" in module Buying with 4 fields and 4 role permission(s)",
+    "Add Select field \"Document Type\" (custom_document_type) to Supplier Document, options: Turnover and sales certificate / Factory location / Other",
+    "Add Attach field \"Attachment\" (custom_file) to Supplier Document",
+    "Add Check field \"Eligibility Complete\" (custom_eligibility_complete) to Supplier",
+    "Add Table field \"Eligibility Criteria\" (custom_eligibility_criteria) to Supplier, options: Supplier Eligibility",
+    "Set default = SUP-.YYYY.- on field \"naming_series\" of Supplier",
+    "Add server script \"require_attachment_for_key_docs\" on Supplier Document (before save)",
+    "Add server script \"ensure_required_supporting_docs\" on Supplier (before save)",
+    "Create email notification \"New Supplier Created - Notify Purchase Managers\" on Supplier (New)",
+    "Create report \"Suppliers Pending Eligibility\" on Supplier with 5 columns",
+    "Create number card \"Suppliers pending eligibility\": Count on Supplier"
+   ],
+   "requirements": [
+    409,
+    414,
+    437
+   ],
+   "risk": "medium",
+   "session": "09e3f5bcaafe",
+   "title": "Supplier onboarding: eligibility & supporting documents (small ops change set)"
   },
   {
    "change_set": "01M5DKV7S83BRAAH00SQRFFXY4",
@@ -72,6 +147,97 @@
    "title": "SRM pilot – Supplier classification, Branch edit access, baseline validations, and series options"
   },
   {
+   "change_set": "01M5DMXJ89CRQBCB67FXP2YYBZ",
+   "created_by": "run:09e3f5bcaafe",
+   "operations": [
+    "Add Check field \"Acknowledged\" (custom_is_acknowledged) to Purchase Order",
+    "Add Date field \"Acknowledged On\" (custom_acknowledged_on) to Purchase Order",
+    "Add Link field \"Acknowledged By\" (custom_acknowledged_by) to Purchase Order, options: User",
+    "Create workflow \"Purchase Order Acknowledgement\" on Purchase Order: 3 states, 1 transitions",
+    "Grant role \"Supplier\" on Purchase Order (level 0): read, write, report, print, email",
+    "Create email notification \"PO Created - Supplier\" on Purchase Order (New)",
+    "Create email notification \"PO Acknowledged - Notify Internal\" on Purchase Order (Value Change)"
+   ],
+   "requirements": [
+    433
+   ],
+   "risk": "high",
+   "session": "09e3f5bcaafe",
+   "title": "Expose Purchase Order to Supplier Portal with Acknowledge flow"
+  },
+  {
+   "change_set": "01M5DN0AZ5YJAEJ62GKJX6YJKA",
+   "created_by": "run:09e3f5bcaafe",
+   "operations": [
+    "Add Currency field \"Retail Rate\" (custom_retail_rate) to Supplier Quotation Item after rate, mandatory",
+    "Add Currency field \"Wholesale Rate\" (custom_wholesale_rate) to Supplier Quotation Item after custom_retail_rate, mandatory",
+    "Add Currency field \"Proposed Offer Rate\" (custom_offer_rate) to Supplier Quotation Item after custom_wholesale_rate, mandatory",
+    "Grant role \"Supplier\" on Supplier Quotation (level 0): read, write, create, submit",
+    "Create system notification notification \"Notify Purchase on Supplier Quotation Submit\" on Supplier Quotation (Submit)"
+   ],
+   "requirements": [
+    422
+   ],
+   "risk": "high",
+   "session": "09e3f5bcaafe",
+   "title": "Supplier-submitted Retail/Wholesale/Offer Rates via Supplier Quotation"
+  },
+  {
+   "change_set": "01M5DN5CCWW01K913E264XZBJX",
+   "created_by": "run:09e3f5bcaafe",
+   "operations": [
+    "Add Data field \"Index Number\" (custom_index_number) to Item after item_code",
+    "Add Data field \"Index Number\" (custom_index_number) to Supplier Item after supplier",
+    "Add Link field \"Linked Item\" (custom_item_link) to Supplier Item after custom_index_number, options: Item",
+    "Add Data field \"Supplier Part No\" (custom_supplier_part_no) to Supplier Item after custom_item_link",
+    "Create report \"Item with Index Number\" on Item with 5 columns",
+    "Create report \"Supplier Items by Index Number\" on Supplier Item with 5 columns"
+   ],
+   "requirements": [
+    420
+   ],
+   "risk": "low",
+   "session": "09e3f5bcaafe",
+   "title": "Add Index Number to Item and Supplier Item, plus reports"
+  },
+  {
+   "change_set": "01M5DNDMGEKWMAR44WP7JN1J79",
+   "created_by": "run:09e3f5bcaafe",
+   "operations": [
+    "Set hidden = False on field \"custom_supporting_documents\" of Supplier",
+    "Set description = Attach all supplier registration and compliance documents here to eliminate paper files. on field \"custom_supporting_documents\" of Supplier",
+    "Set in_list_view = True on field \"mobile_no\" of Supplier",
+    "Set in_list_view = True on field \"email_id\" of Supplier",
+    "Add client script \"supplier_registration_prefill\" to the Supplier form",
+    "Create system notification notification \"Notify Purchase Manager on Supplier Pending Approval\" on Supplier (Value Change)"
+   ],
+   "requirements": [
+    415
+   ],
+   "risk": "medium",
+   "session": "09e3f5bcaafe",
+   "title": "SRM Pilot — Supplier Registration Prefill and Approval Alert"
+  },
+  {
+   "change_set": "01M5DNFRSSEZGDYQJCQ5NK6G1P",
+   "created_by": "run:09e3f5bcaafe",
+   "operations": [
+    "Add Select field \"Supplier Delivery Status\" (custom_supplier_delivery_status) to Purchase Receipt, options: Pending / Shipped / Delivered / Delayed / Cancelled",
+    "Add Select field \"Supplier Delivery Status\" (custom_supplier_delivery_status) to Delivery Note, options: Pending / Shipped / Delivered / Delayed / Cancelled",
+    "Add Link field \"Supplier (for Portal)\" (custom_supplier_link) to Delivery Note, options: Supplier",
+    "Create email notification \"Purchase Receipt Notify Supplier On Submit\" on Purchase Receipt (Submit)",
+    "Create email notification \"Purchase Receipt Notify Supplier On Status Change\" on Purchase Receipt (Value Change)",
+    "Create email notification \"Delivery Note Notify Supplier On Submit\" on Delivery Note (Submit)",
+    "Create email notification \"Delivery Note Notify Supplier On Status Change\" on Delivery Note (Value Change)"
+   ],
+   "requirements": [
+    434
+   ],
+   "risk": "medium",
+   "session": "09e3f5bcaafe",
+   "title": "Supplier delivery status notifications (Purchase Receipt + Delivery Note)"
+  },
+  {
    "change_set": "01M5DPPPF1TMVE7Q2E3GJPK2AF",
    "created_by": "run:09e3f5bcaafe",
    "operations": [
@@ -90,6 +256,20 @@
    "title": "Support for Supplier C-Form uploads (change set)"
   },
   {
+   "change_set": "01M5DPQJYDXVF82FTM878HQ0ZW",
+   "created_by": "run:09e3f5bcaafe",
+   "operations": [
+    "Create DocType \"Supplier Change Request\" in module Buying with 7 fields and 4 role permission(s)",
+    "Create system notification notification \"SCR Submitted - Notify Purchase Managers\" on Supplier Change Request (Submit)"
+   ],
+   "requirements": [
+    419
+   ],
+   "risk": "medium",
+   "session": "09e3f5bcaafe",
+   "title": "Supplier Change Request (SCR) — simple submit + notification"
+  },
+  {
    "change_set": "01M5DQE5388F5ZK6Y5WC200TP0",
    "created_by": "run:f3d3fbbc7503",
    "operations": [
@@ -105,6 +285,28 @@
    "title": "SRM Home workspace (demo-pilot) + Open Supplier Change Requests number card"
   },
   {
+   "change_set": "01M5DR1X0PB14H8FAJNEGQF6ZE",
+   "created_by": "run:49a80675c10d",
+   "operations": [
+    "Add Select field \"Change Request Type\" (custom_change_request_type) to Supplier Change Request, mandatory, options: New Introduction / Change Request / Other",
+    "Add Table field \"Supporting Documents\" (custom_supplier_documents) to Supplier Change Request, options: Supplier Document",
+    "Set mandatory_depends_on = eval:doc.custom_change_request_type in ['New Introduction','Change Request'] on field \"custom_supplier_documents\" of Supplier Change Request",
+    "Add server script \"require_supporting_docs_for_new_or_change_requests\" on Supplier Change Request (before submit)",
+    "Create workflow \"Supplier Change Request Workflow - SRM\" on Supplier Change Request: 4 states, 4 transitions",
+    "Grant role \"Supplier\" on Supplier Change Request (level 0): read, create, report, export, print, email",
+    "Grant role \"Branch User\" on Supplier Change Request (level 0): read, write, create, report, export, print, email",
+    "Grant role \"Purchase Manager\" on Supplier Change Request (level 0): read, write, submit, report, export, print, email",
+    "Create email notification \"SCR - Submitted for Review - Notify Reviewers\" on Supplier Change Request (Value Change)",
+    "Create email notification \"SCR - Approved - Notify Supplier and Branch\" on Supplier Change Request (Value Change)"
+   ],
+   "requirements": [
+    418
+   ],
+   "risk": "high",
+   "session": "49a80675c10d",
+   "title": "Supplier Change Request — supporting documents, workflow, permissions and notifications"
+  },
+  {
    "change_set": "01M5E637HX6RHH1T47Z2F8HF0G",
    "created_by": "run:eb1986a05af3",
    "operations": [
@@ -116,6 +318,33 @@
    "risk": "medium",
    "session": "eb1986a05af3",
    "title": "Set default Supplier naming_series to SUP-.YYYY.-.#####"
+  },
+  {
+   "change_set": "01M5E6BW0G3KT8AXWYH9QPHWAS",
+   "created_by": "run:58b70eb00a36",
+   "operations": [
+    "Add Long Text field \"CSD Validation Summary\" (custom_csd_validation_summary) to Supplier after custom_eligibility_complete",
+    "Set read_only = True on field \"custom_eligibility_complete\" of Supplier",
+    "Set description = Auto-set by server validation when all CSD checks pass. on field \"custom_eligibility_complete\" of Supplier",
+    "Set mandatory_depends_on = eval:doc.custom_risk_rating on field \"custom_risk_review_date\" of Supplier",
+    "Set mandatory_depends_on = eval:doc.country==\"India\" on field \"tax_id\" of Supplier",
+    "Set mandatory_depends_on = eval:doc.custom_preferred_payment_method && (doc.custom_preferred_payment_method==\"Bank Transfer\" || doc.custom_preferred_payment_method==\"NEFT/RTGS\") on field \"default_bank_account\" of Supplier",
+    "Set mandatory_depends_on = eval:doc.custom_preferred_payment_method && (doc.custom_preferred_payment_method.indexOf(\"UPI\")>=0) on field \"custom_upi_id\" of Supplier",
+    "Add server script \"CSD Supplier Auto-Validation\" on Supplier (before save)",
+    "Grant role \"Supplier\" on Supplier Change Request (level 0): read, write, create",
+    "Grant role \"Purchase User\" on Supplier Change Request (level 0): read, write",
+    "Grant role \"Purchase Manager\" on Supplier Change Request (level 0): read, write",
+    "Grant role \"Branch User\" on Supplier Change Request (level 0): read, write",
+    "Create system notification notification \"SCR Moved to Under Review\" on Supplier Change Request (Value Change)",
+    "Create system notification notification \"SCR Approved or Rejected\" on Supplier Change Request (Value Change)",
+    "Create report \"Suppliers Failing CSD Checks\" on Supplier with 6 columns"
+   ],
+   "requirements": [
+    22
+   ],
+   "risk": "high",
+   "session": "58b70eb00a36",
+   "title": "CSD Supplier Validation + Secure Supplier Change Requests (v15, minimal config)"
   },
   {
    "change_set": "01M5E79JVHME6FZX0MV355ABVX",
@@ -203,6 +432,23 @@
    "risk": "high",
    "session": "0ea131c61be4",
    "title": "Supplier CPS declaration: fields, validation, and supplier portal"
+  },
+  {
+   "change_set": "01M5EA255XQW91XVZ4HPHG67CV",
+   "created_by": "run:bb89ad8c891c",
+   "operations": [
+    "Add Link field \"Supplier\" (custom_supplier) to Bank Guarantee, options: Supplier",
+    "Add Attach field \"Renewal / Extension Document\" (custom_renewal_document) to Bank Guarantee",
+    "Grant role \"Supplier\" on Bank Guarantee (level 0): read, write",
+    "Create email notification \"Bank Guarantee Expiry Alert\" on Bank Guarantee (Days Before)",
+    "Create portal web form \"Supplier Bank Guarantees\" (/supplier-bank-guarantees) on Bank Guarantee with 4 field(s)"
+   ],
+   "requirements": [
+    438
+   ],
+   "risk": "high",
+   "session": "bb89ad8c891c",
+   "title": "BG tracking with Supplier renewal upload and 30‑day expiry alerts"
   },
   {
    "change_set": "01M5ECNBC0G8AVTS42P60RK978",
@@ -298,6 +544,845 @@
    "risk": "high",
    "session": "cc309e75e801",
    "title": "Supplier CPS — hide duplicates, enforce canonical fields, add validation, recreate portal form"
+  },
+  {
+   "change_set": "01M61XG4GZNWAHXNXK8NA1YXHA",
+   "created_by": "run:c52c9dd424e0",
+   "operations": [
+    "Add client script \"SRM Theme - Supplier\" to the Supplier form"
+   ],
+   "requirements": [
+    100125
+   ],
+   "risk": "medium",
+   "session": "c52c9dd424e0",
+   "title": "SRM Theme for Supplier Form (client script)"
+  },
+  {
+   "change_set": "01M61XJ7HSW8BKRDR9YGJD4G88",
+   "created_by": "run:ba7dabc47975",
+   "operations": [
+    "Add client script \"SRM Theme - Supplier C-Form\" to the Supplier C-Form form"
+   ],
+   "requirements": [
+    100126
+   ],
+   "risk": "medium",
+   "session": "ba7dabc47975",
+   "title": "Add SRM Theme client script for Supplier C-Form"
+  },
+  {
+   "change_set": "01M61XJJJC18VVE363MTAPX1GE",
+   "created_by": "run:39b723c695ef",
+   "operations": [
+    "Add client script \"SRM Theme - Supplier CPS\" to the Supplier CPS form"
+   ],
+   "requirements": [
+    100127
+   ],
+   "risk": "medium",
+   "session": "39b723c695ef",
+   "title": "Implement SRM form theme for Supplier CPS"
+  },
+  {
+   "change_set": "01M61XJWTA69HZGJEBWQJV82ZG",
+   "created_by": "run:12faeb809129",
+   "operations": [
+    "Add client script \"SRM Theme - Supplier Product Registration\" to the Supplier Product Registration form"
+   ],
+   "requirements": [
+    100128
+   ],
+   "risk": "medium",
+   "session": "12faeb809129",
+   "title": "SRM Theme - Supplier Product Registration"
+  },
+  {
+   "change_set": "01M61XK8QRRQWMZYWA5Z94X4XF",
+   "created_by": "run:56346b070d8c",
+   "operations": [
+    "Add client script \"SRM Theme - Supplier Source Declaration\" to the Supplier Source Declaration form"
+   ],
+   "requirements": [
+    100129
+   ],
+   "risk": "medium",
+   "session": "56346b070d8c",
+   "title": "SRM Theme for Supplier Source Declaration"
+  },
+  {
+   "change_set": "01M61XKHTBJDY8KTEQZ8WX106C",
+   "created_by": "run:dcb6a4863faf",
+   "operations": [
+    "Add client script \"SRM Theme - Branch Price Revision\" to the Branch Price Revision form"
+   ],
+   "requirements": [
+    100130
+   ],
+   "risk": "medium",
+   "session": "dcb6a4863faf",
+   "title": "SRM Theme for Branch Price Revision"
+  },
+  {
+   "change_set": "01M61XKXTVN4ESKEXS9TEYAFJ1",
+   "created_by": "run:342f5fd1697f",
+   "operations": [
+    "Add client script \"SRM Theme - Bank Guarantee\" to the Bank Guarantee form"
+   ],
+   "requirements": [
+    100131
+   ],
+   "risk": "medium",
+   "session": "342f5fd1697f",
+   "title": "SRM Theme for Bank Guarantee (client script)"
+  },
+  {
+   "change_set": "01M61XM9X08H3DY24S6KBJ7RC2",
+   "created_by": "run:2ca02a90e73b",
+   "operations": [
+    "Add client script \"SRM Theme - Supplier Change Request\" to the Supplier Change Request form"
+   ],
+   "requirements": [
+    100132
+   ],
+   "risk": "medium",
+   "session": "2ca02a90e73b",
+   "title": "SRM Theme for Supplier Change Request"
+  },
+  {
+   "change_set": "01M6J8TFW9V76S660250MHM2Y8",
+   "created_by": "run:d610d614f5e9",
+   "operations": [
+    "Add client script \"SRM Theme - Supplier\" to the Supplier form"
+   ],
+   "requirements": [
+    100133
+   ],
+   "risk": "medium",
+   "session": "d610d614f5e9",
+   "title": "Implement SRM Theme v2 for Supplier form"
+  },
+  {
+   "change_set": "01M6J8V108QY3WCKAT2GXZWJTM",
+   "created_by": "run:16f89ad1dd6b",
+   "operations": [
+    "Add client script \"SRM Theme - Supplier C-Form\" to the Supplier C-Form form"
+   ],
+   "requirements": [
+    100134
+   ],
+   "risk": "medium",
+   "session": "16f89ad1dd6b",
+   "title": "Add SRM Theme v2 client script to Supplier C-Form"
+  },
+  {
+   "change_set": "01M6J8VGEAF17943H7YP83W85F",
+   "created_by": "run:62113ab4dfc7",
+   "operations": [
+    "Add client script \"SRM Theme - Supplier CPS\" to the Supplier CPS form"
+   ],
+   "requirements": [
+    100135
+   ],
+   "risk": "medium",
+   "session": "62113ab4dfc7",
+   "title": "Add SRM Theme v2 Client Script for Supplier CPS"
+  },
+  {
+   "change_set": "01M6J8W06HAC6H91CF13H2GNZ4",
+   "created_by": "run:78b51408fd14",
+   "operations": [
+    "Add client script \"SRM Theme - Supplier Product Registration\" to the Supplier Product Registration form"
+   ],
+   "requirements": [
+    100136
+   ],
+   "risk": "medium",
+   "session": "78b51408fd14",
+   "title": "Add SRM Theme v2 client script for Supplier Product Registration"
+  },
+  {
+   "change_set": "01M6J8WKYGZDPPENFT7CE9FHWA",
+   "created_by": "run:3a62cd99f597",
+   "operations": [
+    "Add client script \"SRM Theme - Supplier Source Declaration\" to the Supplier Source Declaration form"
+   ],
+   "requirements": [
+    100137
+   ],
+   "risk": "medium",
+   "session": "3a62cd99f597",
+   "title": "SRM Theme v2 for Supplier Source Declaration"
+  },
+  {
+   "change_set": "01M6J8X2X7N8MGW4WTJMA00KCE",
+   "created_by": "run:8e63fd3aadbb",
+   "operations": [
+    "Add client script \"SRM Theme - Branch Price Revision\" to the Branch Price Revision form"
+   ],
+   "requirements": [
+    100138
+   ],
+   "risk": "medium",
+   "session": "8e63fd3aadbb",
+   "title": "Add SRM Theme V2 client script for Branch Price Revision"
+  },
+  {
+   "change_set": "01M6J8XGKKZH259WVTV3PE82A4",
+   "created_by": "run:a2804c2f8954",
+   "operations": [
+    "Add client script \"SRM Theme - Bank Guarantee\" to the Bank Guarantee form"
+   ],
+   "requirements": [
+    100139
+   ],
+   "risk": "medium",
+   "session": "a2804c2f8954",
+   "title": "SRM Theme v2 for Bank Guarantee (client script)"
+  },
+  {
+   "change_set": "01M6J8Y0GWR603RMRWGMPN11E5",
+   "created_by": "run:23c1fb465d18",
+   "operations": [
+    "Add client script \"SRM Theme - Supplier Change Request\" to the Supplier Change Request form"
+   ],
+   "requirements": [
+    100140
+   ],
+   "risk": "medium",
+   "session": "23c1fb465d18",
+   "title": "Apply SRM Theme v2 to Supplier Change Request"
+  },
+  {
+   "change_set": "01M6JEEEHAGJY175R25NJDHZZ8",
+   "created_by": "run:041574b7983c",
+   "operations": [
+    "Add client script \"SRM List Theme\" to the Supplier CPS form"
+   ],
+   "requirements": [
+    100143
+   ],
+   "risk": "medium",
+   "session": "041574b7983c",
+   "title": "Add SRM List Theme for Supplier CPS"
+  },
+  {
+   "change_set": "01M6JEEH8Z4MZKS7F0JPH11KPY",
+   "created_by": "run:041574b7983c",
+   "operations": [
+    "Add client script \"SRM List Theme\" to the Supplier form"
+   ],
+   "requirements": [
+    100141
+   ],
+   "risk": "medium",
+   "session": "041574b7983c",
+   "title": "SRM List-view Theme for Supplier"
+  },
+  {
+   "change_set": "01M6JEEHEQGHXCVHVPDAX575HF",
+   "created_by": "run:041574b7983c",
+   "operations": [
+    "Add client script \"SRM List Theme\" to the Supplier C-Form form"
+   ],
+   "requirements": [
+    100142
+   ],
+   "risk": "medium",
+   "session": "041574b7983c",
+   "title": "SRM List Theme for Supplier C-Form"
+  },
+  {
+   "change_set": "01M6JEENXGPA028XXW3Z9JZ6AA",
+   "created_by": "run:041574b7983c",
+   "operations": [
+    "Add client script \"SRM List Theme\" to the Supplier Product Registration form"
+   ],
+   "requirements": [
+    100144
+   ],
+   "risk": "medium",
+   "session": "041574b7983c",
+   "title": "SRM List-View Theme for Supplier Product Registration"
+  },
+  {
+   "change_set": "01M6JEEQJQ6ASDCRJTA4EN1W2J",
+   "created_by": "run:041574b7983c",
+   "operations": [
+    "Add client script \"SRM List Theme\" to the Supplier Source Declaration form"
+   ],
+   "requirements": [
+    100145
+   ],
+   "risk": "medium",
+   "session": "041574b7983c",
+   "title": "SRM List Theme for Supplier Source Declaration"
+  },
+  {
+   "change_set": "01M6JEES58ZDD37FYR9M2JGJYS",
+   "created_by": "run:041574b7983c",
+   "operations": [
+    "Add client script \"SRM List Theme\" to the Branch Price Revision form"
+   ],
+   "requirements": [
+    100146
+   ],
+   "risk": "medium",
+   "session": "041574b7983c",
+   "title": "SRM List Theme for Branch Price Revision"
+  },
+  {
+   "change_set": "01M6JEEVVAJ175DN3YHVM9Z2EJ",
+   "created_by": "run:041574b7983c",
+   "operations": [
+    "Add client script \"SRM List Theme\" to the Bank Guarantee form"
+   ],
+   "requirements": [
+    100147
+   ],
+   "risk": "medium",
+   "session": "041574b7983c",
+   "title": "SRM List Theme for Bank Guarantee"
+  },
+  {
+   "change_set": "01M6JEEZ0YYH13XT8GB5Y7HZ82",
+   "created_by": "run:041574b7983c",
+   "operations": [
+    "Add client script \"SRM List Theme\" to the Supplier Change Request form"
+   ],
+   "requirements": [
+    100148
+   ],
+   "risk": "medium",
+   "session": "041574b7983c",
+   "title": "SRM List View Theme for Supplier Change Request"
+  },
+  {
+   "change_set": "01M6JEP50S8915GHR0YPCW79Z1",
+   "created_by": "run:50bd82800325",
+   "operations": [
+    "Add client script \"SRM Contrast Fix Form\" to the Supplier C-Form form"
+   ],
+   "requirements": [
+    100151
+   ],
+   "risk": "medium",
+   "session": "50bd82800325",
+   "title": "SRM Contrast Fix for Supplier C-Form (Form view)"
+  },
+  {
+   "change_set": "01M6JEP58B2S7XCJVGSCWC6FTE",
+   "created_by": "run:50bd82800325",
+   "operations": [
+    "Add client script \"SRM Contrast Fix Form\" to the Supplier form"
+   ],
+   "requirements": [
+    100149
+   ],
+   "risk": "medium",
+   "session": "50bd82800325",
+   "title": "SRM Contrast Fix for Supplier Form"
+  },
+  {
+   "change_set": "01M6JEP5KCD07DJKA6FM69WY7W",
+   "created_by": "run:50bd82800325",
+   "operations": [
+    "Add client script \"SRM Contrast Fix List\" to the Supplier form"
+   ],
+   "requirements": [
+    100150
+   ],
+   "risk": "medium",
+   "session": "50bd82800325",
+   "title": "SRM Contrast Fix List - Client Script"
+  },
+  {
+   "change_set": "01M6JEPCBB0E1RY307D5ZQ9RTE",
+   "created_by": "run:50bd82800325",
+   "operations": [
+    "Add client script \"SRM Contrast Fix Form\" to the Supplier CPS form"
+   ],
+   "requirements": [
+    100153
+   ],
+   "risk": "medium",
+   "session": "50bd82800325",
+   "title": "SRM Contrast Fix — Supplier CPS Form"
+  },
+  {
+   "change_set": "01M6JEPCTJVDKZ6WZBYXG75T8T",
+   "created_by": "run:50bd82800325",
+   "operations": [
+    "Add client script \"SRM Contrast Fix List\" to the Supplier C-Form form"
+   ],
+   "requirements": [
+    100152
+   ],
+   "risk": "medium",
+   "session": "50bd82800325",
+   "title": "SRM Contrast Fix - Supplier C-Form List"
+  },
+  {
+   "change_set": "01M6JEPDKX093K7YF6CRM8C8JZ",
+   "created_by": "run:50bd82800325",
+   "operations": [
+    "Add client script \"SRM Contrast Fix List\" to the Supplier CPS form"
+   ],
+   "requirements": [
+    100154
+   ],
+   "risk": "medium",
+   "session": "50bd82800325",
+   "title": "SRM Contrast Fix — Supplier CPS List View"
+  },
+  {
+   "change_set": "01M6JEPJ21J6HVV80PX3PKGK0R",
+   "created_by": "run:50bd82800325",
+   "operations": [
+    "Add client script \"SRM Contrast Fix Form\" to the Supplier Product Registration form"
+   ],
+   "requirements": [
+    100155
+   ],
+   "risk": "medium",
+   "session": "50bd82800325",
+   "title": "SRM Contrast Fix — Supplier Product Registration Form"
+  },
+  {
+   "change_set": "01M6JEPKMK4QXYVZ7SKP1GT0ZK",
+   "created_by": "run:50bd82800325",
+   "operations": [
+    "Add client script \"SRM Contrast Fix Form\" to the Supplier Source Declaration form"
+   ],
+   "requirements": [
+    100157
+   ],
+   "risk": "medium",
+   "session": "50bd82800325",
+   "title": "SRM Contrast Fix for Supplier Source Declaration Form"
+  },
+  {
+   "change_set": "01M6JEPKYXZAXR1RC3DFZ427XN",
+   "created_by": "run:50bd82800325",
+   "operations": [
+    "Add client script \"SRM Contrast Fix List\" to the Supplier Product Registration form"
+   ],
+   "requirements": [
+    100156
+   ],
+   "risk": "medium",
+   "session": "50bd82800325",
+   "title": "SRM Contrast Fix for Supplier Product Registration List"
+  },
+  {
+   "change_set": "01M6JEPRFY0JS992HS5D3F9WFD",
+   "created_by": "run:50bd82800325",
+   "operations": [
+    "Add client script \"SRM Contrast Fix List\" to the Supplier Source Declaration form"
+   ],
+   "requirements": [
+    100158
+   ],
+   "risk": "medium",
+   "session": "50bd82800325",
+   "title": "SRM Contrast Fix — Supplier Source Declaration List"
+  },
+  {
+   "change_set": "01M6JEPSE629GBMB9MP8TAWF77",
+   "created_by": "run:50bd82800325",
+   "operations": [
+    "Add client script \"SRM Contrast Fix Form\" to the Branch Price Revision form"
+   ],
+   "requirements": [
+    100159
+   ],
+   "risk": "medium",
+   "session": "50bd82800325",
+   "title": "SRM Contrast Fix — Branch Price Revision (Form)"
+  },
+  {
+   "change_set": "01M6JEPSXV60QYTD2SNVWCTS75",
+   "created_by": "run:50bd82800325",
+   "operations": [
+    "Add client script \"SRM Contrast Fix List\" to the Branch Price Revision form"
+   ],
+   "requirements": [
+    100160
+   ],
+   "risk": "medium",
+   "session": "50bd82800325",
+   "title": "SRM Contrast Fix for Branch Price Revision List View"
+  },
+  {
+   "change_set": "01M6JEPZ4EHE62R6DDTRJCNMS3",
+   "created_by": "run:50bd82800325",
+   "operations": [
+    "Add client script \"SRM Contrast Fix List\" to the Bank Guarantee form"
+   ],
+   "requirements": [
+    100162
+   ],
+   "risk": "medium",
+   "session": "50bd82800325",
+   "title": "Add list-view client script for Bank Guarantee SRM contrast"
+  },
+  {
+   "change_set": "01M6JEPZ67KW44T8MYDKYQECGS",
+   "created_by": "run:50bd82800325",
+   "operations": [
+    "Add client script \"SRM Contrast Fix Form\" to the Bank Guarantee form"
+   ],
+   "requirements": [
+    100161
+   ],
+   "risk": "medium",
+   "session": "50bd82800325",
+   "title": "Add SRM Contrast Fix Client Script for Bank Guarantee Form"
+  },
+  {
+   "change_set": "01M6JEQ08KZVBQ6K9S0ZNEWW9W",
+   "created_by": "run:50bd82800325",
+   "operations": [
+    "Add client script \"SRM Contrast Fix Form\" to the Supplier Change Request form"
+   ],
+   "requirements": [
+    100163
+   ],
+   "risk": "medium",
+   "session": "50bd82800325",
+   "title": "Add SRM Contrast Fix client script for Supplier Change Request Form"
+  },
+  {
+   "change_set": "01M6JEQ5XT342Y5GQTBN8TN43N",
+   "created_by": "run:50bd82800325",
+   "operations": [
+    "Add client script \"SRM Contrast Fix List\" to the Supplier Change Request form"
+   ],
+   "requirements": [
+    100164
+   ],
+   "risk": "medium",
+   "session": "50bd82800325",
+   "title": "SRM Contrast Fix for Supplier Change Request List"
+  },
+  {
+   "change_set": "01M6JERMHHBFZ5MBY6JMKDRXK2",
+   "created_by": "run:a90988ff93d6",
+   "operations": [
+    "Add client script \"SRM Contrast Fix Form\" to the Supplier C-Form form"
+   ],
+   "requirements": [
+    100167
+   ],
+   "risk": "medium",
+   "session": "a90988ff93d6",
+   "title": "Add SRM Contrast Fix Form client script"
+  },
+  {
+   "change_set": "01M6JERMWTHBDDPWK9A3PSEH67",
+   "created_by": "run:a90988ff93d6",
+   "operations": [
+    "Add client script \"SRM Contrast Fix Form\" to the Supplier form"
+   ],
+   "requirements": [
+    100165
+   ],
+   "risk": "medium",
+   "session": "a90988ff93d6",
+   "title": "Add SRM Contrast Fix client script on Supplier Form"
+  },
+  {
+   "change_set": "01M6JERMYP8TACM3G6S5W345DB",
+   "created_by": "run:a90988ff93d6",
+   "operations": [
+    "Add client script \"SRM Contrast Fix List\" to the Supplier form"
+   ],
+   "requirements": [
+    100166
+   ],
+   "risk": "medium",
+   "session": "a90988ff93d6",
+   "title": "Implement SRM Contrast Fix List client script"
+  },
+  {
+   "change_set": "01M6JERV3R2ZWGBMTVWWFQMBDB",
+   "created_by": "run:a90988ff93d6",
+   "operations": [
+    "Add client script \"SRM Contrast Fix Form\" to the Supplier CPS form"
+   ],
+   "requirements": [
+    100169
+   ],
+   "risk": "medium",
+   "session": "a90988ff93d6",
+   "title": "SRM Contrast Fix v2 — Supplier CPS Form"
+  },
+  {
+   "change_set": "01M6JERVNTBCG3B18PF7C84HBG",
+   "created_by": "run:a90988ff93d6",
+   "operations": [
+    "Add client script \"SRM Contrast Fix List\" to the Supplier CPS form"
+   ],
+   "requirements": [
+    100170
+   ],
+   "risk": "medium",
+   "session": "a90988ff93d6",
+   "title": "Add SRM Contrast Fix List client script for Supplier CPS"
+  },
+  {
+   "change_set": "01M6JES0G9YZZMWNSPYDYCNNPN",
+   "created_by": "run:a90988ff93d6",
+   "operations": [
+    "Add client script \"SRM Contrast Fix List\" to the Supplier C-Form form"
+   ],
+   "requirements": [
+    100168
+   ],
+   "risk": "medium",
+   "session": "a90988ff93d6",
+   "title": "SRM Contrast Fix List client script"
+  },
+  {
+   "change_set": "01M6JES19NW5X6XZ9P3FQTM3T2",
+   "created_by": "run:a90988ff93d6",
+   "operations": [
+    "Add client script \"SRM Contrast Fix Form\" to the Supplier Product Registration form"
+   ],
+   "requirements": [
+    100171
+   ],
+   "risk": "medium",
+   "session": "a90988ff93d6",
+   "title": "SRM Contrast Fix v2 — Supplier Product Registration (Form)"
+  },
+  {
+   "change_set": "01M6JES1K0E39EZ8BMDBEBMZKR",
+   "created_by": "run:a90988ff93d6",
+   "operations": [
+    "Add client script \"SRM Contrast Fix List\" to the Supplier Product Registration form"
+   ],
+   "requirements": [
+    100172
+   ],
+   "risk": "medium",
+   "session": "a90988ff93d6",
+   "title": "SRM Contrast Fix v2 — Supplier Product Registration List View"
+  },
+  {
+   "change_set": "01M6JES70X7MV3YYJDY4PPFYW0",
+   "created_by": "run:a90988ff93d6",
+   "operations": [
+    "Add client script \"SRM Contrast Fix Form\" to the Supplier Source Declaration form"
+   ],
+   "requirements": [
+    100173
+   ],
+   "risk": "medium",
+   "session": "a90988ff93d6",
+   "title": "Add SRM Contrast Fix client script for Supplier Source Declaration (Form)"
+  },
+  {
+   "change_set": "01M6JES8GMFEQ0KY5KHG5Y61DG",
+   "created_by": "run:a90988ff93d6",
+   "operations": [
+    "Add client script \"SRM Contrast Fix List\" to the Supplier Source Declaration form"
+   ],
+   "requirements": [
+    100174
+   ],
+   "risk": "medium",
+   "session": "a90988ff93d6",
+   "title": "SRM Contrast Fix v2 — Supplier Source Declaration (List view)"
+  },
+  {
+   "change_set": "01M6JES8PSSXTEQB278YKC58D2",
+   "created_by": "run:a90988ff93d6",
+   "operations": [
+    "Add client script \"SRM Contrast Fix Form\" to the Branch Price Revision form"
+   ],
+   "requirements": [
+    100175
+   ],
+   "risk": "medium",
+   "session": "a90988ff93d6",
+   "title": "Add SRM Contrast Fix client script to Branch Price Revision form"
+  },
+  {
+   "change_set": "01M6JESF7EGE9ZCM0YM9YKP117",
+   "created_by": "run:a90988ff93d6",
+   "operations": [
+    "Add client script \"SRM Contrast Fix List\" to the Branch Price Revision form"
+   ],
+   "requirements": [
+    100176
+   ],
+   "risk": "medium",
+   "session": "a90988ff93d6",
+   "title": "Add SRM Contrast Fix List client script for Branch Price Revision"
+  },
+  {
+   "change_set": "01M6JESG828X3NRG86T2EFAMR5",
+   "created_by": "run:a90988ff93d6",
+   "operations": [
+    "Add client script \"SRM Contrast Fix Form\" to the Bank Guarantee form"
+   ],
+   "requirements": [
+    100177
+   ],
+   "risk": "medium",
+   "session": "a90988ff93d6",
+   "title": "Add SRM Contrast Fix Form client script to Bank Guarantee"
+  },
+  {
+   "change_set": "01M6JESGMPCDG3TR9A3F30QBP1",
+   "created_by": "run:a90988ff93d6",
+   "operations": [
+    "Add client script \"SRM Contrast Fix List\" to the Bank Guarantee form"
+   ],
+   "requirements": [
+    100178
+   ],
+   "risk": "medium",
+   "session": "a90988ff93d6",
+   "title": "SRM Contrast Fix v2 — Bank Guarantee List View"
+  },
+  {
+   "change_set": "01M6JESPP9T2XQN3323DGT8Q5B",
+   "created_by": "run:a90988ff93d6",
+   "operations": [
+    "Add client script \"SRM Contrast Fix Form\" to the Supplier Change Request form"
+   ],
+   "requirements": [
+    100179
+   ],
+   "risk": "medium",
+   "session": "a90988ff93d6",
+   "title": "Add SRM Contrast Fix Form client script"
+  },
+  {
+   "change_set": "01M6JESRDS6JN057DS4FNKN60F",
+   "created_by": "run:a90988ff93d6",
+   "operations": [
+    "Add client script \"SRM Contrast Fix List\" to the Supplier Change Request form"
+   ],
+   "requirements": [
+    100180
+   ],
+   "risk": "medium",
+   "session": "a90988ff93d6",
+   "title": "Add SRM Contrast Fix List client script for Supplier Change Request"
+  },
+  {
+   "change_set": "01M6K5XPESJVQ5ZFY15PCWHQMN",
+   "created_by": "run:2cd4d36085c3",
+   "operations": [
+    "Add client script \"Case List Theme\" to the Case form"
+   ],
+   "requirements": [
+    100189
+   ],
+   "risk": "medium",
+   "session": "2cd4d36085c3",
+   "title": "Add Case list theme client script"
+  },
+  {
+   "change_set": "01M6K5XTCNJTMM9W0WMXE0240B",
+   "created_by": "run:2cd4d36085c3",
+   "operations": [
+    "Add client script \"Case Theme\" to the Case form"
+   ],
+   "requirements": [
+    100188
+   ],
+   "risk": "medium",
+   "session": "2cd4d36085c3",
+   "title": "Add Case form theme client script"
+  },
+  {
+   "change_set": "01M6K5YGN89BK257N3W975NSH0",
+   "created_by": "run:2cd4d36085c3",
+   "operations": [
+    "Create workspace HTML block \"Case banner\"",
+    "Create workspace HTML block \"Case Tiles\"",
+    "Create workspace \"Case Management\" with 2 number card(s), 2 chart(s) and 2 shortcut(s)"
+   ],
+   "requirements": [
+    100190
+   ],
+   "risk": "low",
+   "session": "2cd4d36085c3",
+   "title": "Case Management workspace and HTML blocks"
+  },
+  {
+   "change_set": "01M817C1D95KKXTQW6SA32JHRP",
+   "created_by": "run:f9d77a5bf6ec",
+   "operations": [
+    "Create role \"AGM Secretariat\"",
+    "Add Select field \"Supplier Classification\" (custom_classification) to Supplier after supplier_group, options: Preferred / Approved / Conditional / Blacklisted",
+    "Add Check field \"Suspended\" (custom_suspended) to Supplier after custom_classification",
+    "Add Small Text field \"Suspension Reason\" (custom_suspension_reason) to Supplier after custom_suspended",
+    "Add Select field \"PNC/BoA Status\" (custom_pnc_status) to Supplier after custom_suspension_reason, options: Not Sent / In PNC / PNC Recommended / PNC Rejected / BOA Recommended / BOA Rejected",
+    "Add Link field \"Supplier\" (custom_supplier) to Issue after raised_by, options: Supplier",
+    "Add Link field \"Supplier\" (custom_supplier) to Quality Inspection after item_code, options: Supplier",
+    "Add Link field \"Supplier\" (custom_supplier) to Supplier Document after document_type, options: Supplier",
+    "Add Float field \"Supplier Score (Numeric)\" (custom_supplier_score_numeric) to Supplier Scorecard after supplier_score",
+    "Set mandatory_depends_on = eval:doc.custom_suspended==1 on field \"custom_suspension_reason\" of Supplier",
+    "Set in_standard_filter = 1 on field \"custom_classification\" of Supplier",
+    "Set in_standard_filter = 1 on field \"custom_suspended\" of Supplier",
+    "Set in_standard_filter = 1 on field \"custom_pnc_status\" of Supplier",
+    "Set in_standard_filter = 1 on field \"custom_supplier\" of Supplier Document",
+    "Add server script \"require_suspension_reason_if_suspended\" on Supplier (before save)",
+    "Add server script \"require_supplier_for_supplier_issues\" on Issue (before save)",
+    "Add server script \"set_numeric_supplier_score\" on Supplier Scorecard (before save)",
+    "Create workflow \"Supplier Issue Workflow\" on Issue: 4 states, 4 transitions",
+    "Create workflow \"Supplier Quotation PNC BoA Workflow\" on Supplier Quotation: 5 states, 5 transitions",
+    "Create email notification \"Escalate Supplier Issue Over 7 Days\" on Issue (Days After)",
+    "Create report \"Supplier Directory - searchable\" on Supplier with 8 columns",
+    "Create report \"Supplier Documents by Type\" on Supplier Document with 4 columns",
+    "Create report \"Supplier Scorecard Summary\" on Supplier Scorecard with 4 columns",
+    "Create bar chart \"Suppliers by Group\" on Supplier",
+    "Create donut chart \"Suspended Suppliers Count\" on Supplier",
+    "Create line chart \"Open Supplier Issues\" on Issue",
+    "Create number card \"Total Suppliers\": Count on Supplier",
+    "Create number card \"Suspended Suppliers\": Count on Supplier",
+    "Create number card \"Average Supplier Score (Last Year)\": Average of custom_supplier_score_numeric on Supplier Scorecard",
+    "Create number card \"Open Supplier Issues\": Count on Issue",
+    "Create email notification \"Notify Purchase on Supplier Quotation PNC/BOA Status\" on Supplier Quotation (Value Change)",
+    "Create email notification \"Notify when Supplier Suspended\" on Supplier (Value Change)",
+    "Create dashboard \"Supplier Management Dashboard\" with 2 chart(s) and 3 number card(s)",
+    "Create dashboard \"Supplier Performance Dashboard\" with 3 chart(s) and 4 number card(s)"
+   ],
+   "requirements": [
+    26,
+    27,
+    28
+   ],
+   "risk": "high",
+   "session": "f9d77a5bf6ec",
+   "title": "Supplier Directory, Performance Dashboards, Issue Management & PNC/BoA Workflow"
+  },
+  {
+   "change_set": "01M8193WE4E207028NARJ9B7TW",
+   "created_by": "run:17e74b372253",
+   "operations": [
+    "Create role \"CSD Portal User\"",
+    "Add client script \"supplier_registry_lookup\" to the Supplier form",
+    "Add server script \"supplier_fee_schedule_set_paid_on_and_require_ref\" on Supplier Fee Schedule (before save)",
+    "Add server script \"supplier_document_require_file_and_set_dms_path\" on Supplier Document (before save)",
+    "Grant role \"Supplier\" on Supplier Document (level 0): read, write, create",
+    "Grant role \"AGM Secretariat\" on Supplier Document (level 0): read, write, create, delete, report, export, print, email, share",
+    "Create print format \"Supplier Fee Receipt\" for Supplier Fee Schedule",
+    "Insert 8 starter record(s) into Regulatory Registry"
+   ],
+   "requirements": [
+    12,
+    19,
+    25
+   ],
+   "risk": "high",
+   "session": "17e74b372253",
+   "title": "SRM PoC: Registry lookup, Fee receipts, and DMS POC (ops-only)"
   }
  ]
 }

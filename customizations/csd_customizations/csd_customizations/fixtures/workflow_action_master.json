@@ -1,6 +1,36 @@
 [
  {
   "doctype": "Workflow Action Master",
+  "name": "Finalize Decision",
+  "workflow_action_name": "Finalize Decision"
+ },
+ {
+  "doctype": "Workflow Action Master",
+  "name": "Send for Review",
+  "workflow_action_name": "Send for Review"
+ },
+ {
+  "doctype": "Workflow Action Master",
+  "name": "Close",
+  "workflow_action_name": "Close"
+ },
+ {
+  "doctype": "Workflow Action Master",
+  "name": "Reopen",
+  "workflow_action_name": "Reopen"
+ },
+ {
+  "doctype": "Workflow Action Master",
+  "name": "Resolve",
+  "workflow_action_name": "Resolve"
+ },
+ {
+  "doctype": "Workflow Action Master",
+  "name": "Start Investigation",
+  "workflow_action_name": "Start Investigation"
+ },
+ {
+  "doctype": "Workflow Action Master",
   "name": "Approve",
   "workflow_action_name": "Approve"
  },
@@ -21,6 +51,11 @@
  },
  {
   "doctype": "Workflow Action Master",
+  "name": "Acknowledge",
+  "workflow_action_name": "Acknowledge"
+ },
+ {
+  "doctype": "Workflow Action Master",
   "name": "Submit",
   "workflow_action_name": "Submit"
  },
@@ -31,7 +66,27 @@
  },
  {
   "doctype": "Workflow Action Master",
+  "name": "Edit",
+  "workflow_action_name": "Edit"
+ },
+ {
+  "doctype": "Workflow Action Master",
   "name": "Submit for Approval",
   "workflow_action_name": "Submit for Approval"
+ },
+ {
+  "doctype": "Workflow Action Master",
+  "name": "Start Review",
+  "workflow_action_name": "Start Review"
+ },
+ {
+  "doctype": "Workflow Action Master",
+  "name": "Recommend to BOA",
+  "workflow_action_name": "Recommend to BOA"
+ },
+ {
+  "doctype": "Workflow Action Master",
+  "name": "Send to PNC",
+  "workflow_action_name": "Send to PNC"
  }
 ]

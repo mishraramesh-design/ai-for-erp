@@ -2,12 +2,149 @@
  {
   "doctype": "Report",
   "is_standard": "No",
+  "json": "{\"filters\": [], \"fields\": [[\"supplier_name\", \"Supplier\"], [\"supplier_group\", \"Supplier\"], [\"supplier_type\", \"Supplier\"], [\"country\", \"Supplier\"], [\"custom_risk_rating\", \"Supplier\"], [\"disabled\", \"Supplier\"], [\"on_hold\", \"Supplier\"]], \"order_by\": \"`tabSupplier`.`modified` desc\", \"add_totals_row\": 0, \"page_length\": 20, \"column_widths\": {}, \"group_by\": null}",
+  "name": "Supplier Directory",
+  "ref_doctype": "Supplier",
+  "report_name": "Supplier Directory",
+  "report_type": "Report Builder",
+  "roles": [
+   {
+    "role": "Purchase User"
+   },
+   {
+    "role": "Purchase Manager"
+   },
+   {
+    "role": "Quality Manager"
+   }
+  ]
+ },
+ {
+  "doctype": "Report",
+  "is_standard": "No",
+  "json": "{\"filters\": [], \"fields\": [[\"supplier\", \"PNC Decision\"], [\"committee\", \"PNC Decision\"], [\"decision\", \"PNC Decision\"], [\"effective_date\", \"PNC Decision\"], [\"reason\", \"PNC Decision\"]], \"order_by\": \"`tabPNC Decision`.`modified` desc\", \"add_totals_row\": 0, \"page_length\": 20, \"column_widths\": {}, \"group_by\": null}",
+  "name": "PNC Decisions",
+  "ref_doctype": "PNC Decision",
+  "report_name": "PNC Decisions",
+  "report_type": "Report Builder",
+  "roles": [
+   {
+    "role": "Purchase User"
+   },
+   {
+    "role": "Purchase Manager"
+   },
+   {
+    "role": "Quality Manager"
+   }
+  ]
+ },
+ {
+  "doctype": "Report",
+  "is_standard": "No",
+  "json": "{\"filters\": [], \"fields\": [[\"name\", \"Non Conformance\"], [\"custom_supplier\", \"Non Conformance\"], [\"custom_target_resolution_date\", \"Non Conformance\"], [\"modified\", \"Non Conformance\"]], \"order_by\": \"`tabNon Conformance`.`modified` desc\", \"add_totals_row\": 0, \"page_length\": 20, \"column_widths\": {}, \"group_by\": null}",
+  "name": "Supplier Non Conformances",
+  "ref_doctype": "Non Conformance",
+  "report_name": "Supplier Non Conformances",
+  "report_type": "Report Builder",
+  "roles": [
+   {
+    "role": "Purchase User"
+   },
+   {
+    "role": "Purchase Manager"
+   },
+   {
+    "role": "Quality Manager"
+   }
+  ]
+ },
+ {
+  "doctype": "Report",
+  "is_standard": "No",
+  "json": "{\"filters\": [[\"Supplier\", \"custom_eligibility_complete\", \"=\", \"0\", false]], \"fields\": [[\"name\", \"Supplier\"], [\"supplier_name\", \"Supplier\"], [\"disabled\", \"Supplier\"], [\"custom_eligibility_complete\", \"Supplier\"], [\"custom_depot\", \"Supplier\"]], \"order_by\": \"`tabSupplier`.`modified` desc\", \"add_totals_row\": 0, \"page_length\": 20, \"column_widths\": {}, \"group_by\": null}",
+  "name": "Suppliers Pending Eligibility",
+  "ref_doctype": "Supplier",
+  "report_name": "Suppliers Pending Eligibility",
+  "report_type": "Report Builder",
+  "roles": [
+   {
+    "role": "Purchase Manager"
+   },
+   {
+    "role": "Purchase User"
+   }
+  ]
+ },
+ {
+  "doctype": "Report",
+  "is_standard": "No",
+  "json": "{\"filters\": [], \"fields\": [[\"item_code\", \"Item\"], [\"item_name\", \"Item\"], [\"custom_index_number\", \"Item\"], [\"item_group\", \"Item\"], [\"brand\", \"Item\"]], \"order_by\": \"`tabItem`.`modified` desc\", \"add_totals_row\": 0, \"page_length\": 20, \"column_widths\": {}, \"group_by\": null}",
+  "name": "Item with Index Number",
+  "ref_doctype": "Item",
+  "report_name": "Item with Index Number",
+  "report_type": "Report Builder",
+  "roles": [
+   {
+    "role": "Item Manager"
+   },
+   {
+    "role": "Stock Manager"
+   },
+   {
+    "role": "Stock User"
+   }
+  ]
+ },
+ {
+  "doctype": "Report",
+  "is_standard": "No",
+  "json": "{\"filters\": [], \"fields\": [[\"name\", \"Supplier Item\"], [\"supplier\", \"Supplier Item\"], [\"custom_item_link\", \"Supplier Item\"], [\"custom_index_number\", \"Supplier Item\"], [\"custom_supplier_part_no\", \"Supplier Item\"]], \"order_by\": \"`tabSupplier Item`.`modified` desc\", \"add_totals_row\": 0, \"page_length\": 20, \"column_widths\": {}, \"group_by\": null}",
+  "name": "Supplier Items by Index Number",
+  "ref_doctype": "Supplier Item",
+  "report_name": "Supplier Items by Index Number",
+  "report_type": "Report Builder",
+  "roles": [
+   {
+    "role": "Purchase Manager"
+   },
+   {
+    "role": "Purchase User"
+   },
+   {
+    "role": "Supplier"
+   }
+  ]
+ },
+ {
+  "doctype": "Report",
+  "is_standard": "No",
   "json": "{\"filters\": [[\"Supplier C-Form\", \"custom_document_type\", \"=\", \"C-Form\", false], [\"Supplier C-Form\", \"workflow_state\", \"!=\", \"Approved\", false]], \"fields\": [[\"name\", \"Supplier C-Form\"], [\"supplier\", \"Supplier C-Form\"], [\"custom_c_form_number\", \"Supplier C-Form\"], [\"custom_c_form_received_date\", \"Supplier C-Form\"], [\"workflow_state\", \"Supplier C-Form\"]], \"order_by\": \"`tabSupplier C-Form`.`modified` desc\", \"add_totals_row\": 0, \"page_length\": 20, \"column_widths\": {}, \"group_by\": null}",
   "name": "Pending C-Forms",
   "ref_doctype": "Supplier C-Form",
   "report_name": "Pending C-Forms",
   "report_type": "Report Builder",
   "roles": []
+ },
+ {
+  "doctype": "Report",
+  "is_standard": "No",
+  "json": "{\"filters\": [[\"Supplier\", \"custom_eligibility_complete\", \"=\", 0, false]], \"fields\": [[\"name\", \"Supplier\"], [\"supplier_name\", \"Supplier\"], [\"supplier_group\", \"Supplier\"], [\"country\", \"Supplier\"], [\"custom_eligibility_complete\", \"Supplier\"], [\"workflow_state\", \"Supplier\"]], \"order_by\": \"`tabSupplier`.`modified` desc\", \"add_totals_row\": 0, \"page_length\": 20, \"column_widths\": {}, \"group_by\": null}",
+  "name": "Suppliers Failing CSD Checks",
+  "ref_doctype": "Supplier",
+  "report_name": "Suppliers Failing CSD Checks",
+  "report_type": "Report Builder",
+  "roles": [
+   {
+    "role": "Purchase User"
+   },
+   {
+    "role": "Purchase Manager"
+   },
+   {
+    "role": "Branch User"
+   }
+  ]
  },
  {
   "doctype": "Report",
@@ -26,6 +163,66 @@
    },
    {
     "role": "System Manager"
+   }
+  ]
+ },
+ {
+  "doctype": "Report",
+  "is_standard": "No",
+  "json": "{\"filters\": [[\"Supplier\", \"custom_classification\", \"!=\", \"\", false]], \"fields\": [[\"name\", \"Supplier\"], [\"supplier_name\", \"Supplier\"], [\"supplier_group\", \"Supplier\"], [\"custom_classification\", \"Supplier\"], [\"custom_suspended\", \"Supplier\"], [\"custom_pnc_status\", \"Supplier\"], [\"supplier_type\", \"Supplier\"], [\"supplier_primary_contact\", \"Supplier\"]], \"order_by\": \"`tabSupplier`.`modified` desc\", \"add_totals_row\": 0, \"page_length\": 20, \"column_widths\": {}, \"group_by\": null}",
+  "name": "Supplier Directory - searchable",
+  "ref_doctype": "Supplier",
+  "report_name": "Supplier Directory - searchable",
+  "report_type": "Report Builder",
+  "roles": [
+   {
+    "role": "Purchase Manager"
+   },
+   {
+    "role": "Department Head"
+   },
+   {
+    "role": "AGM Secretariat"
+   }
+  ]
+ },
+ {
+  "doctype": "Report",
+  "is_standard": "No",
+  "json": "{\"filters\": [[\"Supplier Document\", \"document_type\", \"!=\", \"\", false]], \"fields\": [[\"name\", \"Supplier Document\"], [\"document_type\", \"Supplier Document\"], [\"custom_supplier\", \"Supplier Document\"], [\"owner\", \"Supplier Document\"]], \"order_by\": \"`tabSupplier Document`.`modified` desc\", \"add_totals_row\": 0, \"page_length\": 20, \"column_widths\": {}, \"group_by\": null}",
+  "name": "Supplier Documents by Type",
+  "ref_doctype": "Supplier Document",
+  "report_name": "Supplier Documents by Type",
+  "report_type": "Report Builder",
+  "roles": [
+   {
+    "role": "Purchase Manager"
+   },
+   {
+    "role": "AGM Secretariat"
+   },
+   {
+    "role": "Supplier"
+   }
+  ]
+ },
+ {
+  "doctype": "Report",
+  "is_standard": "No",
+  "json": "{\"filters\": [[\"Supplier Scorecard\", \"period\", \"!=\", \"\", false]], \"fields\": [[\"supplier\", \"Supplier Scorecard\"], [\"period\", \"Supplier Scorecard\"], [\"custom_supplier_score_numeric\", \"Supplier Scorecard\"], [\"standings\", \"Supplier Scorecard\"]], \"order_by\": \"`tabSupplier Scorecard`.`modified` desc\", \"add_totals_row\": 0, \"page_length\": 20, \"column_widths\": {}, \"group_by\": null}",
+  "name": "Supplier Scorecard Summary",
+  "ref_doctype": "Supplier Scorecard",
+  "report_name": "Supplier Scorecard Summary",
+  "report_type": "Report Builder",
+  "roles": [
+   {
+    "role": "Quality Manager"
+   },
+   {
+    "role": "Purchase Manager"
+   },
+   {
+    "role": "AGM Secretariat"
    }
   ]
  }

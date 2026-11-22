@@ -188,6 +188,80 @@
   "allow_multiple": 0,
   "anonymous": 0,
   "apply_document_permissions": 1,
+  "button_label": "Submit",
+  "doc_type": "Bank Guarantee",
+  "doctype": "Web Form",
+  "introduction_text": "",
+  "is_standard": 0,
+  "list_columns": [
+   {
+    "fieldname": "bank_guarantee_number",
+    "fieldtype": "Data",
+    "label": "Bank Guarantee Number"
+   },
+   {
+    "fieldname": "amount",
+    "fieldtype": "Currency",
+    "label": "Amount"
+   },
+   {
+    "fieldname": "end_date",
+    "fieldtype": "Date",
+    "label": "End Date"
+   }
+  ],
+  "login_required": 1,
+  "module": "Custom",
+  "name": "supplier-bank-guarantees",
+  "published": 1,
+  "route": "supplier-bank-guarantees",
+  "show_list": 1,
+  "success_message": "",
+  "title": "Supplier Bank Guarantees",
+  "web_form_fields": [
+   {
+    "default": "",
+    "fieldname": "bank_guarantee_number",
+    "fieldtype": "Data",
+    "label": "Bank Guarantee Number",
+    "options": "",
+    "read_only": 1,
+    "reqd": 0
+   },
+   {
+    "default": "",
+    "fieldname": "amount",
+    "fieldtype": "Currency",
+    "label": "Amount",
+    "options": "",
+    "read_only": 1,
+    "reqd": 0
+   },
+   {
+    "default": "",
+    "fieldname": "end_date",
+    "fieldtype": "Date",
+    "label": "End Date",
+    "options": "",
+    "read_only": 1,
+    "reqd": 0
+   },
+   {
+    "default": "",
+    "fieldname": "custom_renewal_document",
+    "fieldtype": "Attach",
+    "label": "Renewal / Extension Document",
+    "options": "",
+    "read_only": 0,
+    "reqd": 0
+   }
+  ]
+ },
+ {
+  "allow_edit": 1,
+  "allow_multiple": 0,
+  "anonymous": 0,
+  "apply_document_permissions": 1,
   "button_label": "Submit Declaration",
   "doc_type": "Supplier Source Declaration",
   "doctype": "Web Form",

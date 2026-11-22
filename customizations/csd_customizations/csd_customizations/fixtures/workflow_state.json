@@ -11,6 +11,31 @@
  },
  {
   "doctype": "Workflow State",
+  "name": "Finalized",
+  "workflow_state_name": "Finalized"
+ },
+ {
+  "doctype": "Workflow State",
+  "name": "Logged",
+  "workflow_state_name": "Logged"
+ },
+ {
+  "doctype": "Workflow State",
+  "name": "Under Investigation",
+  "workflow_state_name": "Under Investigation"
+ },
+ {
+  "doctype": "Workflow State",
+  "name": "Resolved",
+  "workflow_state_name": "Resolved"
+ },
+ {
+  "doctype": "Workflow State",
+  "name": "Closed",
+  "workflow_state_name": "Closed"
+ },
+ {
+  "doctype": "Workflow State",
   "name": "Approved",
   "workflow_state_name": "Approved"
  },
@@ -26,12 +51,37 @@
  },
  {
   "doctype": "Workflow State",
+  "name": "Acknowledged",
+  "workflow_state_name": "Acknowledged"
+ },
+ {
+  "doctype": "Workflow State",
   "name": "Verified",
   "workflow_state_name": "Verified"
  },
  {
   "doctype": "Workflow State",
+  "name": "Submitted for Review",
+  "workflow_state_name": "Submitted for Review"
+ },
+ {
+  "doctype": "Workflow State",
   "name": "Pending Approval",
   "workflow_state_name": "Pending Approval"
+ },
+ {
+  "doctype": "Workflow State",
+  "name": "Open",
+  "workflow_state_name": "Open"
+ },
+ {
+  "doctype": "Workflow State",
+  "name": "For PNC Review",
+  "workflow_state_name": "For PNC Review"
+ },
+ {
+  "doctype": "Workflow State",
+  "name": "For BOA Approval",
+  "workflow_state_name": "For BOA Approval"
  }
 ]
