@@ -1,7 +1,7 @@
 """Serve the CSD desk theme through the Python app (no static-asset linking needed).
 
-The CSS comes from the single DocType "CSD Desk Theme" when it is enabled and non-empty, so the Studio can
-change the look with a normal set_setting operation. Otherwise the bundled file is served."""
+The bundled stylesheet is always served. When the single DocType "CSD Desk Theme" is enabled, its CSS is
+appended after it, so the Studio can restyle anything with a normal set_setting operation (later rules win)."""
 import os
 import frappe
 
@@ -25,7 +25,10 @@ def _from_site():
 
 @frappe.whitelist(allow_guest=True)
 def css():
-    data = _from_site() or _bundled()
+    data = _bundled()
+    extra = _from_site()
+    if extra:
+        data += b"\n/* Studio overrides */\n" + extra
     frappe.local.response.filename = "csd_theme.css"
     frappe.local.response.filecontent = data
     frappe.local.response.type = "download"
