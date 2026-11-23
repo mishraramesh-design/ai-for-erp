@@ -1235,3 +1235,48 @@ QD on field "custom_demand_cycle" of Material Request
 - Requirement 100224: Experience: CSD Home launcher v4 saffron base palette
   - Create workspace HTML block "CSD Home Launcher"
 
+## Create Custom HTML Blocks for Case Tiles and SCM Depot Banner  (`01M84KQ9XHGTAPGZYNNWX259G8`, risk low)
+- Requirement 100243: .case-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}.case-tiles a{display:block;background:#fff;color:#281868 !important;border:1px solid #e3dfd9;border-left:6px solid #ff6600;border-radius:10px;paddin
+- Requirement 100244: Run create_html_block with name "SCM Depot Banner" (replacing the existing block of that name). Use EXACTLY this html and EXACTLY this style, unchanged.
+- Requirement 100245: <div class="scm-bar"><div class="scm-chip">SCM</div><div class="scm-title">Depot Overview</div></div>
+- Requirement 100246: .scm-bar{background:#f8e3d6;border-left:6px solid #ff6600;border-bottom:3px solid #0d8a00;border-radius:8px;display:flex;align-items:center;gap:16px;padding:12px 16px;width:100%;box-sizing:border-box}.scm-chip{background:#ff6600;color:#1c11
+  - Create workspace HTML block "Case Tiles"
+  - Create workspace HTML block "SCM Depot Banner"
+
+## Create/update three Custom HTML Blocks (demo-pilot banner, Case banner, Case Tiles)  (`01M84KR5XSW3RACRP50FN2CENW`, risk low)
+- Requirement 100235: Run create_html_block with name "demo-pilot banner" (replacing the existing block of that name). Use EXACTLY this html and EXACTLY this style, unchanged.
+- Requirement 100236: <div class="srm-banner"><div class="srm-banner-inner"><div class="srm-banner-title">demo-pilot</div><div class="srm-banner-sub">Supplier Relationship Management</div></div></div>
+- Requirement 100237: .srm-banner{background:#f8e3d6;border-left:6px solid #ff6600;border-bottom:3px solid #0d8a00;border-radius:8px;padding:18px 20px;margin-bottom:16px;box-sizing:border-box}.srm-banner-title{font-weight:700;color:#281868;font-size:20px;line-he
+- Requirement 100238: Run create_html_block with name "Case banner" (replacing the existing block of that name). Use EXACTLY this html and EXACTLY this style, unchanged.
+- Requirement 100239: <div class="case-banner"><div class="case-topbar"></div><h1>demo-pilot</h1><p>Case Management</p></div>
+- Requirement 100240: .case-banner{background:#f8e3d6;border-left:6px solid #ff6600;border-bottom:3px solid #0d8a00;border-radius:8px;padding:18px;border-radius:10px}.case-banner .case-topbar{height:4px;background:linear-gradient(90deg,#ff6600 0 33%,#ffffff 33% 
+- Requirement 100241: Run create_html_block with name "Case Tiles" (replacing the existing block of that name). Use EXACTLY this html and EXACTLY this style, unchanged.
+- Requirement 100242: <div class="case-tiles"><a href="/app/case"><div>Cases</div><div class="caption">All cases</div></a><a href="/app/case/new"><div>New Case</div><div class="caption">Register a case</div></a><a href="/app/dashboard-view/Case Dashboard"><div>C
+  - Create workspace HTML block "demo-pilot banner"
+  - Create workspace HTML block "Case banner"
+  - Create workspace HTML block "Case Tiles"
+
+## Create Custom HTML Block: SCM RM Banner  (`01M84M4RCZMHK1NMVVP4F8X23Y`, risk low)
+- Requirement 100260: Create or replace the Custom HTML Block named "SCM RM Banner" with create_html_block, passing this exact JSON as the op arguments (html and style are both required and must not be empty): {"name":"SCM RM Banner","html":"<div class=\"scm-bar
+  - Create workspace HTML block "SCM RM Banner"
+
+## Create Custom HTML Block: SCM BI Banner  (`01M84M4SNEWCG2DJFSSSFCZSQS`, risk low)
+- Requirement 100261: Create or replace the Custom HTML Block named "SCM BI Banner" with create_html_block, passing this exact JSON as the op arguments (html and style are both required and must not be empty): {"name":"SCM BI Banner","html":"<div class=\"scm-ban
+  - Create workspace HTML block "SCM BI Banner"
+
+## Create Custom HTML Block: SCM QD Overview Banner  (`01M84M4T59B88A45RSVVJWHMV5`, risk low)
+- Requirement 100259: Create or replace the Custom HTML Block named "SCM QD Overview Banner" with create_html_block, passing this exact JSON as the op arguments (html and style are both required and must not be empty): {"name":"SCM QD Overview Banner","html":"<d
+  - Create workspace HTML block "SCM QD Overview Banner"
+
+## Create/update Custom HTML Block 'Case Tiles'  (`01M84M4VD91M04EZPQWB3EJAWT`, risk low)
+- Requirement 100258: Create or replace the Custom HTML Block named "Case Tiles" with create_html_block, passing this exact JSON as the op arguments (html and style are both required and must not be empty): {"name":"Case Tiles","html":"<div class=\"case-tiles\">
+  - Create workspace HTML block "Case Tiles"
+
+## Create/Update Custom HTML Block: SRM Tiles  (`01M84M5FSAJXV0T2N3S0T4Z6VD`, risk low)
+- Requirement 100256: Create or replace the Custom HTML Block named "SRM Tiles" with create_html_block, passing this exact JSON as the op arguments (html and style are both required and must not be empty): {"name":"SRM Tiles","html":"<div class=\"srm-tiles\"><di
+  - Create workspace HTML block "SRM Tiles"
+
+## Create/Update SRM tiles Custom HTML Block  (`01M84M5KJ7E72DB98BJGNAHFMF`, risk low)
+- Requirement 100257: Create or replace the Custom HTML Block named "srm-tiles-block" with create_html_block, passing this exact JSON as the op arguments (html and style are both required and must not be empty): {"name":"srm-tiles-block","html":"<div class=\"srm
+  - Create workspace HTML block "srm-tiles-block"
+
