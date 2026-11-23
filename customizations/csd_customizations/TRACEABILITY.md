@@ -1205,3 +1205,24 @@ QD on field "custom_demand_cycle" of Material Request
 - Requirement 100222: Experience: replace CSD Home launcher block content with sober client-palette design (v3)
   - Create workspace HTML block "CSD Home Launcher"
 
+## Apply custom donut/legend palette via CSD Desk Theme CSS  (`01M84HKVNJVQF7P5MTDEM3EVN9`, risk medium)
+- Requirement 100223: Experience: donut chart and legend colours follow the client palette
+  - Set CSD Desk Theme › css = .list-row:hover, .result .list-row-container:hover { background: #eeedf7 !important; }
+.form-control[readonly], .form-control[disabled] { opacity: 1 !important; }
+.frappe-chart .donut-path:nth-of-type(8n+1) { stroke: #281868 !important; }
+.frappe-chart .chart-legend > g:nth-of-type(8n+1) .legend-dot { fill: #281868 !important; }
+.frappe-chart .donut-path:nth-of-type(8n+2) { stroke: #800000 !important; }
+.frappe-chart .chart-legend > g:nth-of-type(8n+2) .legend-dot { fill: #800000 !important; }
+.frappe-chart .donut-path:nth-of-type(8n+3) { stroke: #0a98d8 !important; }
+.frappe-chart .chart-legend > g:nth-of-type(8n+3) .legend-dot { fill: #0a98d8 !important; }
+.frappe-chart .donut-path:nth-of-type(8n+4) { stroke: #ff6600 !important; }
+.frappe-chart .chart-legend > g:nth-of-type(8n+4) .legend-dot { fill: #ff6600 !important; }
+.frappe-chart .donut-path:nth-of-type(8n+5) { stroke: #0d8a00 !important; }
+.frappe-chart .chart-legend > g:nth-of-type(8n+5) .legend-dot { fill: #0d8a00 !important; }
+.frappe-chart .donut-path:nth-of-type(8n+6) { stroke: #d42a1e !important; }
+.frappe-chart .chart-legend > g:nth-of-type(8n+6) .legend-dot { fill: #d42a1e !important; }
+.frappe-chart .donut-path:nth-of-type(8n+7) { stroke: #7a7fa8 !important; }
+.frappe-chart .chart-legend > g:nth-of-type(8n+7) .legend-dot { fill: #7a7fa8 !important; }
+.frappe-chart .donut-path:nth-of-type(8n+8) { stroke: #b9a98a !important; }
+.frappe-chart .chart-legend > g:nth-of-type(8n+8) .legend-dot { fill: #b9a98a !important; }
+
