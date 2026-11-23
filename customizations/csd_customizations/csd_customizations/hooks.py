@@ -718,3 +718,4 @@ after_migrate = ["csd_customizations.studio_apply.run"]
 
 # CSD theme (hand-written, outside the generated block)
 app_include_css = "/api/method/csd_customizations.theme.css"
+web_include_css = "/api/method/csd_customizations.theme.css"
