@@ -1226,3 +1226,12 @@ QD on field "custom_demand_cycle" of Material Request
 .frappe-chart .donut-path:nth-of-type(8n+8) { stroke: #b9a98a !important; }
 .frappe-chart .chart-legend > g:nth-of-type(8n+8) .legend-dot { fill: #b9a98a !important; }
 
+## Apply desk theme CSS override for readonly rule  (`01M84J613FE68M3F2GQTEDD190`, risk medium)
+- Requirement 100225: Experience: desk theme override keeps only the readonly rule (v5)
+  - Set CSD Desk Theme › css = .list-row:hover, .result .list-row-container:hover { background: #fff3ea !important; }
+.form-control[readonly], .form-control[disabled] { opacity: 1 !important; }
+
+## Add/Replace CSD Home Launcher HTML block (saffron palette)  (`01M84J83CK93XSQ30MSP3ADY2C`, risk low)
+- Requirement 100224: Experience: CSD Home launcher v4 saffron base palette
+  - Create workspace HTML block "CSD Home Launcher"
+
