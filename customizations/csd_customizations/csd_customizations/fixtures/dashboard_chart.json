@@ -321,5 +321,33 @@
   "number_of_groups": 10,
   "timeseries": 0,
   "type": "Bar"
+ },
+ {
+  "chart_name": "MR Count by Workflow State - PoC",
+  "chart_type": "Group By",
+  "doctype": "Dashboard Chart",
+  "document_type": "Material Request",
+  "filters_json": "[]",
+  "group_by_based_on": "workflow_state",
+  "group_by_type": "Count",
+  "is_public": 1,
+  "name": "MR Count by Workflow State - PoC",
+  "number_of_groups": 10,
+  "timeseries": 0,
+  "type": "Bar"
+ },
+ {
+  "chart_name": "MR Count by Depot (set_warehouse) - PoC",
+  "chart_type": "Group By",
+  "doctype": "Dashboard Chart",
+  "document_type": "Material Request",
+  "filters_json": "[]",
+  "group_by_based_on": "set_warehouse",
+  "group_by_type": "Count",
+  "is_public": 1,
+  "name": "MR Count by Depot (set_warehouse) - PoC",
+  "number_of_groups": 10,
+  "timeseries": 0,
+  "type": "Bar"
  }
 ]

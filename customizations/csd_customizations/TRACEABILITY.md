@@ -1161,3 +1161,34 @@ QD on field "custom_demand_cycle" of Material Request
 - Requirement 100211: PoC dataset: stage 4b - supplier non-conformance cases
   - Insert 3 starter record(s) into Non Conformance
 
+## Seed Depot PoC Warehouses  (`01M84BVPNRZN9QE8GMDDGBT0KV`, risk medium)
+- Requirement 100213: PoC dataset: Depot Pune order quantity limits and planning parameters
+  - Insert 2 starter record(s) into Warehouse
+
+## PoC Material Request dataset + Dashboard (seed + simple BI)  (`01M84CSFTRC8QKX1BZEQJS243E`, risk medium)
+- Requirement 100212: PoC dataset: Material Requests across workflow states and depots (BI dashboard variety)
+  - Create report "PoC MR List" on Material Request with 7 columns
+  - Create bar chart "MR Count by Workflow State - PoC" on Material Request
+  - Create bar chart "MR Count by Depot (set_warehouse) - PoC" on Material Request
+  - Create number card "Total Material Requests - PoC": Count on Material Request
+  - Insert 6 starter record(s) into Material Request
+  - Insert 6 starter record(s) into Material Request
+  - Insert 6 starter record(s) into Material Request
+  - Insert 1 starter record(s) into Material Request
+  - Insert 6 starter record(s) into Material Request
+  - Insert 2 starter record(s) into Material Request
+  - Create dashboard "PoC Material Request Dashboard" with 2 chart(s) and 1 number card(s)
+
+## PoC dataset: Seed Purchase Receipts  (`01M84F16414F9TVWT5EE23N7B4`, risk medium)
+- Requirement 100217: PoC dataset: Purchase Receipts against demo Purchase Orders
+  - Insert 6 starter record(s) into Purchase Receipt
+
+## CSD Home launcher workspace and HTML block  (`01M84F35NCSWYPRN233PPWT8AF`, risk low)
+- Requirement 100218: Experience: CSD Home launcher workspace with branded icon tiles for SCM, Warehouse, Finance and Supplier Management
+  - Create workspace HTML block "CSD Home Launcher"
+  - Create workspace "CSD Home" with 0 number card(s), 0 chart(s) and 4 shortcut(s)
+
+## Seed PoC Purchase Invoices (3 demo records)  (`01M84F3MW2663FJV9D1TSQGTQS`, risk medium)
+- Requirement 100219: PoC dataset: Purchase Invoices billing received demo Purchase Orders
+  - Insert 3 starter record(s) into Purchase Invoice
+

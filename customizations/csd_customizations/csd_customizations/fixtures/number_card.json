@@ -342,5 +342,17 @@
   "show_percentage_stats": 1,
   "stats_time_interval": "Daily",
   "type": "Document Type"
+ },
+ {
+  "doctype": "Number Card",
+  "document_type": "Material Request",
+  "filters_json": "[]",
+  "function": "Count",
+  "is_public": 1,
+  "label": "Total Material Requests - PoC",
+  "name": "Total Material Requests - PoC",
+  "show_percentage_stats": 1,
+  "stats_time_interval": "Daily",
+  "type": "Document Type"
  }
 ]
