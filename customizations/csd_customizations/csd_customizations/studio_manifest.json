@@ -2405,6 +2405,82 @@
    "risk": "medium",
    "session": "b938908eb4b6",
    "title": "Seed Non Conformance PoC dataset (stage 4b)"
+  },
+  {
+   "change_set": "01M84BVPNRZN9QE8GMDDGBT0KV",
+   "created_by": "run:1a9963db70ff",
+   "operations": [
+    "Insert 2 starter record(s) into Warehouse"
+   ],
+   "requirements": [
+    100213
+   ],
+   "risk": "medium",
+   "session": "1a9963db70ff",
+   "title": "Seed Depot PoC Warehouses"
+  },
+  {
+   "change_set": "01M84CSFTRC8QKX1BZEQJS243E",
+   "created_by": "run:d35b620da670",
+   "operations": [
+    "Create report \"PoC MR List\" on Material Request with 7 columns",
+    "Create bar chart \"MR Count by Workflow State - PoC\" on Material Request",
+    "Create bar chart \"MR Count by Depot (set_warehouse) - PoC\" on Material Request",
+    "Create number card \"Total Material Requests - PoC\": Count on Material Request",
+    "Insert 6 starter record(s) into Material Request",
+    "Insert 6 starter record(s) into Material Request",
+    "Insert 6 starter record(s) into Material Request",
+    "Insert 1 starter record(s) into Material Request",
+    "Insert 6 starter record(s) into Material Request",
+    "Insert 2 starter record(s) into Material Request",
+    "Create dashboard \"PoC Material Request Dashboard\" with 2 chart(s) and 1 number card(s)"
+   ],
+   "requirements": [
+    100212
+   ],
+   "risk": "medium",
+   "session": "d35b620da670",
+   "title": "PoC Material Request dataset + Dashboard (seed + simple BI)"
+  },
+  {
+   "change_set": "01M84F16414F9TVWT5EE23N7B4",
+   "created_by": "run:d1766f118d62",
+   "operations": [
+    "Insert 6 starter record(s) into Purchase Receipt"
+   ],
+   "requirements": [
+    100217
+   ],
+   "risk": "medium",
+   "session": "d1766f118d62",
+   "title": "PoC dataset: Seed Purchase Receipts"
+  },
+  {
+   "change_set": "01M84F35NCSWYPRN233PPWT8AF",
+   "created_by": "run:e74e133e12dd",
+   "operations": [
+    "Create workspace HTML block \"CSD Home Launcher\"",
+    "Create workspace \"CSD Home\" with 0 number card(s), 0 chart(s) and 4 shortcut(s)"
+   ],
+   "requirements": [
+    100218
+   ],
+   "risk": "low",
+   "session": "e74e133e12dd",
+   "title": "CSD Home launcher workspace and HTML block"
+  },
+  {
+   "change_set": "01M84F3MW2663FJV9D1TSQGTQS",
+   "created_by": "run:478c447e70e3",
+   "operations": [
+    "Insert 3 starter record(s) into Purchase Invoice"
+   ],
+   "requirements": [
+    100219
+   ],
+   "risk": "medium",
+   "session": "478c447e70e3",
+   "title": "Seed PoC Purchase Invoices (3 demo records)"
   }
  ]
 }

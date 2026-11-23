@@ -263,5 +263,25 @@
   "dashboard_name": "SCM Executive BI",
   "doctype": "Dashboard",
   "name": "SCM Executive BI"
+ },
+ {
+  "cards": [
+   {
+    "card": "Total Material Requests - PoC"
+   }
+  ],
+  "charts": [
+   {
+    "chart": "MR Count by Workflow State - PoC",
+    "width": "Half"
+   },
+   {
+    "chart": "MR Count by Depot (set_warehouse) - PoC",
+    "width": "Half"
+   }
+  ],
+  "dashboard_name": "PoC Material Request Dashboard",
+  "doctype": "Dashboard",
+  "name": "PoC Material Request Dashboard"
  }
 ]

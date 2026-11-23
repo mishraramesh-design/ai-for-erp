@@ -691,5 +691,15 @@
     "role": "System Manager"
    }
   ]
+ },
+ {
+  "doctype": "Report",
+  "is_standard": "No",
+  "json": "{\"filters\": [], \"fields\": [[\"title\", \"Material Request\"], [\"company\", \"Material Request\"], [\"set_warehouse\", \"Material Request\"], [\"workflow_state\", \"Material Request\"], [\"transaction_date\", \"Material Request\"], [\"schedule_date\", \"Material Request\"], [\"custom_mstc_reference\", \"Material Request\"]], \"order_by\": \"`tabMaterial Request`.`transaction_date` asc\", \"add_totals_row\": 0, \"page_length\": 20, \"column_widths\": {}, \"group_by\": null}",
+  "name": "PoC MR List",
+  "ref_doctype": "Material Request",
+  "report_name": "PoC MR List",
+  "report_type": "Report Builder",
+  "roles": []
  }
 ]

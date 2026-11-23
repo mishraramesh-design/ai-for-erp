@@ -297,5 +297,49 @@
    }
   ],
   "title": "SCM BI Home"
+ },
+ {
+  "charts": [],
+  "content": "[{\"id\": \"b01\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>CSD Home</b></span>\", \"col\": 12}}, {\"id\": \"b02\", \"type\": \"custom_block\", \"data\": {\"custom_block_name\": \"CSD Home Launcher\", \"col\": 12}}, {\"id\": \"b03\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"b04\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h5\\\"><b>Shortcuts</b></span>\", \"col\": 12}}, {\"id\": \"b05\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Material Request\", \"col\": 3}}, {\"id\": \"b06\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Purchase Order\", \"col\": 3}}, {\"id\": \"b07\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Purchase Invoice\", \"col\": 3}}, {\"id\": \"b08\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Supplier\", \"col\": 3}}]",
+  "custom_blocks": [
+   {
+    "custom_block_name": "CSD Home Launcher",
+    "label": "CSD Home Launcher"
+   }
+  ],
+  "doctype": "Workspace",
+  "label": "CSD Home",
+  "module": "CSD Customizations",
+  "name": "CSD Home",
+  "number_cards": [],
+  "public": 1,
+  "roles": [],
+  "shortcuts": [
+   {
+    "doc_view": "List",
+    "label": "Material Request",
+    "link_to": "Material Request",
+    "type": "DocType"
+   },
+   {
+    "doc_view": "List",
+    "label": "Purchase Order",
+    "link_to": "Purchase Order",
+    "type": "DocType"
+   },
+   {
+    "doc_view": "List",
+    "label": "Purchase Invoice",
+    "link_to": "Purchase Invoice",
+    "type": "DocType"
+   },
+   {
+    "doc_view": "List",
+    "label": "Supplier",
+    "link_to": "Supplier",
+    "type": "DocType"
+   }
+  ],
+  "title": "CSD Home"
  }
 ]
