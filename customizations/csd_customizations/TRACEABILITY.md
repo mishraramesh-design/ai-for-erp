@@ -1192,3 +1192,7 @@ QD on field "custom_demand_cycle" of Material Request
 - Requirement 100219: PoC dataset: Purchase Invoices billing received demo Purchase Orders
   - Insert 3 starter record(s) into Purchase Invoice
 
+## Add CSD Home Launcher HTML block (sober restyle)  (`01M84G7YAPCE9J4Y16Z1TM2PQF`, risk medium)
+- Requirement 100220: Experience: restyle CSD Home launcher in the client palette (sober)
+  - Insert 1 starter record(s) into Custom HTML Block
+

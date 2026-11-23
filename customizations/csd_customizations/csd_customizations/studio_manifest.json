@@ -2481,6 +2481,19 @@
    "risk": "medium",
    "session": "478c447e70e3",
    "title": "Seed PoC Purchase Invoices (3 demo records)"
+  },
+  {
+   "change_set": "01M84G7YAPCE9J4Y16Z1TM2PQF",
+   "created_by": "run:95247c3f461c",
+   "operations": [
+    "Insert 1 starter record(s) into Custom HTML Block"
+   ],
+   "requirements": [
+    100220
+   ],
+   "risk": "medium",
+   "session": "95247c3f461c",
+   "title": "Add CSD Home Launcher HTML block (sober restyle)"
   }
  ]
 }
