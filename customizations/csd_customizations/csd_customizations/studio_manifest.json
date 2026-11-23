@@ -2559,6 +2559,123 @@
    "risk": "low",
    "session": "afe75920072a",
    "title": "Add/Replace CSD Home Launcher HTML block (saffron palette)"
+  },
+  {
+   "change_set": "01M84KQ9XHGTAPGZYNNWX259G8",
+   "created_by": "run:a8a24a17be86",
+   "operations": [
+    "Create workspace HTML block \"Case Tiles\"",
+    "Create workspace HTML block \"SCM Depot Banner\""
+   ],
+   "requirements": [
+    100243,
+    100244,
+    100245,
+    100246
+   ],
+   "risk": "low",
+   "session": "a8a24a17be86",
+   "title": "Create Custom HTML Blocks for Case Tiles and SCM Depot Banner"
+  },
+  {
+   "change_set": "01M84KR5XSW3RACRP50FN2CENW",
+   "created_by": "run:a8a24a17be86",
+   "operations": [
+    "Create workspace HTML block \"demo-pilot banner\"",
+    "Create workspace HTML block \"Case banner\"",
+    "Create workspace HTML block \"Case Tiles\""
+   ],
+   "requirements": [
+    100235,
+    100236,
+    100237,
+    100238,
+    100239,
+    100240,
+    100241,
+    100242
+   ],
+   "risk": "low",
+   "session": "a8a24a17be86",
+   "title": "Create/update three Custom HTML Blocks (demo-pilot banner, Case banner, Case Tiles)"
+  },
+  {
+   "change_set": "01M84M4RCZMHK1NMVVP4F8X23Y",
+   "created_by": "run:a1b52afe6e0c",
+   "operations": [
+    "Create workspace HTML block \"SCM RM Banner\""
+   ],
+   "requirements": [
+    100260
+   ],
+   "risk": "low",
+   "session": "a1b52afe6e0c",
+   "title": "Create Custom HTML Block: SCM RM Banner"
+  },
+  {
+   "change_set": "01M84M4SNEWCG2DJFSSSFCZSQS",
+   "created_by": "run:74662c41e31d",
+   "operations": [
+    "Create workspace HTML block \"SCM BI Banner\""
+   ],
+   "requirements": [
+    100261
+   ],
+   "risk": "low",
+   "session": "74662c41e31d",
+   "title": "Create Custom HTML Block: SCM BI Banner"
+  },
+  {
+   "change_set": "01M84M4T59B88A45RSVVJWHMV5",
+   "created_by": "run:c0d7a13e45d7",
+   "operations": [
+    "Create workspace HTML block \"SCM QD Overview Banner\""
+   ],
+   "requirements": [
+    100259
+   ],
+   "risk": "low",
+   "session": "c0d7a13e45d7",
+   "title": "Create Custom HTML Block: SCM QD Overview Banner"
+  },
+  {
+   "change_set": "01M84M4VD91M04EZPQWB3EJAWT",
+   "created_by": "run:6afec309ab62",
+   "operations": [
+    "Create workspace HTML block \"Case Tiles\""
+   ],
+   "requirements": [
+    100258
+   ],
+   "risk": "low",
+   "session": "6afec309ab62",
+   "title": "Create/update Custom HTML Block 'Case Tiles'"
+  },
+  {
+   "change_set": "01M84M5FSAJXV0T2N3S0T4Z6VD",
+   "created_by": "run:fa7539562826",
+   "operations": [
+    "Create workspace HTML block \"SRM Tiles\""
+   ],
+   "requirements": [
+    100256
+   ],
+   "risk": "low",
+   "session": "fa7539562826",
+   "title": "Create/Update Custom HTML Block: SRM Tiles"
+  },
+  {
+   "change_set": "01M84M5KJ7E72DB98BJGNAHFMF",
+   "created_by": "run:7cf9cb8083bd",
+   "operations": [
+    "Create workspace HTML block \"srm-tiles-block\""
+   ],
+   "requirements": [
+    100257
+   ],
+   "risk": "low",
+   "session": "7cf9cb8083bd",
+   "title": "Create/Update SRM tiles Custom HTML Block"
   }
  ]
 }
