@@ -1196,3 +1196,12 @@ QD on field "custom_demand_cycle" of Material Request
 - Requirement 100220: Experience: restyle CSD Home launcher in the client palette (sober)
   - Insert 1 starter record(s) into Custom HTML Block
 
+## CSD Desk Theme: Override desk palette via css setting  (`01M84GMDVKAZP3MQ8KTT2QHMGB`, risk medium)
+- Requirement 100221: Experience: desk theme override uses client palette (no yellow)
+  - Set CSD Desk Theme › css = .list-row:hover, .result .list-row-container:hover { background: #eeedf7 !important; }
+.form-control[readonly], .form-control[disabled] { opacity: 1 !important; }
+
+## Replace CSD Home Launcher block with client-palette design  (`01M84H04MDCMWD24555X8FTR1G`, risk low)
+- Requirement 100222: Experience: replace CSD Home launcher block content with sober client-palette design (v3)
+  - Create workspace HTML block "CSD Home Launcher"
+

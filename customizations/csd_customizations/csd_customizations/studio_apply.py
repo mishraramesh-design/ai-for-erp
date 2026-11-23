@@ -286,7 +286,7 @@ SETTINGS = [
  {
   "doctype": "CSD Desk Theme",
   "field": "css",
-  "value": ".list-row:hover, .result .list-row-container:hover { background: #fffbe0 !important; }\n.form-control[readonly], .form-control[disabled] { opacity: 1 !important; }"
+  "value": ".list-row:hover, .result .list-row-container:hover { background: #eeedf7 !important; }\n.form-control[readonly], .form-control[disabled] { opacity: 1 !important; }"
  }
 ]
 

@@ -2494,6 +2494,32 @@
    "risk": "medium",
    "session": "95247c3f461c",
    "title": "Add CSD Home Launcher HTML block (sober restyle)"
+  },
+  {
+   "change_set": "01M84GMDVKAZP3MQ8KTT2QHMGB",
+   "created_by": "run:f8ef9b984098",
+   "operations": [
+    "Set CSD Desk Theme › css = .list-row:hover, .result .list-row-container:hover { background: #eeedf7 !important; }\n.form-control[readonly], .form-control[disabled] { opacity: 1 !important; }"
+   ],
+   "requirements": [
+    100221
+   ],
+   "risk": "medium",
+   "session": "f8ef9b984098",
+   "title": "CSD Desk Theme: Override desk palette via css setting"
+  },
+  {
+   "change_set": "01M84H04MDCMWD24555X8FTR1G",
+   "created_by": "run:2e8173c39adf",
+   "operations": [
+    "Create workspace HTML block \"CSD Home Launcher\""
+   ],
+   "requirements": [
+    100222
+   ],
+   "risk": "low",
+   "session": "2e8173c39adf",
+   "title": "Replace CSD Home Launcher block with client-palette design"
   }
  ]
 }
