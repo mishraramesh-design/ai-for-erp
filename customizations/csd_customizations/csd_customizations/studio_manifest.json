@@ -2533,6 +2533,32 @@
    "risk": "medium",
    "session": "9bd511197dd4",
    "title": "Apply custom donut/legend palette via CSD Desk Theme CSS"
+  },
+  {
+   "change_set": "01M84J613FE68M3F2GQTEDD190",
+   "created_by": "run:452f840344b6",
+   "operations": [
+    "Set CSD Desk Theme › css = .list-row:hover, .result .list-row-container:hover { background: #fff3ea !important; }\n.form-control[readonly], .form-control[disabled] { opacity: 1 !important; }"
+   ],
+   "requirements": [
+    100225
+   ],
+   "risk": "medium",
+   "session": "452f840344b6",
+   "title": "Apply desk theme CSS override for readonly rule"
+  },
+  {
+   "change_set": "01M84J83CK93XSQ30MSP3ADY2C",
+   "created_by": "run:afe75920072a",
+   "operations": [
+    "Create workspace HTML block \"CSD Home Launcher\""
+   ],
+   "requirements": [
+    100224
+   ],
+   "risk": "low",
+   "session": "afe75920072a",
+   "title": "Add/Replace CSD Home Launcher HTML block (saffron palette)"
   }
  ]
 }
