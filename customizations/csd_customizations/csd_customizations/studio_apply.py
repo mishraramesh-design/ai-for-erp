@@ -274,6 +274,76 @@ PERMISSIONS = [
    "read"
   ],
   "role": "URC Demand User"
+ },
+ {
+  "doctype": "Supplier Scorecard",
+  "permlevel": 0,
+  "rights": [
+   "read"
+  ],
+  "role": "AGM Secretariat"
+ },
+ {
+  "doctype": "Supplier Product Registration",
+  "permlevel": 0,
+  "rights": [
+   "read",
+   "write",
+   "create"
+  ],
+  "role": "AGM Secretariat"
+ },
+ {
+  "doctype": "SCM Market Intelligence",
+  "permlevel": 0,
+  "rights": [
+   "read"
+  ],
+  "role": "CS Directorate"
+ },
+ {
+  "doctype": "Liquor Demand Forecast",
+  "permlevel": 0,
+  "rights": [
+   "read"
+  ],
+  "role": "CS Directorate"
+ },
+ {
+  "doctype": "Liquor Forecast Settings",
+  "permlevel": 0,
+  "rights": [
+   "read"
+  ],
+  "role": "CS Directorate"
+ },
+ {
+  "doctype": "URC Payment Advice",
+  "permlevel": 0,
+  "rights": [
+   "read"
+  ],
+  "role": "CS Directorate"
+ },
+ {
+  "doctype": "Temporary Credit Request",
+  "permlevel": 0,
+  "rights": [
+   "read",
+   "write",
+   "create"
+  ],
+  "role": "URC Demand User"
+ },
+ {
+  "doctype": "URC Loan Request",
+  "permlevel": 0,
+  "rights": [
+   "read",
+   "write",
+   "create"
+  ],
+  "role": "URC Demand User"
  }
 ]
 

@@ -342,5 +342,13 @@
   "name": "Supplier Fee Schedule - List default approved filter",
   "script": "frappe.listview_settings['Supplier Fee Schedule'] = { onload: function(listview) { try { listview.filter_area.add([[ 'Supplier Fee Schedule', 'custom_approved_for_depot', '=', 1 ]]); } catch (e) {} } };",
   "view": "List"
+ },
+ {
+  "doctype": "Client Script",
+  "dt": "Supplier",
+  "enabled": 1,
+  "name": "supplier_vendor_contact_autofill_and_mobile_cleanup",
+  "script": "frappe.ui.form.on('Supplier', {\n\tsupplier_primary_contact: function(frm) {\n\t\tif (!frm.doc.supplier_primary_contact) {\n\t\t\treturn;\n\t\t}\n\t\tfrappe.db.get_value('Contact', frm.doc.supplier_primary_contact, ['full_name','mobile_no','phone']).then(r => {\n\t\t\tif (!r || !r.message) {\n\t\t\t\treturn;\n\t\t\t}\n\t\t\tconst msg = r.message;\n\t\t\t// fill name if not filled\n\t\t\tif (!frm.doc.custom_vendor_contact_name && (msg.full_name)) {\n\t\t\t\tfrm.set_value('custom_vendor_contact_name', msg.full_name);\n\t\t\t}\n\t\t\t// try to fill mobile from Contact mobile_no or phone, strip non-digits\n\t\t\tif (!frm.doc.custom_vendor_contact_mobile) {\n\t\t\t\tlet m = msg.mobile_no || msg.phone || '';\n\t\t\t\tif (m) {\n\t\t\t\t\tlet digits = m.toString().replace(/\\D/g, '');\n\t\t\t\t\tfrm.set_value('custom_vendor_contact_mobile', digits);\n\t\t\t\t}\n\t\t\t}\n\t\t});\n\t},\n\tcustom_vendor_contact_mobile: function(frm) {\n\t\tif (!frm.doc.custom_vendor_contact_mobile) return;\n\t\t// remove non-digits for user convenience\n\t\tlet v = frm.doc.custom_vendor_contact_mobile.toString();\n\t\tlet cleaned = v.replace(/\\D/g, '');\n\t\tif (cleaned !== v) {\n\t\t\tfrm.set_value('custom_vendor_contact_mobile', cleaned);\n\t\t}\n\t}\n});",
+  "view": "Form"
  }
 ]

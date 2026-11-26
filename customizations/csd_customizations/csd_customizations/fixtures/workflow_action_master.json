@@ -213,5 +213,15 @@
   "doctype": "Workflow Action Master",
   "name": "Submit to HO",
   "workflow_action_name": "Submit to HO"
+ },
+ {
+  "doctype": "Workflow Action Master",
+  "name": "Issue Release Order (Store)",
+  "workflow_action_name": "Issue Release Order (Store)"
+ },
+ {
+  "doctype": "Workflow Action Master",
+  "name": "Submit Order",
+  "workflow_action_name": "Submit Order"
  }
 ]

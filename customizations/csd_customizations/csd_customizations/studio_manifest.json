@@ -2339,6 +2339,22 @@
    "title": "PoC dataset: stage 3a finance masters — seed records"
   },
   {
+   "change_set": "01M81WECK3ZCDE9WFJKSKG0RT9",
+   "created_by": "run:90902531e160",
+   "operations": [
+    "Add server script \"auto_set_depreciation_voucher_type\" on Journal Entry (before validate)",
+    "Insert 2 starter record(s) into Bank Account",
+    "Insert 3 starter record(s) into Budget",
+    "Insert 6 starter record(s) into Journal Entry"
+   ],
+   "requirements": [
+    100200
+   ],
+   "risk": "medium",
+   "session": "90902531e160",
+   "title": "PoC dataset: Bank Accounts, 2026-27 Budgets, and Posted Journal Entries"
+  },
+  {
    "change_set": "01M81WYJH3QH7NRP7V031XF06X",
    "created_by": "run:b9ab3f6e65c4",
    "operations": [
@@ -2441,6 +2457,34 @@
    "risk": "medium",
    "session": "d35b620da670",
    "title": "PoC Material Request dataset + Dashboard (seed + simple BI)"
+  },
+  {
+   "change_set": "01M84DPETA04ZXYQPDQ7YZWAXB",
+   "created_by": "run:a3e885ae2548",
+   "operations": [
+    "Add server script \"auto_fill_bank_before_submit\" on Bank Guarantee (before submit)",
+    "Insert 5 starter record(s) into Bank Guarantee"
+   ],
+   "requirements": [
+    100215
+   ],
+   "risk": "medium",
+   "session": "a3e885ae2548",
+   "title": "Seed 5 submitted Bank Guarantees with auto-fill Bank on submit"
+  },
+  {
+   "change_set": "01M84EHAAAJCN94TC59B5B5QVY",
+   "created_by": "run:a007dc4712ec",
+   "operations": [
+    "Add server script \"SCM_allow_seed_mr_set_demand_cycle_to_FD\" on Material Request (before submit)",
+    "Insert 2 starter record(s) into Material Request"
+   ],
+   "requirements": [
+    100216
+   ],
+   "risk": "medium",
+   "session": "a007dc4712ec",
+   "title": "Seed two HO-approved demo Material Requests with pre-submit Demand Cycle fix"
   },
   {
    "change_set": "01M84F16414F9TVWT5EE23N7B4",
@@ -2561,6 +2605,20 @@
    "title": "Add/Replace CSD Home Launcher HTML block (saffron palette)"
   },
   {
+   "change_set": "01M84KHH22FP0T7PRGV71TKYA9",
+   "created_by": "run:6f9daa655754",
+   "operations": [
+    "Create workspace HTML block \"demo-pilot-banner\"",
+    "Create workspace HTML block \"SRM Home Header\""
+   ],
+   "requirements": [
+    100234
+   ],
+   "risk": "low",
+   "session": "6f9daa655754",
+   "title": "Restyle legacy website blocks: demo-pilot-banner and SRM Home Header"
+  },
+  {
    "change_set": "01M84KQ9XHGTAPGZYNNWX259G8",
    "created_by": "run:a8a24a17be86",
    "operations": [
@@ -2676,6 +2734,200 @@
    "risk": "low",
    "session": "7cf9cb8083bd",
    "title": "Create/Update SRM tiles Custom HTML Block"
+  },
+  {
+   "change_set": "01M88QACYTWRG476XZDY5QY19A",
+   "created_by": "run:24abbc044018",
+   "operations": [
+    "Add Data field \"Vendor Contact Name\" (custom_vendor_contact_name) to Supplier",
+    "Add Data field \"Vendor Contact Mobile\" (custom_vendor_contact_mobile) to Supplier",
+    "Add client script \"supplier_vendor_contact_autofill_and_mobile_cleanup\" to the Supplier form",
+    "Add server script \"supplier_validate_vendor_contact_mobile_and_fill_name\" on Supplier (before save)"
+   ],
+   "requirements": [
+    100007
+   ],
+   "risk": "medium",
+   "session": "24abbc044018",
+   "title": "Supplier: Vendor Contact Name + 10-digit Mobile (RFP item 100007)"
+  },
+  {
+   "change_set": "01M8BFK95BKG0MHDK0C7E13Q1Q",
+   "created_by": "run:db49464d5282",
+   "operations": [
+    "Grant role \"AGM Secretariat\" on Supplier Scorecard (level 0): read",
+    "Grant role \"AGM Secretariat\" on Supplier Product Registration (level 0): read, write, create"
+   ],
+   "requirements": [
+    100269
+   ],
+   "risk": "high",
+   "session": "db49464d5282",
+   "title": "Grant AGM Secretariat permissions on Supplier Scorecard and Supplier Product Registration"
+  },
+  {
+   "change_set": "01M8BH69KQX7S8A39030TWNYND",
+   "created_by": "run:0eb3a15e4ca4",
+   "operations": [
+    "Grant role \"CS Directorate\" on SCM Market Intelligence (level 0): read",
+    "Grant role \"CS Directorate\" on Liquor Demand Forecast (level 0): read",
+    "Grant role \"CS Directorate\" on Liquor Forecast Settings (level 0): read",
+    "Grant role \"CS Directorate\" on URC Payment Advice (level 0): read",
+    "Insert 1 starter record(s) into User Permission"
+   ],
+   "requirements": [
+    100268
+   ],
+   "risk": "high",
+   "session": "0eb3a15e4ca4",
+   "title": "Add read-only permission for CS Directorate and create User Permission"
+  },
+  {
+   "change_set": "01M8BJ26FWD6HQ9JWQXKT9ZK66",
+   "created_by": "run:0c5805767f6a",
+   "operations": [
+    "Grant role \"URC Demand User\" on Temporary Credit Request (level 0): read, write, create",
+    "Grant role \"URC Demand User\" on URC Loan Request (level 0): read, write, create",
+    "Insert 1 starter record(s) into User Permission"
+   ],
+   "requirements": [
+    100270
+   ],
+   "risk": "high",
+   "session": "0c5805767f6a",
+   "title": "Add URC Demand User permissions and User Permission for Grant Plastics Ltd."
+  },
+  {
+   "change_set": "01M8BJQP35465D951NPVXVKJC4",
+   "created_by": "run:5ce3b5d5ea74",
+   "operations": [
+    "Create workflow \"SCM Release Order\" on Delivery Note: 2 states, 2 transitions"
+   ],
+   "requirements": [
+    100282
+   ],
+   "risk": "high",
+   "session": "5ce3b5d5ea74",
+   "title": "Create Workflow: SCM Release Order (Delivery Note)"
+  },
+  {
+   "change_set": "01M8BJRNX3EFRGEGGX3XG3JQC1",
+   "created_by": "run:16eda149b558",
+   "operations": [
+    "Create workflow \"Expense Approval Workflow\" on Purchase Invoice: 5 states, 6 transitions"
+   ],
+   "requirements": [
+    100283
+   ],
+   "risk": "high",
+   "session": "16eda149b558",
+   "title": "Rebuild: Expense Approval Workflow on Purchase Invoice"
+  },
+  {
+   "change_set": "01M8BJSRGQEF830JN99YWDR5HY",
+   "created_by": "run:06aa45f22ba8",
+   "operations": [
+    "Create workflow \"Project Delegation Approval\" on Project: 5 states, 6 transitions"
+   ],
+   "requirements": [
+    100284
+   ],
+   "risk": "high",
+   "session": "06aa45f22ba8",
+   "title": "Rebuild Project Delegation Approval Workflow"
+  },
+  {
+   "change_set": "01M8BKBQ9ATX5VZYMY0BCY37V3",
+   "created_by": "run:59143868ca18",
+   "operations": [
+    "Insert 6 starter record(s) into Liquor Demand Forecast"
+   ],
+   "requirements": [
+    100286
+   ],
+   "risk": "medium",
+   "session": "59143868ca18",
+   "title": "Seed Liquor Demand Forecast starter records"
+  },
+  {
+   "change_set": "01M8BKT72NYB88QNDG7BFCT34R",
+   "created_by": "run:548cc95f7b75",
+   "operations": [
+    "Insert 2 starter record(s) into Supplier Fee Schedule"
+   ],
+   "requirements": [
+    100296
+   ],
+   "risk": "medium",
+   "session": "548cc95f7b75",
+   "title": "Seed Supplier Fee Schedule starter records"
+  },
+  {
+   "change_set": "01M8BKTA806J1E23FC5WPAXAM4",
+   "created_by": "run:b79338580577",
+   "operations": [
+    "Insert 2 starter record(s) into Supplier Fee Schedule"
+   ],
+   "requirements": [
+    100296
+   ],
+   "risk": "medium",
+   "session": "b79338580577",
+   "title": "Seed Starter Records - Supplier Fee Schedule"
+  },
+  {
+   "change_set": "01M8BKTASXHP5V2EX3D1312HP7",
+   "created_by": "run:cae09ec5e044",
+   "operations": [
+    "Insert 2 starter record(s) into Supplier Fee Schedule"
+   ],
+   "requirements": [
+    100296
+   ],
+   "risk": "medium",
+   "session": "cae09ec5e044",
+   "title": "Seed Supplier Fee Schedule Starter Records"
+  },
+  {
+   "change_set": "01M8BM3RT89DKC31PNAWQTSJA7",
+   "created_by": "run:786f4188cfeb",
+   "operations": [
+    "Insert 2 starter record(s) into Supplier Scorecard Criteria",
+    "Insert 2 starter record(s) into Supplier Scorecard"
+   ],
+   "requirements": [
+    100299
+   ],
+   "risk": "medium",
+   "session": "786f4188cfeb",
+   "title": "Seed Supplier Scorecard Criteria and Supplier Scorecard records"
+  },
+  {
+   "change_set": "01M8BM3V98WRR8350V19PV0GAM",
+   "created_by": "run:59de5b3fc7e0",
+   "operations": [
+    "Insert 2 starter record(s) into Supplier Scorecard Criteria",
+    "Insert 2 starter record(s) into Supplier Scorecard"
+   ],
+   "requirements": [
+    100299
+   ],
+   "risk": "medium",
+   "session": "59de5b3fc7e0",
+   "title": "Seed demo Supplier Scorecard Criteria and Supplier Scorecard records"
+  },
+  {
+   "change_set": "01M8BMPERGARPQJR7VG01GM3VD",
+   "created_by": "run:2d2722a73383",
+   "operations": [
+    "Create workflow \"Purchase Order Acknowledgement\" on Purchase Order: 3 states, 3 transitions"
+   ],
+   "requirements": [
+    100300
+   ],
+   "risk": "high",
+   "session": "2d2722a73383",
+   "title": "Replace Purchase Order Acknowledgement workflow"
   }
  ]
 }

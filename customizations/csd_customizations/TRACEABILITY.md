@@ -1137,6 +1137,13 @@ QD on field "custom_demand_cycle" of Material Request
   - Insert 1 starter record(s) into Sales Taxes and Charges Template
   - Insert 1 starter record(s) into Purchase Taxes and Charges Template
 
+## PoC dataset: Bank Accounts, 2026-27 Budgets, and Posted Journal Entries  (`01M81WECK3ZCDE9WFJKSKG0RT9`, risk medium)
+- Requirement 100200: PoC dataset: stage 3b - finance: bank accounts, 2026-27 budgets by cost center and posted journal entries
+  - Add server script "auto_set_depreciation_voucher_type" on Journal Entry (before validate)
+  - Insert 2 starter record(s) into Bank Account
+  - Insert 3 starter record(s) into Budget
+  - Insert 6 starter record(s) into Journal Entry
+
 ## PoC dataset — seed Purchase and Sales Invoices  (`01M81WYJH3QH7NRP7V031XF06X`, risk medium)
 - Requirement 100203: PoC dataset: stage 3c2 - finance: supplier invoices with GST and URC sales invoices (retry, sales without stock movement)
   - Insert 5 starter record(s) into Purchase Invoice
@@ -1178,6 +1185,16 @@ QD on field "custom_demand_cycle" of Material Request
   - Insert 6 starter record(s) into Material Request
   - Insert 2 starter record(s) into Material Request
   - Create dashboard "PoC Material Request Dashboard" with 2 chart(s) and 1 number card(s)
+
+## Seed 5 submitted Bank Guarantees with auto-fill Bank on submit  (`01M84DPETA04ZXYQPDQ7YZWAXB`, risk medium)
+- Requirement 100215: PoC dataset: Submit demo Bank Guarantees
+  - Add server script "auto_fill_bank_before_submit" on Bank Guarantee (before submit)
+  - Insert 5 starter record(s) into Bank Guarantee
+
+## Seed two HO-approved demo Material Requests with pre-submit Demand Cycle fix  (`01M84EHAAAJCN94TC59B5B5QVY`, risk medium)
+- Requirement 100216: PoC dataset: Submit HO Approved demo Material Requests
+  - Add server script "SCM_allow_seed_mr_set_demand_cycle_to_FD" on Material Request (before submit)
+  - Insert 2 starter record(s) into Material Request
 
 ## PoC dataset: Seed Purchase Receipts  (`01M84F16414F9TVWT5EE23N7B4`, risk medium)
 - Requirement 100217: PoC dataset: Purchase Receipts against demo Purchase Orders
@@ -1235,6 +1252,11 @@ QD on field "custom_demand_cycle" of Material Request
 - Requirement 100224: Experience: CSD Home launcher v4 saffron base palette
   - Create workspace HTML block "CSD Home Launcher"
 
+## Restyle legacy website blocks: demo-pilot-banner and SRM Home Header  (`01M84KHH22FP0T7PRGV71TKYA9`, risk low)
+- Requirement 100234: 'demo-pilot-banner' and 'SRM Home Header': replace the inline styles with classes; saffron wash #fff3ea background with 4px saffron left border for demo-pilot-banner; navy headings (#281868) and muted text (#5f6272).
+  - Create workspace HTML block "demo-pilot-banner"
+  - Create workspace HTML block "SRM Home Header"
+
 ## Create Custom HTML Blocks for Case Tiles and SCM Depot Banner  (`01M84KQ9XHGTAPGZYNNWX259G8`, risk low)
 - Requirement 100243: .case-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}.case-tiles a{display:block;background:#fff;color:#281868 !important;border:1px solid #e3dfd9;border-left:6px solid #ff6600;border-radius:10px;paddin
 - Requirement 100244: Run create_html_block with name "SCM Depot Banner" (replacing the existing block of that name). Use EXACTLY this html and EXACTLY this style, unchanged.
@@ -1279,4 +1301,72 @@ QD on field "custom_demand_cycle" of Material Request
 ## Create/Update SRM tiles Custom HTML Block  (`01M84M5KJ7E72DB98BJGNAHFMF`, risk low)
 - Requirement 100257: Create or replace the Custom HTML Block named "srm-tiles-block" with create_html_block, passing this exact JSON as the op arguments (html and style are both required and must not be empty): {"name":"srm-tiles-block","html":"<div class=\"srm
   - Create workspace HTML block "srm-tiles-block"
+
+## Supplier: Vendor Contact Name + 10-digit Mobile (RFP item 100007)  (`01M88QACYTWRG476XZDY5QY19A`, risk medium)
+- Requirement 100007: Supplier master must capture a Vendor Contact Person name and a Contact Mobile Number that must be exactly 10 digits.
+  - Add Data field "Vendor Contact Name" (custom_vendor_contact_name) to Supplier
+  - Add Data field "Vendor Contact Mobile" (custom_vendor_contact_mobile) to Supplier
+  - Add client script "supplier_vendor_contact_autofill_and_mobile_cleanup" to the Supplier form
+  - Add server script "supplier_validate_vendor_contact_mobile_and_fill_name" on Supplier (before save)
+
+## Grant AGM Secretariat permissions on Supplier Scorecard and Supplier Product Registration  (`01M8BFK95BKG0MHDK0C7E13Q1Q`, risk high)
+- Requirement 100269: Add DocType permissions (permlevel 0) for role "AGM Secretariat": read on "Supplier Scorecard"; read, write, create on "Supplier Product Registration". Do not alter existing permission rows.
+  - Grant role "AGM Secretariat" on Supplier Scorecard (level 0): read
+  - Grant role "AGM Secretariat" on Supplier Product Registration (level 0): read, write, create
+
+## Add read-only permission for CS Directorate and create User Permission  (`01M8BH69KQX7S8A39030TWNYND`, risk high)
+- Requirement 100268: Add DocType permissions (permlevel 0, read only) for role "CS Directorate" on doctypes "SCM Market Intelligence", "Liquor Demand Forecast", "Liquor Forecast Settings" and "URC Payment Advice". Do not alter existing permission rows.
+  - Grant role "CS Directorate" on SCM Market Intelligence (level 0): read
+  - Grant role "CS Directorate" on Liquor Demand Forecast (level 0): read
+  - Grant role "CS Directorate" on Liquor Forecast Settings (level 0): read
+  - Grant role "CS Directorate" on URC Payment Advice (level 0): read
+  - Insert 1 starter record(s) into User Permission
+
+## Add URC Demand User permissions and User Permission for Grant Plastics Ltd.  (`01M8BJ26FWD6HQ9JWQXKT9ZK66`, risk high)
+- Requirement 100270: Add DocType permissions (permlevel 0) for role "URC Demand User": read, write, create on "Temporary Credit Request" and "URC Loan Request". Then add a User Permission restricting user urc.grant@csd-poc.example to Customer "Grant Plastics Lt
+  - Grant role "URC Demand User" on Temporary Credit Request (level 0): read, write, create
+  - Grant role "URC Demand User" on URC Loan Request (level 0): read, write, create
+  - Insert 1 starter record(s) into User Permission
+
+## Create Workflow: SCM Release Order (Delivery Note)  (`01M8BJQP35465D951NPVXVKJC4`, risk high)
+- Requirement 100282: Change the existing workflow "SCM Release Order" on Delivery Note. Use ONE create_workflow operation with "rebuild": true and the EXACT same name "SCM Release Order" (it replaces the existing workflow in place). doctype: Delivery Note. Give
+  - Create workflow "SCM Release Order" on Delivery Note: 2 states, 2 transitions
+
+## Rebuild: Expense Approval Workflow on Purchase Invoice  (`01M8BJRNX3EFRGEGGX3XG3JQC1`, risk high)
+- Requirement 100283: Change the existing workflow "Expense Approval Workflow" on Purchase Invoice. Use ONE create_workflow operation with "rebuild": true and the EXACT same name "Expense Approval Workflow" (it replaces the existing workflow in place). doctype: 
+  - Create workflow "Expense Approval Workflow" on Purchase Invoice: 5 states, 6 transitions
+
+## Rebuild Project Delegation Approval Workflow  (`01M8BJSRGQEF830JN99YWDR5HY`, risk high)
+- Requirement 100284: Change the existing workflow "Project Delegation Approval" on Project. Use ONE create_workflow operation with "rebuild": true and the EXACT same name "Project Delegation Approval" (it replaces the existing workflow in place). doctype: Proje
+  - Create workflow "Project Delegation Approval" on Project: 5 states, 6 transitions
+
+## Seed Liquor Demand Forecast starter records  (`01M8BKBQ9ATX5VZYMY0BCY37V3`, risk medium)
+- Requirement 100286: Seed 6 starter records into DocType "Liquor Demand Forecast" using seed_records (key_field none): items SKU001, SKU002, SKU003 each for month 2026-11-01 and 2026-12-01, with forecast_qty 120, 80, 60 for November and 130, 90, 70 for December
+  - Insert 6 starter record(s) into Liquor Demand Forecast
+
+## Seed Supplier Fee Schedule starter records  (`01M8BKT72NYB88QNDG7BFCT34R`, risk medium)
+- Requirement 100296: Seed 2 starter records into DocType "Supplier Fee Schedule" using seed_records (key_field payment_reference): [{"supplier":"DEMO Supplier Alpha Pvt Ltd","fee_stage":"Verification","amount":7500,"status":"Paid","payment_reference":"UTR-DEMO-
+  - Insert 2 starter record(s) into Supplier Fee Schedule
+
+## Seed Starter Records - Supplier Fee Schedule  (`01M8BKTA806J1E23FC5WPAXAM4`, risk medium)
+- Requirement 100296: Seed 2 starter records into DocType "Supplier Fee Schedule" using seed_records (key_field payment_reference): [{"supplier":"DEMO Supplier Alpha Pvt Ltd","fee_stage":"Verification","amount":7500,"status":"Paid","payment_reference":"UTR-DEMO-
+  - Insert 2 starter record(s) into Supplier Fee Schedule
+
+## Seed Supplier Fee Schedule Starter Records  (`01M8BKTASXHP5V2EX3D1312HP7`, risk medium)
+- Requirement 100296: Seed 2 starter records into DocType "Supplier Fee Schedule" using seed_records (key_field payment_reference): [{"supplier":"DEMO Supplier Alpha Pvt Ltd","fee_stage":"Verification","amount":7500,"status":"Paid","payment_reference":"UTR-DEMO-
+  - Insert 2 starter record(s) into Supplier Fee Schedule
+
+## Seed Supplier Scorecard Criteria and Supplier Scorecard records  (`01M8BM3RT89DKC31PNAWQTSJA7`, risk medium)
+- Requirement 100299: Seed starter records using seed_records twice, in this order, all with the exact JSON given. The standard Supplier Scorecard Standing records already exist, do not create them. (1) DocType "Supplier Scorecard Criteria" (key_field criteria_n
+  - Insert 2 starter record(s) into Supplier Scorecard Criteria
+  - Insert 2 starter record(s) into Supplier Scorecard
+
+## Seed demo Supplier Scorecard Criteria and Supplier Scorecard records  (`01M8BM3V98WRR8350V19PV0GAM`, risk medium)
+- Requirement 100299: Seed starter records using seed_records twice, in this order, all with the exact JSON given. The standard Supplier Scorecard Standing records already exist, do not create them. (1) DocType "Supplier Scorecard Criteria" (key_field criteria_n
+  - Insert 2 starter record(s) into Supplier Scorecard Criteria
+  - Insert 2 starter record(s) into Supplier Scorecard
+
+## Replace Purchase Order Acknowledgement workflow  (`01M8BMPERGARPQJR7VG01GM3VD`, risk high)
+- Requirement 100300: Replace the existing Purchase Order workflow using exactly this single operation, copied verbatim, including "rebuild": true and every "allow_self_approval": true: {"op":"create_workflow","rebuild":true,"name":"Purchase Order Acknowledgemen
+  - Create workflow "Purchase Order Acknowledgement" on Purchase Order: 3 states, 3 transitions
 

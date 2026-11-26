@@ -8,10 +8,10 @@
  },
  {
   "doctype": "Custom HTML Block",
-  "html": "<div style=\"padding:12px 0\"><h2 style=\"margin:0 0 6px 0\">Supplier Relationship Management (SRM)</h2><div style=\"color:#6b6b6b\">Quick access to supplier lists and SRM actions</div></div>",
+  "html": "<header class=\"srm-home-header\">\n  <div class=\"srm-home-header__inner\">\n    <h1 class=\"srm-home-header__title\">SRM</h1>\n    <p class=\"srm-home-header__lead\">Welcome to the Supplier Relationship Management home.</p>\n    <!-- replace any inline styles with the semantic classes above -->\n  </div>\n</header>",
   "name": "SRM Home Header",
   "private": 0,
-  "style": ""
+  "style": ".srm-home-header{background:transparent;padding:24px 0}\n.srm-home-header__inner{max-width:1200px;margin:0 auto;padding:0 16px}\n.srm-home-header__title{color:#281868;margin:0;font-size:2rem}\n.srm-home-header__lead{color:#5f6272;margin:8px 0 0 0}\n.srm-home-header a{color:#281868}\n"
  },
  {
   "doctype": "Custom HTML Block",
@@ -22,10 +22,10 @@
  },
  {
   "doctype": "Custom HTML Block",
-  "html": "<div class=\"srm-demo-banner\" style=\"padding:16px;background:#FFF8E1;border-radius:6px;\">\n  <h2 style=\"margin:0;color:#333;\">Demo Pilot</h2>\n  <p style=\"margin:4px 0 0;color:#333;\">This is the demo pilot banner.</p>\n</div>",
+  "html": "<div class=\"demo-pilot-banner\">\n  <div class=\"demo-pilot-banner__content\">\n    <h2 class=\"demo-pilot-banner__heading\">Demo Pilot</h2>\n    <p class=\"demo-pilot-banner__subtext\">An introduction or short description goes here.</p>\n    <!-- preserve any existing content, but avoid inline styles -->\n  </div>\n</div>",
   "name": "demo-pilot-banner",
   "private": 0,
-  "style": ""
+  "style": ".demo-pilot-banner{background:#fff3ea;border-left:4px solid #f4a300;padding:16px 20px;margin:0 0 16px 0}\n.demo-pilot-banner__content{max-width:1100px;margin:0 auto}\n.demo-pilot-banner__heading{color:#281868;margin:0 0 8px 0;font-size:1.5rem}\n.demo-pilot-banner__subtext{color:#5f6272;margin:0;font-size:1rem}\n/* utility classes inside the block if needed */\n.demo-pilot-banner a{color:#281868;text-decoration:underline}\n"
  },
  {
   "doctype": "Custom HTML Block",
