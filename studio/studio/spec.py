@@ -199,6 +199,7 @@ class WorkflowTransitionSpec(_Op):
 
 class CreateWorkflow(_Op):
     op: Literal["create_workflow"] = "create_workflow"
+    rebuild: bool = False  # overwrite the existing workflow of this exact name (states and transitions are replaced; undo restores them)
     name: str
     doctype: str
     states: list[WorkflowStateSpec]
