@@ -460,5 +460,41 @@
   "reference_doctype": "Dependency Request",
   "script": "if doc.workflow_state == 'Approved' and doc.dual_dependency == 1:\n    issued = 0\n    if doc.get('noc_issued'):\n        issued = 1\n    if issued == 0:\n        frappe.db.set_value('Dependency Request', doc.name, 'noc_issued', 1)\n        frappe.db.set_value('Dependency Request', doc.name, 'noc_issue_date', frappe.utils.nowdate())\n        frappe.db.set_value('Dependency Request', doc.name, 'noc_issued_by', frappe.session.user)\n        if not doc.get('noc_remarks'):\n            frappe.db.set_value('Dependency Request', doc.name, 'noc_remarks', 'Auto-issued for Dual Dependency')",
   "script_type": "DocType Event"
+ },
+ {
+  "disabled": 0,
+  "doctype": "Server Script",
+  "doctype_event": "Before Validate",
+  "name": "Journal Entry - auto_set_depreciation_voucher_type",
+  "reference_doctype": "Journal Entry",
+  "script": "ACCUM_TYPE = \"Accumulated Depreciation\"\n\nvt = \"\"\nif doc.get(\"voucher_type\"):\n    vt = str(doc.voucher_type)\n\nif vt == \"Journal Entry\":\n    has_accum = False\n    has_depr_exp = False\n    if doc.get(\"accounts\"):\n        for d in doc.accounts:\n            acc_name = \"\"\n            if d.get(\"account\"):\n                acc_name = str(d.account)\n            lower = acc_name.lower()\n            acc_type = frappe.db.get_value(\"Account\", acc_name, \"account_type\")\n            if acc_type == ACCUM_TYPE or (\"accumulated\" in lower and \"depreciation\" in lower):\n                has_accum = True\n            if (\"depreciation\" in lower) and (\"accumulated\" not in lower):\n                has_depr_exp = True\n        if has_accum and has_depr_exp:\n            doc.voucher_type = \"Depreciation Entry\"",
+  "script_type": "DocType Event"
+ },
+ {
+  "disabled": 0,
+  "doctype": "Server Script",
+  "doctype_event": "Before Submit",
+  "name": "Bank Guarantee - auto_fill_bank_before_submit",
+  "reference_doctype": "Bank Guarantee",
+  "script": "BANK_FILL_LIMIT = 1\nif not doc.get('bank'):\n    banks = frappe.get_all('Bank', limit_page_length=BANK_FILL_LIMIT)\n    if banks and len(banks) > 0:\n        doc.bank = banks[0].get('name')\n    else:\n        frappe.throw('No Bank exists. Create at least one Bank before submitting Bank Guarantees.')",
+  "script_type": "DocType Event"
+ },
+ {
+  "disabled": 0,
+  "doctype": "Server Script",
+  "doctype_event": "Before Submit",
+  "name": "Material Request - SCM_allow_seed_mr_set_demand_cycle_to_FD",
+  "reference_doctype": "Material Request",
+  "script": "NAMES = ['MAT-MR-2026-00020', 'MAT-MR-2026-00021']\nif doc.name in NAMES:\n    # Ensure Demand Cycle is set to Firm Demand before other before_submit checks run\n    doc.custom_demand_cycle = 'FD'",
+  "script_type": "DocType Event"
+ },
+ {
+  "disabled": 0,
+  "doctype": "Server Script",
+  "doctype_event": "Before Save",
+  "name": "supplier_validate_vendor_contact_mobile_and_fill_name",
+  "reference_doctype": "Supplier",
+  "script": "if doc.get('custom_vendor_contact_mobile'):\n    mobile = str(doc.get('custom_vendor_contact_mobile'))\n    # remove whitespace\n    mobile = mobile.replace(' ', '')\n    # ensure digits only\n    if not mobile.isdigit():\n        frappe.throw('Vendor Contact Mobile must contain digits only (0-9) and be exactly 10 digits).')\n    if len(mobile) != 10:\n        frappe.throw('Vendor Contact Mobile must be exactly 10 digits.')\n    # normalize stored value\n    doc.custom_vendor_contact_mobile = mobile\n# Backfill vendor contact name from supplier_primary_contact if available and name empty\nif doc.get('supplier_primary_contact') and not doc.get('custom_vendor_contact_name'):\n    name = frappe.db.get_value('Contact', doc.supplier_primary_contact, 'full_name')\n    if not name:\n        # fallback to first_name+last_name\n        fn = frappe.db.get_value('Contact', doc.supplier_primary_contact, 'first_name')\n        ln = frappe.db.get_value('Contact', doc.supplier_primary_contact, 'last_name')\n        if fn or ln:\n            name = (fn or '') + (' ' + ln if ln else '')\n    if name:\n        doc.custom_vendor_contact_name = name",
+  "script_type": "DocType Event"
  }
 ]

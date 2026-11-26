@@ -192,6 +192,20 @@
   ],
   "transitions": [
    {
+    "action": "Submit",
+    "allow_self_approval": 1,
+    "allowed": "Purchase Manager",
+    "next_state": "Submitted",
+    "state": "Draft"
+   },
+   {
+    "action": "Submit Order",
+    "allow_self_approval": 1,
+    "allowed": "Purchase User",
+    "next_state": "Submitted",
+    "state": "Draft"
+   },
+   {
     "action": "Acknowledge",
     "allow_self_approval": 1,
     "allowed": "Supplier",
@@ -789,6 +803,13 @@
     "allowed": "Depot Manager",
     "next_state": "Release Order Issued",
     "state": "Draft"
+   },
+   {
+    "action": "Issue Release Order (Store)",
+    "allow_self_approval": 1,
+    "allowed": "Delivery User",
+    "next_state": "Release Order Issued",
+    "state": "Draft"
    }
   ],
   "workflow_name": "SCM Release Order",
@@ -1007,7 +1028,7 @@
     "action": "Approve",
     "allow_self_approval": 1,
     "allowed": "Depot Manager",
-    "condition": "flt(doc.get('custom_estimated_cost') or 0) <= flt(doc.get('custom_depot_manager_limit') or 0)",
+    "condition": "float(doc.get('custom_estimated_cost') or 0) <= float(doc.get('custom_depot_manager_limit') or 0)",
     "next_state": "Approved",
     "state": "Pending Depot Manager Approval"
    },
@@ -1015,7 +1036,7 @@
     "action": "Escalate to RM",
     "allow_self_approval": 1,
     "allowed": "Depot Manager",
-    "condition": "flt(doc.get('custom_estimated_cost') or 0) > flt(doc.get('custom_depot_manager_limit') or 0)",
+    "condition": "float(doc.get('custom_estimated_cost') or 0) > float(doc.get('custom_depot_manager_limit') or 0)",
     "next_state": "Pending Regional Manager Approval",
     "state": "Pending Depot Manager Approval"
    },
@@ -1090,7 +1111,7 @@
     "action": "Approve",
     "allow_self_approval": 1,
     "allowed": "Accounts Manager",
-    "condition": "flt(doc.get('grand_total') or 0) <= flt(doc.get('custom_regional_manager_threshold') or 0) or flt(doc.get('custom_regional_manager_threshold') or 0) == 0",
+    "condition": "float(doc.get('grand_total') or 0) <= float(doc.get('custom_regional_manager_threshold') or 0) or float(doc.get('custom_regional_manager_threshold') or 0) == 0",
     "next_state": "Approved",
     "state": "Pending AM Approval"
    },
@@ -1098,7 +1119,7 @@
     "action": "Escalate to RM",
     "allow_self_approval": 1,
     "allowed": "Accounts Manager",
-    "condition": "flt(doc.get('grand_total') or 0) > flt(doc.get('custom_regional_manager_threshold') or 0)",
+    "condition": "float(doc.get('grand_total') or 0) > float(doc.get('custom_regional_manager_threshold') or 0)",
     "next_state": "Pending Regional Manager Approval",
     "state": "Pending AM Approval"
    },
