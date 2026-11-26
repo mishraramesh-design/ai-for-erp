@@ -101,8 +101,14 @@ class Applier:
                 if not self.erp.get_doc("Workflow Action Master", a):
                     d = self.erp.insert("Workflow Action Master", {"doctype": "Workflow Action Master", "workflow_action_name": a})
                     step["created"].append(["Workflow Action Master", d.get("name") or a])
-            doc = self.erp.insert("Workflow", workflow_payload(op))
-            step["created"].append(["Workflow", doc.get("name") or op.name])
+            old = self.erp.get_doc("Workflow", op.name) if getattr(op, "rebuild", False) else None
+            if old:  # replace states and transitions in place; undo puts the old ones back
+                step["updated"].append(["Workflow", op.name, {k: old.get(k) for k in ("is_active", "states", "transitions", "workflow_state_field", "override_status", "send_email_alert") if k in old}])
+                self.erp.update("Workflow", op.name, {k: v for k, v in workflow_payload(op).items() if k not in ("doctype", "workflow_name")})
+                step["note"] = "rebuilt existing workflow"
+            else:
+                doc = self.erp.insert("Workflow", workflow_payload(op))
+                step["created"].append(["Workflow", doc.get("name") or op.name])
         elif t in RECORD_OPS:
             dt = RECORD_OPS[t]
             payload = record_payload(op)

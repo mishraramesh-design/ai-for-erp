@@ -191,6 +191,30 @@ def test_create_doctype_and_workflow_apply(env):
     assert ("Workflow", "SO Approval") not in erp.docs and ("Workflow State", "Approved") not in erp.docs
 
 
+def test_workflow_rebuild_replaces_existing_and_undo_restores(env):
+    erp, snap, *_ = env
+    base = {"op": "create_workflow", "name": "SO Approval", "doctype": "Sales Order",
+            "states": [{"state": "Draft", "doc_status": 0, "allow_edit": "Sales User"},
+                       {"state": "Approved", "doc_status": 1, "allow_edit": "Sales Manager"}],
+            "transitions": [{"state": "Draft", "action": "Approve", "next_state": "Approved", "allowed": "Sales Manager"}]}
+    apply_ok(erp, snap, mk([base]))
+    snap.active_workflow = lambda dt: "SO Approval"  # the fake ERP does not filter list_docs
+    again = mk([dict(base)])
+    assert "workflow_exists" in codes(again, snap)  # same name without rebuild is refused
+    other = mk([dict(base, name="SO Approval v2")])
+    assert "workflow_active_exists" in codes(other, snap)  # a second active workflow is still refused
+    new = dict(base, rebuild=True, transitions=base["transitions"] + [
+        {"state": "Draft", "action": "Approve (Store)", "next_state": "Approved", "allowed": "Stock Manager"}])
+    cs = mk([new])
+    assert not has_errors(validate(cs, snap)) and "workflow_rebuild" in codes(cs, snap)
+    ok, steps, err = Applier(erp, snap).apply(cs)
+    assert ok, err
+    assert len(erp.docs[("Workflow", "SO Approval")]["transitions"]) == 2
+    cs.steps, cs.status = steps, "applied"
+    Applier(erp, snap).undo(cs)
+    assert len(erp.docs[("Workflow", "SO Approval")]["transitions"]) == 1
+
+
 # ---------------------------------------------------------------- patterns
 def test_promote_and_reuse_pattern(env):
     erp, snap, pats, _ = env

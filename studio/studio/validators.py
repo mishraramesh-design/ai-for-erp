@@ -472,7 +472,17 @@ def _check_workflow(op, ctx, snap, add, i) -> None:
     existing = snap.active_workflow(op.doctype) if op.doctype not in ctx.planned_doctypes else None
     if existing and existing != op.name:
         add("error", "workflow_active_exists",
-            f'{op.doctype} already has the active workflow "{existing}"; activating another would switch it off.', i)
+            f'{op.doctype} already has the active workflow "{existing}"; activating another would switch it off. '
+            f'To change that workflow, repeat its exact name "{existing}" with rebuild=true and the full new definition.', i)
+    elif existing == op.name:
+        if op.rebuild:
+            add("warning", "workflow_rebuild",
+                f'Workflow "{op.name}" exists and will be replaced by this definition (undo restores the old one).', i)
+        else:
+            add("error", "workflow_exists",
+                f'Workflow "{op.name}" already exists. To change it set rebuild=true and give its complete states and transitions.', i)
+    elif op.rebuild and op.doctype not in ctx.planned_doctypes:
+        add("error", "workflow_rebuild", f'There is no active workflow named "{op.name}" on {op.doctype} to rebuild.', i)
     if len(op.states) < 2:
         add("error", "workflow_states", "A workflow needs at least two states.", i)
     names = [s.state for s in op.states]
